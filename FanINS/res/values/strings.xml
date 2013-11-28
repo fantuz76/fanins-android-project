@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="titolo1">Inserire Dati</string>
+    <string name="app_name">FanINS</string>
+    <string name="action_upload">Upload txt</string>
+    <string name="action_sync">Scrivi txt dentro INS_temp</string>
+    <string name="action_settings">Settings</string>
+    <string name="strOK">OK>></string>
+    <string name="desc_imgData">Data_image</string>
+    <string name="desc_refresh">refresh_image</string>
+    <string name="titoloData">Data:</string>
+    <string name="titoloTipoOper">Tipo:</string>
+    <string name="titoloChi">Chi fa:</string>
+    <string name="titoloADa">A/Da:</string>
+    <string name="titoloPersonale">C/Pers:</string>
+    <string name="titoloValore">Val[€]:</string>
+    <string name="titoloCategoria">Cat:</string>
+    <string name="titoloDescrizione">Descr:</string>
+    <string name="titoloNote">Note:</string>
+
+    <string-array name="tipo_operazione">
+        <item>Spesa</item>
+        <item>Spostamento</item>
+        <item>Entrata</item>
+    </string-array>
+    <string-array name="chi_la_fa">
+        <item>SF</item>
+        <item>JB</item>
+        <item>IWBank</item>
+        <item>Fineco</item>
+        <item>LaBanque</item>
+        <item>MPS</item>
+        <item>Conto Arancio</item>
+    </string-array>
+    <string-array name="a_da">
+        <item></item>
+        <item>JB</item>
+        <item>SF</item>
+        <item>IWBank</item>
+        <item>Fineco</item>
+        <item>LaBanque</item>
+        <item>MPS</item>
+        <item>Nessuno</item>
+        <item>Conto Arancio</item>
+        <item>Conad</item>
+        <item>Comet</item>
+        <item>Ipercoop</item>
+        <item>Obi</item>
+        <item>Brico</item>
+        <item>ASF</item>
+        <item>Ikea</item>
+        <item>Mediaworld</item>
+        <item>Coiffeur</item>
+        <item>Amazon</item>
+        <item>FNAC</item>
+        <item>Internet</item>
+        <item>Chiavi Iper</item>
+        <item>Expert</item>
+        <item>Tiscali</item>
+    </string-array>
+    <string-array name="Personali">
+        <item>C</item>
+        <item>JB</item>
+        <item>SF</item>
+    </string-array>
+    <string-array name="Categoria">
+        <item>Carburante</item>
+        <item>Manutenzione auto</item>
+        <item>Tasse/assic auto</item>
+        <item>Parcheggi</item>
+        <item>Treno/Bus/Metro</item>
+        <item>Pedaggi</item>
+        <item>Spesa</item>
+        <item>Ristorante</item>
+        <item>Bar/Pub</item>
+        <item>Boll. Gas</item>
+        <item>Boll. Luce</item>
+        <item>Boll. Acqua</item>
+        <item>Boll. Rifiuti</item>
+        <item>Boll. Telefono</item>
+        <item>Affitto</item>
+        <item>Spese condominiali</item>
+        <item>Imposte varie</item>
+        <item>Medicine</item>
+        <item>Dentista</item>
+        <item>Visita medica</item>
+        <item>Sport</item>
+        <item>CD/DVD</item>
+        <item>Cinema</item>
+        <item>Concerti</item>
+        <item>Libri</item>
+        <item>Divertimento</item>
+        <item>Matrimonio</item>
+        <item>Arredamento</item>
+        <item>Elettrodomestico</item>
+        <item>Decorazione</item>
+        <item>Attrezzature casa</item>
+        <item>Regali</item>
+        <item>Offerte</item>
+        <item>Vacanze</item>
+        <item>Vestiti</item>
+        <item>Personali</item>
+        <item>Ricarica cell.</item>
+        <item>Bonifico</item>
+        <item>Rimborso</item>
+        <item>Prelievo</item>
+        <item>Prepagata</item>
+    </string-array>
+
+    <string name="title_activity_read_txt">INS Versione TXT</string>
+    <string name="hello_world">Hello world!</string>
+
+</resources>
