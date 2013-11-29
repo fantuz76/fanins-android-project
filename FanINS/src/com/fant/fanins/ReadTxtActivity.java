@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.widget.TextView;
 
-
 public class ReadTxtActivity extends Activity {
 
 	public static String versionName = "";
@@ -16,7 +15,7 @@ public class ReadTxtActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_read_txt);
 
-			
+
 		try {
 			versionName = this.getPackageManager()
             	    .getPackageInfo(this.getPackageName(), 0).versionName;
@@ -26,10 +25,9 @@ public class ReadTxtActivity extends Activity {
 			versionName = "Errore versione non rilevata";
 		}
 
-		TextView stFrom  = (TextView) findViewById(R.id.AppVersion);
+		TextView stFrom  = (TextView) findViewById(R.id.appVersion);
 		stFrom .setText(versionName);
-		
-		
+
 		
 	}
 
