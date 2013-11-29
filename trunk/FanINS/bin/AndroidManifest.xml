@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.fant.fanins"
-    android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionCode="2"
+    android:versionName="1.1" >
 
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -20,7 +20,15 @@
         android:icon="@drawable/ic_money"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-        <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
+        <!--         
+        questo meta-data qua sotto l'ho dovuto aggiungere altrimenti andava in errore l'upload su google drive 
+        da quando sono passato a Android 4.4
+        In realtà è probabilmente dovuto all'upgrade di google play alla versione 13. 
+        http://stackoverflow.com/questions/19724113/google-play-services-update
+        http://stackoverflow.com/questions/19723811/after-google-play-service-update-to-version-13-i-got-an-error
+        http://stackoverflow.com/questions/19724547/google-services-added-force-close-application-with-log-cat-error 
+         -->
+         <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
         <activity
             android:name="com.fant.fanins.MainActivity"
             android:label="@string/app_name" >

@@ -223,6 +223,7 @@ containing a value of this type.
         public static final int ic_refresh_256=0x7f020024;
     }
     public static final class id {
+        public static final int AppVersion=0x7f050009;
         public static final int LinearLayout=0x7f050005;
         public static final int SpinnerADa=0x7f050011;
         public static final int SpinnerCategoria=0x7f050018;
@@ -235,9 +236,9 @@ containing a value of this type.
         public static final int TextDescrizione=0x7f05001a;
         public static final int TextNote=0x7f05001c;
         public static final int TextValore=0x7f050015;
-        public static final int action_settings=0x7f05001f;
-        public static final int action_sync=0x7f05001e;
-        public static final int action_upload=0x7f05001d;
+        public static final int action_settings=0x7f050020;
+        public static final int action_sync=0x7f05001f;
+        public static final int action_upload=0x7f05001e;
         public static final int hybrid=0x7f050004;
         public static final int imgbtnOK=0x7f050008;
         public static final int imgbtnReset=0x7f050006;
@@ -246,7 +247,7 @@ containing a value of this type.
         public static final int satellite=0x7f050002;
         public static final int terrain=0x7f050003;
         public static final int textView1=0x7f05000b;
-        public static final int textView2=0x7f050009;
+        public static final int textView2=0x7f05001d;
         public static final int textView3=0x7f05000d;
         public static final int textView4=0x7f05000f;
         public static final int textView5=0x7f050012;

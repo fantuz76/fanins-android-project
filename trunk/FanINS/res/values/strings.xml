@@ -109,6 +109,6 @@
     </string-array>
 
     <string name="title_activity_read_txt">INS Versione TXT</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="hello_world">Versione</string>
 
 </resources>

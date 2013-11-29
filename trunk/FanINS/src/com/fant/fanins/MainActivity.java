@@ -22,6 +22,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -485,7 +486,9 @@ public class MainActivity extends FragmentActivity {
                 Intent intent = new Intent(this, ReadTxtActivity.class);
                 EditText editText = (EditText) findViewById(R.id.TextDescrizione);
                 String message = editText.getText().toString();
-                intent.putExtra(EXTRA_MESSAGE, message);
+
+				intent.putExtra(EXTRA_MESSAGE, message);
+                
                 startActivity(intent);
               return true;
 
