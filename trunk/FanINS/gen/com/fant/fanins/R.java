@@ -236,13 +236,14 @@ containing a value of this type.
         public static final int TextDescrizione=0x7f05001a;
         public static final int TextNote=0x7f05001c;
         public static final int TextValore=0x7f050015;
-        public static final int action_settings=0x7f050020;
-        public static final int action_sync=0x7f05001f;
-        public static final int action_upload=0x7f05001e;
+        public static final int action_settings=0x7f050021;
+        public static final int action_sync=0x7f050020;
+        public static final int action_upload=0x7f05001f;
         public static final int appVersion=0x7f05001d;
         public static final int hybrid=0x7f050004;
         public static final int imgbtnOK=0x7f050008;
         public static final int imgbtnReset=0x7f050006;
+        public static final int label=0x7f05001e;
         public static final int none=0x7f050000;
         public static final int normal=0x7f050001;
         public static final int satellite=0x7f050002;
@@ -263,6 +264,7 @@ containing a value of this type.
     public static final class layout {
         public static final int activity_main=0x7f030000;
         public static final int activity_read_txt=0x7f030001;
+        public static final int list_item=0x7f030002;
     }
     public static final class menu {
         public static final int main=0x7f0b0000;
