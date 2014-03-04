@@ -1,0 +1,45 @@
+package com.fant.fanins;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import android.content.Context;
+import android.os.Environment;
+
+
+public class myGlobal
+{
+
+    Context mContext;
+
+    // constructor
+    public myGlobal(Context context){
+        this.mContext = context;
+    }
+    
+    // *************************************************************************
+    // Ritorno il percorso dove vado a salvare i file, se non esiste lo crea anche
+    // *************************************************************************
+    public static java.io.File getStorageFantDir(){
+    	// controllo presenza dir e se non c'è la creo
+    	String storageDir = Environment.getExternalStorageDirectory().getPath() + java.io.File.separator + "FanINS";
+    	java.io.File myfolder = new java.io.File(storageDir);
+        if (!myfolder.exists())
+        	myfolder.mkdir();
+        
+        return (myfolder);
+
+    }
+    
+    
+    public String convToSQLiteDate(String _dataDaConvertire) {
+    	String tmpstr = _dataDaConvertire;
+    	
+    	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSZ");
+    	Date myDate = dateFormat.parse("your date string");
+    	     myDate.getTime(); //Your timestamp in milliseconds
+    	
+    	
+    	return (tmpstr);
+    }
+}

@@ -22,7 +22,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager.NameNotFoundException;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -30,6 +30,7 @@ import android.os.Environment;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -64,11 +65,19 @@ import com.google.gdata.data.spreadsheet.WorksheetFeed;
 
 
 public class MainActivity extends FragmentActivity {
+		
+	
 	static final int REQUEST_ACCOUNT_PICKER = 1;
 	static final int REQUEST_AUTHORIZATION = 2;
 	static final int CAPTURE_IMAGE = 3;
 
 	static final String SPREADSHEET_INS_TEMP_NAME = "INS_temp";
+	
+	static final String LOCAL_DB_FILENAME = "INSbase.sqlite";
+	
+	
+	
+	private MyDatabase DBINS;
 	
   	private static Uri fileUri;
     private static Drive service;
@@ -76,7 +85,10 @@ public class MainActivity extends FragmentActivity {
 	    				
 	private String valData, valTipoOper, valChiFa, valADa, valPersonale, valValore, valCategoria, valDescrizione, valNote;
 	private boolean fileAccessOK;
-	private String dirName, fileName, fileNameFull;
+	
+	private boolean fileSqliteAccessOK;
+	
+	public static String fileName, fileNameFull;
 	Spinner spinCategoria;
 	String[] arrCategoria;
 	AutoCompleteTextView textCategoria;
@@ -103,13 +115,8 @@ public class MainActivity extends FragmentActivity {
 		Spinner spinner;
 		ArrayAdapter<CharSequence> adapter;
 		
-		Calendar c = Calendar.getInstance();
-		SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy", Locale.ITALY);
-		String formattedDate = df.format(c.getTime());
-		
+
 		EditText editTextData = (EditText) findViewById(R.id.TextData);
-		editTextData.setText(formattedDate);
-		//editTextData.setOnClickListener(new ClickDataButton());
 		editTextData.setOnTouchListener(new ClickDataButton());
 					
 		spinner = (Spinner) findViewById(R.id.SpinnerTipoOper);
@@ -162,6 +169,34 @@ public class MainActivity extends FragmentActivity {
 		
 		// prepara file
 		fileAccessOK = prepFileisOK();
+		DBINS = new MyDatabase(getApplicationContext(), myGlobal.getStorageFantDir().getPath() + java.io.File.separator +  LOCAL_DB_FILENAME);
+		
+		fileSqliteAccessOK = true;		
+		DBINS.open();
+		if (DBINS.fetchProducts().getCount() == 0) {
+			assert true;	// nop
+		} else {
+			Cursor mycursor;
+			mycursor = DBINS.fetchProducts();
+			while ( mycursor.moveToNext() ) {
+
+			    Log.i("MyActivity", " FANTUZ --> " +
+			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.ProductsMetaData.DATA_OPERAZIONE_KEY) ) +
+			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.ProductsMetaData.TIPO_OPERAZIONE_KEY) ) + 
+			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.ProductsMetaData.CHI_FA_KEY) ) +
+			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.ProductsMetaData.A_DA_KEY) ) +
+			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.ProductsMetaData.C_PERS_KEY) ) +
+			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.ProductsMetaData.VALORE_KEY) ) +
+			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.ProductsMetaData.CATEGORIA_KEY) ) +
+			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.ProductsMetaData.GENERICA_KEY) ) +
+			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.ProductsMetaData.DESCRIZIONE_KEY) ) + 
+			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.ProductsMetaData.NOTE_KEY) )
+			    );
+			    
+			}   
+
+		}
+		DBINS.close();
 		
 		if (!fileAccessOK) {
 			showToast("Error file create: " + fileNameFull);
@@ -174,8 +209,7 @@ public class MainActivity extends FragmentActivity {
         buttonReset.setOnClickListener(new ClickResetButton());
         
         initTextValue();
-        
-
+    
     }
 
 
@@ -219,6 +253,44 @@ public class MainActivity extends FragmentActivity {
       }
     }    
 
+    
+    // *************************************************************************
+    // Carico fisicamente il file su Google Drive. Parametri: Directory, NomeFile, Metadata
+    // *************************************************************************
+    private boolean uploadSingleFile(String _pathName, String _fileName, String _metaData) {
+    	
+    	Uri fileUriDataBase;
+    	
+          fileUriDataBase = Uri.fromFile(new java.io.File(_pathName + java.io.File.separator + _fileName));
+    	// File's binary content
+          java.io.File fileContent = new java.io.File(fileUriDataBase.getPath());
+          FileContent mediaContent = new FileContent(_metaData, fileContent);
+
+          // File's metadata.
+          com.google.api.services.drive.model.File body;
+          body = new File();
+          body.setTitle(fileContent.getName());
+          body.setMimeType(_metaData);
+
+          
+          com.google.api.services.drive.model.File file = null;
+		try {
+			file = service.files().insert(body, mediaContent).execute();
+        } catch (UserRecoverableAuthIOException e) {
+            startActivityForResult(e.getIntent(), REQUEST_AUTHORIZATION);
+            showToast("Error UserRecoverableAuthIOException: " );		
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			showToast("Error IOException: " + e.getMessage());
+		}
+          
+          if (file != null) {
+        	  return (true);
+          } else {
+        	  return (false);        	  
+          }
+    }
 
 
     // *************************************************************************
@@ -228,43 +300,21 @@ public class MainActivity extends FragmentActivity {
 
         @Override
         protected String doInBackground(String... params) {
+        	if (uploadSingleFile(myGlobal.getStorageFantDir().getPath(), fileName, "text/plain"))
+        		showToast("Uploaded: " + fileNameFull);
+		
+        	if (uploadSingleFile(myGlobal.getStorageFantDir().getPath(), LOCAL_DB_FILENAME, "application/octet-stream"))
+        		showToast("Uploaded: " + LOCAL_DB_FILENAME);
         	
-    	try {
-  	          // File's binary content
-  	          java.io.File fileContent = new java.io.File(fileUri.getPath());
-  	          FileContent mediaContent = new FileContent("text/plain", fileContent);
-  	
-  	          // File's metadata.
-  	          File body = new File();
-  	          body.setTitle(fileContent.getName());
-  	          body.setMimeType("text/plain");
-  	
-  	          
-  	          File file = service.files().insert(body, mediaContent).execute();
-  	          
-  	          if (file != null) {
-  	            showToast("Uploaded: " + file.getTitle());
-
-  	          }
-          } catch (UserRecoverableAuthIOException e) {
-            startActivityForResult(e.getIntent(), REQUEST_AUTHORIZATION);
-            showToast("Error UserRecoverableAuthIOException: " );
-          } catch (IOException e) {
-            e.printStackTrace();
-            showToast("Error IOException: " + e.getMessage());
-          }
-        	
-
-
-              return "Executed";
+        	return "Executed";
         }      
+        
 
         @Override
         protected void onPostExecute(String result) {
-                            
-              if (MainActivity.this.progDia != null) {
-            	  MainActivity.this.progDia.dismiss();
-              }
+        	if (MainActivity.this.progDia != null) {
+        		MainActivity.this.progDia.dismiss();
+        	}
         }
 
         @Override
@@ -479,8 +529,8 @@ public class MainActivity extends FragmentActivity {
     	    	
 
         		return true;
-                
-        	case R.id.action_settings:
+
+        	case R.id.action_readfile:
             	showToast("Menu setting not available");
             	//showDatePickerDialog(MainActivity.this);
                 Intent intent = new Intent(this, ReadTxtActivity.class);
@@ -490,6 +540,13 @@ public class MainActivity extends FragmentActivity {
 				intent.putExtra(EXTRA_MESSAGE, message);
                 
                 startActivity(intent);
+              return true;
+        		
+        	case R.id.action_settings:
+            	showToast("Menu setting not available");
+            	//showDatePickerDialog(MainActivity.this);
+                Intent intentSettings = new Intent(this, SettingsActivity.class);                
+                startActivity(intentSettings);
               return true;
 
             default:
@@ -507,7 +564,7 @@ public class MainActivity extends FragmentActivity {
     	}
     	
     	if (!checkValore()) {
-    		showToast("Valore Sbagliato");
+    		showToast("Valore € Sbagliato");
     		return false;
     	} 
     	
@@ -523,11 +580,13 @@ public class MainActivity extends FragmentActivity {
     	return true;
     }
     
+    
     public boolean checkData()  {
     	String dataStr = valData;    		
 		String[] splitData = {""};
 		int giorno, mese, anno;
-		boolean changed = false;
+		boolean changed = false, errData = false;
+		
 		if (dataStr.contains("/")) {
 				splitData = dataStr.split("/");
 		} else if (dataStr.contains(".")) {
@@ -537,39 +596,43 @@ public class MainActivity extends FragmentActivity {
 		} else if (dataStr.contains("-")) {
 			splitData = dataStr.split("-");        				
 		}
+		if (splitData.length > 2 ) {
+			anno = (int) Integer.parseInt(splitData[0]);
+			if (anno<0 || anno >2299) {
+				anno = 2014;
+				errData = changed = true;				
+			}
+		}		
 		if (splitData.length > 0 ) {
-			mese = (int) Integer.parseInt(splitData[0]);
+			mese = (int) Integer.parseInt(splitData[1]);
 			if (mese<0 || mese >12) {
 				mese = 1;
-				changed = true;
+				errData = changed = true;
 			}
 		}
 		if (splitData.length > 1 ) {
-			giorno = (int) Integer.parseInt(splitData[1]);
+			giorno = (int) Integer.parseInt(splitData[2]);
 			if (giorno<0 || giorno >31) {
 				giorno = 1;
-				changed = true;
+				errData = changed = true;
 			}
-		}
-		if (splitData.length > 2 ) {
-			anno = (int) Integer.parseInt(splitData[2]);
-			if (anno<0 || anno >2199) {
-				anno = 2013;
-				changed = true;
-			}
-		}
-		if (changed) {
-			showToast("Attenzione: corretta data automaticamente.");
 		}
 
+		if (changed) {
+			showToast("Attenzione: Errore Data.");
+		}
+
+		// reg exp per MM-dd-yyyy o MM/dd/yyyy o MM.dd.yyyy
+    	//String regEx = "^(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])[- /.](19|20)\\d\\d$";
 		
-    	String regEx = "^(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])[- /.](19|20)\\d\\d$";
-    	if (valData.matches(regEx)) 
+		// reg exp per yyyy-MM-dd o yyyy/MM/dd ecc...		
+    	String regEx = "^(19|20)\\d\\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$";
+    	if (valData.matches(regEx) && !errData) 
     		return(true);
     	else
-    		return(false);
-    	
+    		return(false);    	
     }
+    
 
     public boolean checkValore()  {
     	float myFloat;
@@ -614,6 +677,7 @@ public class MainActivity extends FragmentActivity {
     	}
     	
     }
+
     
     // *************************************************************************
     // Preparo file di testo, controllo consistenza 
@@ -622,14 +686,9 @@ public class MainActivity extends FragmentActivity {
     	boolean mExternalStorageAvailable = false;
     	boolean mExternalStorageWriteable = false;
     	
-    	// controllo presenza dir e se non c'è la creo
-    	String storageDir = Environment.getExternalStorageDirectory().getPath() + "/FanINS";
-    	java.io.File folder = new java.io.File(storageDir);
-        if (!folder.exists())
-            folder.mkdir();
         
-        
-
+    	
+    	
         // definisco nome file usando IMEI telefono per avere file diversi da tel diversi
         TelephonyManager tMgr =(TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
         final String mIMEIstr;
@@ -640,10 +699,9 @@ public class MainActivity extends FragmentActivity {
         }
         
         
-        // inizializzo nome directory nome file
-        dirName = folder.getPath();
+        // inizializzo nome directory nome file        
         fileName = "FanINS_" + mIMEIstr.trim() +".txt";        
-        fileNameFull = dirName + java.io.File.separator + fileName;
+        fileNameFull = myGlobal.getStorageFantDir().getPath() + java.io.File.separator + fileName;
     	
  
 		// Verifico presenza SD esterna per salvare dati
@@ -785,8 +843,15 @@ public class MainActivity extends FragmentActivity {
         	final EditText editTextNote = (EditText) findViewById(R.id.TextNote);    				
         	valNote = editTextNote.getText().toString();
         	
-        	if (checkAllValues())
+        	if (checkAllValues()) {
         		saveDataOnFile() ;
+        		
+        		DBINS.open();
+        		DBINS.insertRecordDataIns(valData, valTipoOper, valChiFa, valADa, valPersonale, valValore, valCategoria, valDescrizione, valNote);
+        		DBINS.close();
+        	} else {
+        		showToast("Dati non corretti nessun file caricato");
+        	}
         	
         }
     };
@@ -954,7 +1019,7 @@ public class MainActivity extends FragmentActivity {
 		
 		public void onDateSet(DatePicker view, int year, int month, int day) {
 			// Do something with the date chosen by the user						
-			SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy", Locale.ITALY);
+			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALY);
 			//Date selDate = new Date(year, month, day);
 			
 			String formattedDate = df.format(new Date(year-1900, month, day));
@@ -1002,7 +1067,7 @@ public class MainActivity extends FragmentActivity {
 		//ArrayAdapter<CharSequence> adapter;
 		
 		Calendar c = Calendar.getInstance();
-		SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy", Locale.ITALY);
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALY);
 		String formattedDate = df.format(c.getTime());
 		
 		myeditText = (EditText) findViewById(R.id.TextData);

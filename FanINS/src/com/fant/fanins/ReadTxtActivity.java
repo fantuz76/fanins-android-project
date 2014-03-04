@@ -40,7 +40,7 @@ public class ReadTxtActivity extends ListActivity {
         ArrayAdapter<CharSequence> adapter1;
 		adapter1 = ArrayAdapter.createFromResource(this, R.array.tipo_operazione, android.R.layout.simple_spinner_item);	// Create an ArrayAdapter using the string array and a default spinner layout		
 		adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);		// Specify the layout to use when the list of choices appears
-*/		
+*/	
 		//spinner.setAdapter(adapter1);	// Apply the adapter to the spinner
 
         
