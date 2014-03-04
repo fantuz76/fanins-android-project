@@ -301,7 +301,7 @@ public class MainActivity extends FragmentActivity {
         @Override
         protected String doInBackground(String... params) {
         	if (uploadSingleFile(myGlobal.getStorageFantDir().getPath(), fileName, "text/plain"))
-        		showToast("Uploaded: " + fileNameFull);
+        		showToast("Uploaded: " + fileName);
 		
         	if (uploadSingleFile(myGlobal.getStorageFantDir().getPath(), LOCAL_DB_FILENAME, "application/octet-stream"))
         		showToast("Uploaded: " + LOCAL_DB_FILENAME);
