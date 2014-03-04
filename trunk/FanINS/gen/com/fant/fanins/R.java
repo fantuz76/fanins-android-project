@@ -9,11 +9,15 @@ package com.fant.fanins;
 
 public final class R {
     public static final class array {
-        public static final int Categoria=0x7f090004;
-        public static final int Personali=0x7f090003;
-        public static final int a_da=0x7f090002;
-        public static final int chi_la_fa=0x7f090001;
-        public static final int tipo_operazione=0x7f090000;
+        public static final int Categoria=0x7f0a0004;
+        public static final int Personali=0x7f0a0003;
+        public static final int a_da=0x7f0a0002;
+        public static final int chi_la_fa=0x7f0a0001;
+        public static final int pref_example_list_titles=0x7f0a0005;
+        public static final int pref_example_list_values=0x7f0a0006;
+        public static final int pref_sync_frequency_titles=0x7f0a0007;
+        public static final int pref_sync_frequency_values=0x7f0a0008;
+        public static final int tipo_operazione=0x7f0a0000;
     }
     public static final class attr {
         /** 
@@ -158,20 +162,20 @@ containing a value of this type.
         public static final int zOrderOnTop=0x7f01000f;
     }
     public static final class color {
-        public static final int common_action_bar_splitter=0x7f040009;
+        public static final int common_action_bar_splitter=0x7f050009;
         /**  Sign-in Button Colors 
          */
-        public static final int common_signin_btn_dark_text_default=0x7f040000;
-        public static final int common_signin_btn_dark_text_disabled=0x7f040002;
-        public static final int common_signin_btn_dark_text_focused=0x7f040003;
-        public static final int common_signin_btn_dark_text_pressed=0x7f040001;
-        public static final int common_signin_btn_default_background=0x7f040008;
-        public static final int common_signin_btn_light_text_default=0x7f040004;
-        public static final int common_signin_btn_light_text_disabled=0x7f040006;
-        public static final int common_signin_btn_light_text_focused=0x7f040007;
-        public static final int common_signin_btn_light_text_pressed=0x7f040005;
-        public static final int common_signin_btn_text_dark=0x7f04000a;
-        public static final int common_signin_btn_text_light=0x7f04000b;
+        public static final int common_signin_btn_dark_text_default=0x7f050000;
+        public static final int common_signin_btn_dark_text_disabled=0x7f050002;
+        public static final int common_signin_btn_dark_text_focused=0x7f050003;
+        public static final int common_signin_btn_dark_text_pressed=0x7f050001;
+        public static final int common_signin_btn_default_background=0x7f050008;
+        public static final int common_signin_btn_light_text_default=0x7f050004;
+        public static final int common_signin_btn_light_text_disabled=0x7f050006;
+        public static final int common_signin_btn_light_text_focused=0x7f050007;
+        public static final int common_signin_btn_light_text_pressed=0x7f050005;
+        public static final int common_signin_btn_text_dark=0x7f05000a;
+        public static final int common_signin_btn_text_light=0x7f05000b;
     }
     public static final class dimen {
         /**  Default screen margins, per the Android Design guidelines. 
@@ -180,8 +184,8 @@ containing a value of this type.
          screen margins) for sw720dp devices (e.g. 10" tablets) in landscape here.
     
          */
-        public static final int activity_horizontal_margin=0x7f080000;
-        public static final int activity_vertical_margin=0x7f080001;
+        public static final int activity_horizontal_margin=0x7f090000;
+        public static final int activity_vertical_margin=0x7f090001;
     }
     public static final class drawable {
         public static final int common_signin_btn_icon_dark=0x7f020000;
@@ -223,43 +227,44 @@ containing a value of this type.
         public static final int ic_refresh_256=0x7f020024;
     }
     public static final class id {
-        public static final int AppVersion=0x7f050009;
-        public static final int LinearLayout=0x7f050005;
-        public static final int SpinnerADa=0x7f050011;
-        public static final int SpinnerCategoria=0x7f050018;
-        public static final int SpinnerChiFa=0x7f05000e;
-        public static final int SpinnerPersonale=0x7f050013;
-        public static final int SpinnerTipoOper=0x7f05000c;
-        public static final int TextAutocompleteADa=0x7f050010;
-        public static final int TextAutocompleteCategoria=0x7f050017;
-        public static final int TextData=0x7f05000a;
-        public static final int TextDescrizione=0x7f05001a;
-        public static final int TextNote=0x7f05001c;
-        public static final int TextValore=0x7f050015;
-        public static final int action_settings=0x7f050021;
-        public static final int action_sync=0x7f050020;
-        public static final int action_upload=0x7f05001f;
-        public static final int appVersion=0x7f05001d;
-        public static final int hybrid=0x7f050004;
-        public static final int imgbtnOK=0x7f050008;
-        public static final int imgbtnReset=0x7f050006;
-        public static final int label=0x7f05001e;
-        public static final int none=0x7f050000;
-        public static final int normal=0x7f050001;
-        public static final int satellite=0x7f050002;
-        public static final int terrain=0x7f050003;
-        public static final int textView1=0x7f05000b;
-        public static final int textView3=0x7f05000d;
-        public static final int textView4=0x7f05000f;
-        public static final int textView5=0x7f050012;
-        public static final int textView6=0x7f050014;
-        public static final int textView7=0x7f050016;
-        public static final int textView8=0x7f050019;
-        public static final int textView9=0x7f05001b;
-        public static final int textViewTitle=0x7f050007;
+        public static final int AppVersion=0x7f060009;
+        public static final int LinearLayout=0x7f060005;
+        public static final int SpinnerADa=0x7f060011;
+        public static final int SpinnerCategoria=0x7f060018;
+        public static final int SpinnerChiFa=0x7f06000e;
+        public static final int SpinnerPersonale=0x7f060013;
+        public static final int SpinnerTipoOper=0x7f06000c;
+        public static final int TextAutocompleteADa=0x7f060010;
+        public static final int TextAutocompleteCategoria=0x7f060017;
+        public static final int TextData=0x7f06000a;
+        public static final int TextDescrizione=0x7f06001a;
+        public static final int TextNote=0x7f06001c;
+        public static final int TextValore=0x7f060015;
+        public static final int action_readfile=0x7f060021;
+        public static final int action_settings=0x7f060022;
+        public static final int action_sync=0x7f060020;
+        public static final int action_upload=0x7f06001f;
+        public static final int appVersion=0x7f06001d;
+        public static final int hybrid=0x7f060004;
+        public static final int imgbtnOK=0x7f060008;
+        public static final int imgbtnReset=0x7f060006;
+        public static final int label=0x7f06001e;
+        public static final int none=0x7f060000;
+        public static final int normal=0x7f060001;
+        public static final int satellite=0x7f060002;
+        public static final int terrain=0x7f060003;
+        public static final int textView1=0x7f06000b;
+        public static final int textView3=0x7f06000d;
+        public static final int textView4=0x7f06000f;
+        public static final int textView5=0x7f060012;
+        public static final int textView6=0x7f060014;
+        public static final int textView7=0x7f060016;
+        public static final int textView8=0x7f060019;
+        public static final int textView9=0x7f06001b;
+        public static final int textViewTitle=0x7f060007;
     }
     public static final class integer {
-        public static final int google_play_services_version=0x7f070000;
+        public static final int google_play_services_version=0x7f080000;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
@@ -267,123 +272,145 @@ containing a value of this type.
         public static final int list_item=0x7f030002;
     }
     public static final class menu {
-        public static final int main=0x7f0b0000;
-        public static final int read_txt=0x7f0b0001;
+        public static final int main=0x7f0c0000;
+        public static final int read_txt=0x7f0c0001;
     }
     public static final class string {
-        public static final int action_settings=0x7f06001e;
-        public static final int action_sync=0x7f06001d;
-        public static final int action_upload=0x7f06001c;
-        public static final int app_name=0x7f06001b;
+        public static final int VersionNameString=0x7f07002e;
+        public static final int action_readfile=0x7f07002d;
+        public static final int action_settings=0x7f07001e;
+        public static final int action_sync=0x7f07001d;
+        public static final int action_upload=0x7f07001c;
+        public static final int app_name=0x7f07001b;
         /**   Title for notification shown when GooglePlayServices needs to be
         enabled for a application to work. [CHAR LIMIT=70] 
          */
-        public static final int auth_client_needs_enabling_title=0x7f060015;
+        public static final int auth_client_needs_enabling_title=0x7f070015;
         /**   Title for notification shown when GooglePlayServices needs to be
         installed for a application to work. [CHAR LIMIT=70] 
          */
-        public static final int auth_client_needs_installation_title=0x7f060016;
+        public static final int auth_client_needs_installation_title=0x7f070016;
         /**   Title for notification shown when GooglePlayServices needs to be
         udpated for a application to work. [CHAR LIMIT=70] 
          */
-        public static final int auth_client_needs_update_title=0x7f060017;
+        public static final int auth_client_needs_update_title=0x7f070017;
         /**   Title for notification shown when GooglePlayServices is unavailable [CHAR LIMIT=42] 
          */
-        public static final int auth_client_play_services_err_notification_msg=0x7f060018;
+        public static final int auth_client_play_services_err_notification_msg=0x7f070018;
         /**   Requested by string saying which app requested the notification. [CHAR LIMIT=42] 
          */
-        public static final int auth_client_requested_by_msg=0x7f060019;
+        public static final int auth_client_requested_by_msg=0x7f070019;
         /**   Title for notification shown when a bad version of GooglePlayServices
         has been installed and needs correction for an application to work.
         [CHAR LIMIT=70] 
          */
-        public static final int auth_client_using_bad_version_title=0x7f060014;
+        public static final int auth_client_using_bad_version_title=0x7f070014;
         /**  Button in confirmation dialog to enable Google Play services.  Clicking it
         will direct user to application settings of Google Play services where they
         can enable it [CHAR LIMIT=40] 
          */
-        public static final int common_google_play_services_enable_button=0x7f060006;
+        public static final int common_google_play_services_enable_button=0x7f070006;
         /**  Message in confirmation dialog informing user they need to enable
         Google Play services in application settings [CHAR LIMIT=NONE] 
          */
-        public static final int common_google_play_services_enable_text=0x7f060005;
+        public static final int common_google_play_services_enable_text=0x7f070005;
         /**  Title of confirmation dialog informing user they need to enable
         Google Play services in application settings [CHAR LIMIT=40] 
          */
-        public static final int common_google_play_services_enable_title=0x7f060004;
+        public static final int common_google_play_services_enable_title=0x7f070004;
         /**  Button in confirmation dialog for installing Google Play services [CHAR LIMIT=40] 
          */
-        public static final int common_google_play_services_install_button=0x7f060003;
+        public static final int common_google_play_services_install_button=0x7f070003;
         /**  (For phones) Message in confirmation dialog informing user that
         they need to install Google Play services (from Play Store) [CHAR LIMIT=NONE] 
          */
-        public static final int common_google_play_services_install_text_phone=0x7f060001;
+        public static final int common_google_play_services_install_text_phone=0x7f070001;
         /**  (For tablets) Message in confirmation dialog informing user that
         they need to install Google Play services (from Play Store) [CHAR LIMIT=NONE] 
          */
-        public static final int common_google_play_services_install_text_tablet=0x7f060002;
+        public static final int common_google_play_services_install_text_tablet=0x7f070002;
         /**  Title of confirmation dialog informing user that they need to install
         Google Play services (from Play Store) [CHAR LIMIT=40] 
          */
-        public static final int common_google_play_services_install_title=0x7f060000;
+        public static final int common_google_play_services_install_title=0x7f070000;
         /**  Message in confirmation dialog informing the user that they provided an invalid account. [CHAR LIMIT=NONE] 
          */
-        public static final int common_google_play_services_invalid_account_text=0x7f06000c;
+        public static final int common_google_play_services_invalid_account_text=0x7f07000c;
         /**  Title of confirmation dialog informing the user that they provided an invalid account. [CHAR LIMIT=40] 
          */
-        public static final int common_google_play_services_invalid_account_title=0x7f06000b;
+        public static final int common_google_play_services_invalid_account_title=0x7f07000b;
         /**  Message in confirmation dialog informing the user that a network error occurred. [CHAR LIMIT=NONE] 
          */
-        public static final int common_google_play_services_network_error_text=0x7f06000a;
+        public static final int common_google_play_services_network_error_text=0x7f07000a;
         /**  Title of confirmation dialog informing the user that a network error occurred. [CHAR LIMIT=40] 
          */
-        public static final int common_google_play_services_network_error_title=0x7f060009;
+        public static final int common_google_play_services_network_error_title=0x7f070009;
         /**  Message in confirmation dialog informing user there is an unknown issue in Google Play
         services [CHAR LIMIT=NONE] 
          */
-        public static final int common_google_play_services_unknown_issue=0x7f06000d;
+        public static final int common_google_play_services_unknown_issue=0x7f07000d;
         /**  Message in confirmation dialog informing user that date on the device is not correct,
     causing certificate checks to fail. [CHAR LIMIT=NONE] 
          */
-        public static final int common_google_play_services_unsupported_date_text=0x7f060010;
+        public static final int common_google_play_services_unsupported_date_text=0x7f070010;
         /**  Message in confirmation dialog informing user that Google Play services is not supported on their device [CHAR LIMIT=NONE] 
          */
-        public static final int common_google_play_services_unsupported_text=0x7f06000f;
+        public static final int common_google_play_services_unsupported_text=0x7f07000f;
         /**  Title of confirmation dialog informing user that Google Play services is not supported on their device [CHAR LIMIT=40] 
          */
-        public static final int common_google_play_services_unsupported_title=0x7f06000e;
+        public static final int common_google_play_services_unsupported_title=0x7f07000e;
         /**  Button in confirmation dialog for updating Google Play services [CHAR LIMIT=40] 
          */
-        public static final int common_google_play_services_update_button=0x7f060011;
+        public static final int common_google_play_services_update_button=0x7f070011;
         /**  Message in confirmation dialog informing user that they need to update
         Google Play services (from Play Store) [CHAR LIMIT=NONE] 
          */
-        public static final int common_google_play_services_update_text=0x7f060008;
+        public static final int common_google_play_services_update_text=0x7f070008;
         /**  Title of confirmation dialog informing user that they need to update
         Google Play services (from Play Store) [CHAR LIMIT=40] 
          */
-        public static final int common_google_play_services_update_title=0x7f060007;
+        public static final int common_google_play_services_update_title=0x7f070007;
         /**  Sign-in button text [CHAR LIMIT=15] 
          */
-        public static final int common_signin_button_text=0x7f060012;
+        public static final int common_signin_button_text=0x7f070012;
         /**  Long form sign-in button text [CHAR LIMIT=30] 
          */
-        public static final int common_signin_button_text_long=0x7f060013;
-        public static final int desc_imgData=0x7f060020;
-        public static final int desc_refresh=0x7f060021;
-        public static final int hello_world=0x7f06002c;
-        public static final int strOK=0x7f06001f;
-        public static final int title_activity_read_txt=0x7f06002b;
-        public static final int titolo1=0x7f06001a;
-        public static final int titoloADa=0x7f060025;
-        public static final int titoloCategoria=0x7f060028;
-        public static final int titoloChi=0x7f060024;
-        public static final int titoloData=0x7f060022;
-        public static final int titoloDescrizione=0x7f060029;
-        public static final int titoloNote=0x7f06002a;
-        public static final int titoloPersonale=0x7f060026;
-        public static final int titoloTipoOper=0x7f060023;
-        public static final int titoloValore=0x7f060027;
+        public static final int common_signin_button_text_long=0x7f070013;
+        public static final int desc_imgData=0x7f070020;
+        public static final int desc_refresh=0x7f070021;
+        public static final int pref_description_social_recommendations=0x7f070032;
+        /**  Example settings for Data & Sync 
+         */
+        public static final int pref_header_data_sync=0x7f070034;
+        /**  Strings related to Settings 
+ Example General settings 
+         */
+        public static final int pref_header_general=0x7f070030;
+        /**  Example settings for Notifications 
+         */
+        public static final int pref_header_notifications=0x7f070037;
+        public static final int pref_ringtone_silent=0x7f07003a;
+        public static final int pref_title_add_friends_to_messages=0x7f070033;
+        public static final int pref_title_new_message_notifications=0x7f070038;
+        public static final int pref_title_ringtone=0x7f070039;
+        public static final int pref_title_social_recommendations=0x7f070031;
+        public static final int pref_title_sync_frequency=0x7f070035;
+        public static final int pref_title_system_sync_settings=0x7f070036;
+        public static final int pref_title_vibrate=0x7f07003b;
+        public static final int strOK=0x7f07001f;
+        public static final int title_activity_read_txt=0x7f07002b;
+        public static final int title_activity_settings=0x7f07002f;
+        public static final int titolo1=0x7f07001a;
+        public static final int titoloADa=0x7f070025;
+        public static final int titoloCategoria=0x7f070028;
+        public static final int titoloChi=0x7f070024;
+        public static final int titoloData=0x7f070022;
+        public static final int titoloDescrizione=0x7f070029;
+        public static final int titoloNote=0x7f07002a;
+        public static final int titoloPersonale=0x7f070026;
+        public static final int titoloTipoOper=0x7f070023;
+        public static final int titoloValore=0x7f070027;
+        public static final int versione=0x7f07002c;
     }
     public static final class style {
         /** 
@@ -407,13 +434,19 @@ containing a value of this type.
     
  API 14 theme customizations can go here. 
          */
-        public static final int AppBaseTheme=0x7f0a0000;
+        public static final int AppBaseTheme=0x7f0b0000;
         /**  Application theme. 
  All customizations that are NOT specific to a particular API-level can go here. 
          */
-        public static final int AppTheme=0x7f0a0001;
-        public static final int CustTextLabel=0x7f0a0002;
-        public static final int CustTextTitle=0x7f0a0003;
+        public static final int AppTheme=0x7f0b0001;
+        public static final int CustTextLabel=0x7f0b0002;
+        public static final int CustTextTitle=0x7f0b0003;
+    }
+    public static final class xml {
+        public static final int pref_data_sync=0x7f040000;
+        public static final int pref_general=0x7f040001;
+        public static final int pref_headers=0x7f040002;
+        public static final int pref_notification=0x7f040003;
     }
     public static final class styleable {
         /** Attributes that can be used with a AdsAttrs.
@@ -449,7 +482,7 @@ theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
           <p>This is a private symbol.
-          @attr name android:adSize
+          @attr name com.fant.fanins:adSize
         */
         public static final int AdsAttrs_adSize = 0;
         /**
@@ -465,7 +498,7 @@ theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
           <p>This is a private symbol.
-          @attr name android:adUnitId
+          @attr name com.fant.fanins:adUnitId
         */
         public static final int AdsAttrs_adUnitId = 1;
         /** Attributes that can be used with a MapAttrs.
@@ -521,7 +554,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name android:cameraBearing
+          @attr name com.fant.fanins:cameraBearing
         */
         public static final int MapAttrs_cameraBearing = 1;
         /**
@@ -535,7 +568,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name android:cameraTargetLat
+          @attr name com.fant.fanins:cameraTargetLat
         */
         public static final int MapAttrs_cameraTargetLat = 2;
         /**
@@ -549,7 +582,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name android:cameraTargetLng
+          @attr name com.fant.fanins:cameraTargetLng
         */
         public static final int MapAttrs_cameraTargetLng = 3;
         /**
@@ -563,7 +596,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name android:cameraTilt
+          @attr name com.fant.fanins:cameraTilt
         */
         public static final int MapAttrs_cameraTilt = 4;
         /**
@@ -577,7 +610,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name android:cameraZoom
+          @attr name com.fant.fanins:cameraZoom
         */
         public static final int MapAttrs_cameraZoom = 5;
         /**
@@ -597,7 +630,7 @@ containing a value of this type.
 <tr><td><code>terrain</code></td><td>3</td><td></td></tr>
 <tr><td><code>hybrid</code></td><td>4</td><td></td></tr>
 </table>
-          @attr name android:mapType
+          @attr name com.fant.fanins:mapType
         */
         public static final int MapAttrs_mapType = 0;
         /**
@@ -611,7 +644,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name android:uiCompass
+          @attr name com.fant.fanins:uiCompass
         */
         public static final int MapAttrs_uiCompass = 6;
         /**
@@ -625,7 +658,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name android:uiRotateGestures
+          @attr name com.fant.fanins:uiRotateGestures
         */
         public static final int MapAttrs_uiRotateGestures = 7;
         /**
@@ -639,7 +672,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name android:uiScrollGestures
+          @attr name com.fant.fanins:uiScrollGestures
         */
         public static final int MapAttrs_uiScrollGestures = 8;
         /**
@@ -653,7 +686,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name android:uiTiltGestures
+          @attr name com.fant.fanins:uiTiltGestures
         */
         public static final int MapAttrs_uiTiltGestures = 9;
         /**
@@ -667,7 +700,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name android:uiZoomControls
+          @attr name com.fant.fanins:uiZoomControls
         */
         public static final int MapAttrs_uiZoomControls = 10;
         /**
@@ -681,7 +714,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name android:uiZoomGestures
+          @attr name com.fant.fanins:uiZoomGestures
         */
         public static final int MapAttrs_uiZoomGestures = 11;
         /**
@@ -695,7 +728,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name android:useViewLifecycle
+          @attr name com.fant.fanins:useViewLifecycle
         */
         public static final int MapAttrs_useViewLifecycle = 12;
         /**
@@ -709,7 +742,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name android:zOrderOnTop
+          @attr name com.fant.fanins:zOrderOnTop
         */
         public static final int MapAttrs_zOrderOnTop = 13;
     };

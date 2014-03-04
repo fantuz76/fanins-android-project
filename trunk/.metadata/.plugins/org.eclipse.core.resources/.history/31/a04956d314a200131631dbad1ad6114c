@@ -1,0 +1,23 @@
+package com.fant.fanins;
+
+import android.os.Environment;
+
+
+public class MyGlobal
+{
+
+    
+    // *************************************************************************
+    // Ritorno il percorso dove vado a salvare i file, se non esiste lo crea anche
+    // *************************************************************************
+    public java.io.File getStorageFantDir(){
+    	// controllo presenza dir e se non c'è la creo
+    	String storageDir = Environment.getExternalStorageDirectory().getPath() + "/FanINS";
+    	java.io.File myfolder = new java.io.File(storageDir);
+        if (!myfolder.exists())
+        	myfolder.mkdir();
+        
+        return (myfolder);
+
+    }
+}

@@ -1,6 +1,9 @@
-# view AndroidManifest.xml #generated:32
+# view AndroidManifest.xml #generated:37
 -keep class com.fant.fanins.MainActivity { <init>(...); }
 
-# view AndroidManifest.xml #generated:41
+# view AndroidManifest.xml #generated:46
 -keep class com.fant.fanins.ReadTxtActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:50
+-keep class com.fant.fanins.SettingsActivity { <init>(...); }
 
