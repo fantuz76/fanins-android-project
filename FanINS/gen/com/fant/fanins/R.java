@@ -240,8 +240,9 @@ containing a value of this type.
         public static final int TextDescrizione=0x7f06001a;
         public static final int TextNote=0x7f06001c;
         public static final int TextValore=0x7f060015;
+        public static final int action_downloadDB=0x7f060022;
         public static final int action_readfile=0x7f060021;
-        public static final int action_settings=0x7f060022;
+        public static final int action_settings=0x7f060023;
         public static final int action_sync=0x7f060020;
         public static final int action_upload=0x7f06001f;
         public static final int appVersion=0x7f06001d;
@@ -276,7 +277,8 @@ containing a value of this type.
         public static final int read_txt=0x7f0c0001;
     }
     public static final class string {
-        public static final int VersionNameString=0x7f07002e;
+        public static final int VersionNameString=0x7f07002f;
+        public static final int action_downloadDB=0x7f07002e;
         public static final int action_readfile=0x7f07002d;
         public static final int action_settings=0x7f07001e;
         public static final int action_sync=0x7f07001d;
@@ -378,28 +380,28 @@ containing a value of this type.
         public static final int common_signin_button_text_long=0x7f070013;
         public static final int desc_imgData=0x7f070020;
         public static final int desc_refresh=0x7f070021;
-        public static final int pref_description_social_recommendations=0x7f070032;
+        public static final int pref_description_social_recommendations=0x7f070033;
         /**  Example settings for Data & Sync 
          */
-        public static final int pref_header_data_sync=0x7f070034;
+        public static final int pref_header_data_sync=0x7f070035;
         /**  Strings related to Settings 
  Example General settings 
          */
-        public static final int pref_header_general=0x7f070030;
+        public static final int pref_header_general=0x7f070031;
         /**  Example settings for Notifications 
          */
-        public static final int pref_header_notifications=0x7f070037;
-        public static final int pref_ringtone_silent=0x7f07003a;
-        public static final int pref_title_add_friends_to_messages=0x7f070033;
-        public static final int pref_title_new_message_notifications=0x7f070038;
-        public static final int pref_title_ringtone=0x7f070039;
-        public static final int pref_title_social_recommendations=0x7f070031;
-        public static final int pref_title_sync_frequency=0x7f070035;
-        public static final int pref_title_system_sync_settings=0x7f070036;
-        public static final int pref_title_vibrate=0x7f07003b;
+        public static final int pref_header_notifications=0x7f070038;
+        public static final int pref_ringtone_silent=0x7f07003b;
+        public static final int pref_title_add_friends_to_messages=0x7f070034;
+        public static final int pref_title_new_message_notifications=0x7f070039;
+        public static final int pref_title_ringtone=0x7f07003a;
+        public static final int pref_title_social_recommendations=0x7f070032;
+        public static final int pref_title_sync_frequency=0x7f070036;
+        public static final int pref_title_system_sync_settings=0x7f070037;
+        public static final int pref_title_vibrate=0x7f07003c;
         public static final int strOK=0x7f07001f;
         public static final int title_activity_read_txt=0x7f07002b;
-        public static final int title_activity_settings=0x7f07002f;
+        public static final int title_activity_settings=0x7f070030;
         public static final int titolo1=0x7f07001a;
         public static final int titoloADa=0x7f070025;
         public static final int titoloCategoria=0x7f070028;

@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -52,6 +53,7 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
+import com.google.api.services.drive.model.FileList;
 import com.google.gdata.client.spreadsheet.SpreadsheetService;
 import com.google.gdata.data.spreadsheet.CellEntry;
 import com.google.gdata.data.spreadsheet.CellFeed;
@@ -70,10 +72,16 @@ public class MainActivity extends FragmentActivity {
 	static final int REQUEST_ACCOUNT_PICKER = 1;
 	static final int REQUEST_AUTHORIZATION = 2;
 	static final int CAPTURE_IMAGE = 3;
+	
+	static final int UPLOAD_GDRIVE = 1;
+	static final int  DOWNLOAD_GDRIVE = 2;
+	static int actAfterAccountPicker;
 
 	static final String SPREADSHEET_INS_TEMP_NAME = "INS_temp";
 	
-	static final String LOCAL_DB_FILENAME = "INSbase.sqlite";
+	static final String SQL_CREATE_EMPTYDB_FILENAME = "createEmptyDB.sql";
+	static final String LOCAL_DB_FILENAME = "INSbase_loc.sqlite";	
+	static final String REMOTE_DB_FILENAME = "INSbase.sqlite";
 	
 	
 	
@@ -169,7 +177,9 @@ public class MainActivity extends FragmentActivity {
 		
 		// prepara file
 		fileAccessOK = prepFileisOK();
-		DBINS = new MyDatabase(getApplicationContext(), myGlobal.getStorageFantDir().getPath() + java.io.File.separator +  LOCAL_DB_FILENAME);
+		DBINS = new MyDatabase(
+				getApplicationContext(), 
+				myGlobal.getStorageFantDir().getPath() + java.io.File.separator +  LOCAL_DB_FILENAME);
 		
 		fileSqliteAccessOK = true;		
 		DBINS.open();
@@ -224,31 +234,38 @@ public class MainActivity extends FragmentActivity {
       case REQUEST_ACCOUNT_PICKER:    	
         if (resultCode == RESULT_OK && data != null && data.getExtras() != null) {
           String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-
-
           
           if (accountName != null) {
             credential.setSelectedAccountName(accountName);
             
             service = getDriveService(credential);
-            
-            this.progDia = ProgressDialog.show(this, "INS..", "Uploading Data...", true);
-            new saveFileToDrive2().execute("");
-
-
+            if (actAfterAccountPicker == UPLOAD_GDRIVE){
+                this.progDia = ProgressDialog.show(this, "INS..", "Uploading Data...", true);
+                new uploadFileToGDrive().execute("");            	
+            } else if (actAfterAccountPicker == DOWNLOAD_GDRIVE){ 
+	            this.progDia = ProgressDialog.show(this, "INS..", "Downloading Data...", true);
+	            new downloadFromGDrive().execute();
+            }
           }
         }
         break;
         
       case REQUEST_AUTHORIZATION:
         if (resultCode == Activity.RESULT_OK) {
-            this.progDia = ProgressDialog.show(this, "INS..", "Uploading Data...", true);
-            new saveFileToDrive2().execute("");
+        	if (actAfterAccountPicker == UPLOAD_GDRIVE){
+                this.progDia = ProgressDialog.show(this, "INS..", "Uploading Data...", true);
+                new uploadFileToGDrive().execute("");            	
+            } else if (actAfterAccountPicker == DOWNLOAD_GDRIVE){ 
+	            this.progDia = ProgressDialog.show(this, "INS..", "Downloading Data...", true);
+	            new downloadFromGDrive().execute();
+            }
         } else {
-          startActivityForResult(credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
-          
+          startActivityForResult(credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);          
         }
         break;
+        
+        default:
+        	break;
       
       }
     }    
@@ -296,7 +313,7 @@ public class MainActivity extends FragmentActivity {
     // *************************************************************************
     // Upload file di testo in google drive, Task asincrono
     // *************************************************************************
-    private class saveFileToDrive2  extends AsyncTask<String, Void, String> {
+    private class uploadFileToGDrive  extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
@@ -326,6 +343,88 @@ public class MainActivity extends FragmentActivity {
         }        
     	
       }
+    
+
+
+    // *************************************************************************
+    // Upload file di testo in google drive, Task asincrono
+    // *************************************************************************
+    
+    
+    private class downloadFromGDrive  extends AsyncTask<Void, Integer, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+        	//
+			showToast("Downloading... ");
+			
+			try {
+				List<File> resultList = new ArrayList<File>();
+				
+				com.google.api.services.drive.model.File fileGD;
+				
+				com.google.api.services.drive.Drive.Files.List request; 
+				request = service.files().list().setQ("trashed = false");
+				do {
+					try {
+						FileList files = request.execute();
+						resultList.addAll(files.getItems());
+						request.setPageToken(files.getNextPageToken());
+					} catch(IOException e){
+		                System.out.println("An error occurred: " + e);
+		                request.setPageToken(null);
+		            }
+				} while(request.getPageToken() != null && request.getPageToken().length() > 0);
+				
+			    for(File file : resultList){
+			        Log.i("MyActivity","FANTUZ GDrive List file : " + file.getTitle() + "ID:" + file.getId());
+			    }				
+				
+				fileGD = service.files().get("1SUGDxtBWLL1Yw0HZWLeqdhmblo6Cfs7QVuyQS0BkgcE").execute();
+				fileGD.getId();
+			    java.io.File toFile = new java.io.File(myGlobal.getStorageFantDir().getPath() + java.io.File.separator);
+			    toFile.createNewFile();
+			    HttpDownloadManager downloader = new HttpDownloadManager(fileGD, toFile);
+			    downloader.setListener(new HttpDownloadManager.FileDownloadProgressListener() {
+			
+			        public void downloadProgress(long bytesRead, long totalBytes) {
+			            Log.i("chauster",Long.toString(totalBytes));
+			            Log.i("chauster",Long.toString(bytesRead));
+			        }
+			
+			        @Override
+			        public void downloadFinished() {
+			            // TODO Auto-generated method stub
+			        }
+			
+			        @Override
+			        public void downloadFailedWithError(Exception e) {
+			            // TODO Auto-generated method stub  
+			        }                       
+			    });
+			    return downloader.download(service);
+			} catch (IOException e) {
+			    e.printStackTrace();
+			}
+            
+			return false;
+        }  	
+        	
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+        	if (MainActivity.this.progDia != null) {
+        		MainActivity.this.progDia.dismiss();
+        	}
+        }
+
+        @Override
+        protected void onPreExecute() {        	
+        }
+
+
+      }
+    
     
     
     
@@ -508,6 +607,7 @@ public class MainActivity extends FragmentActivity {
         {
         	case R.id.action_upload:        	
                 credential = GoogleAccountCredential.usingOAuth2(this, Arrays.asList(DriveScopes.DRIVE));
+                actAfterAccountPicker = UPLOAD_GDRIVE;
                 startActivityForResult(credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
                 return true;
                 
@@ -541,7 +641,13 @@ public class MainActivity extends FragmentActivity {
                 
                 startActivity(intent);
               return true;
-        		
+
+        	case R.id.action_downloadDB:
+                credential = GoogleAccountCredential.usingOAuth2(this, Arrays.asList(DriveScopes.DRIVE));
+                actAfterAccountPicker = DOWNLOAD_GDRIVE;
+                startActivityForResult(credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);                
+              return true;
+              
         	case R.id.action_settings:
             	showToast("Menu setting not available");
             	//showDatePickerDialog(MainActivity.this);
@@ -847,7 +953,7 @@ public class MainActivity extends FragmentActivity {
         		saveDataOnFile() ;
         		
         		DBINS.open();
-        		DBINS.insertRecordDataIns(valData, valTipoOper, valChiFa, valADa, valPersonale, valValore, valCategoria, valDescrizione, valNote);
+        		DBINS.insertRecordDataIns(valData, valTipoOper, valChiFa, valADa, valPersonale, valValore, valCategoria, valDescrizione, valNote, "");
         		DBINS.close();
         	} else {
         		showToast("Dati non corretti nessun file caricato");
