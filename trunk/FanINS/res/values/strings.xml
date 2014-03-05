@@ -111,6 +111,7 @@
     <string name="title_activity_read_txt">Lettura File TXT</string>
     <string name="versione">Ver:</string>
     <string name="action_readfile">Read File</string>
+    <string name="action_downloadDB">Download DB</string>    
     <string name="VersionNameString">1.2</string>
 
 </resources>
