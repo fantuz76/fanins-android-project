@@ -2,15 +2,11 @@ package com.fant.fanins;
 
 //import java.io.File;
 
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -26,6 +22,9 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -48,19 +47,20 @@ import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.dropbox.client2.DropboxAPI;
+import com.dropbox.client2.android.AndroidAuthSession;
+import com.dropbox.client2.android.AuthActivity;
+import com.dropbox.client2.session.AccessTokenPair;
+import com.dropbox.client2.session.AppKeyPair;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
-import com.google.api.client.googleapis.media.MediaHttpDownloader;
 import com.google.api.client.googleapis.media.MediaHttpUploader;
 import com.google.api.client.http.FileContent;
-import com.google.api.client.http.GenericUrl;
-import com.google.api.client.http.HttpResponse;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
-import com.google.api.services.drive.model.FileList;
 import com.google.gdata.client.spreadsheet.SpreadsheetService;
 import com.google.gdata.data.spreadsheet.CellEntry;
 import com.google.gdata.data.spreadsheet.CellFeed;
@@ -74,14 +74,44 @@ import com.google.gdata.data.spreadsheet.WorksheetFeed;
 
 
 public class MainActivity extends FragmentActivity {
-		
+
+	private static final String TAG = "FANTUZ_Activity";
+    ///////////////////////////////////////////////////////////////////////////
+    //                          DROPBOX.                      				 //
+    ///////////////////////////////////////////////////////////////////////////
+    // Replace this with your app key and secret assigned by Dropbox.
+    // Note that this is a really insecure way to do this, and you shouldn't
+    // ship code which contains your key & secret in such an obvious way.
+    // Obfuscation is good.
+    final static private String APP_KEY = "7dlkc5hdc0cvk82";
+    final static private String APP_SECRET = "4m8c8auq5eheo3q_SECRET";
+    ///////////////////////////////////////////////////////////////////////////
+    //                      End app-specific settings.                       //
+    ///////////////////////////////////////////////////////////////////////////
+    // You don't need to change these, leave them alone.
+    final static private String ACCOUNT_PREFS_NAME = "prefs";
+    final static private String ACCESS_KEY_NAME = "ACCESS_KEY";
+    final static private String ACCESS_SECRET_NAME = "ACCESS_SECRET";
+
+    private static final boolean USE_OAUTH1 = false;
+
+    DropboxAPI<AndroidAuthSession> mApi;
+
+    ///////////////////////////////////////////////////////////////////////////
+    //                                 End DROPBOX                           //
+    ///////////////////////////////////////////////////////////////////////////
+    
+    private boolean mDropboxLoggedIn;
+	java.io.File retFileDropbox;
+	private final String DROPBOX_INS_DIR = "/INS/";
+	private final String LOCAL_FILE = "INSbase_download.sqlite";
+	
+	
 	
 	static final int REQUEST_ACCOUNT_PICKER = 1;
 	static final int REQUEST_AUTHORIZATION = 2;
-	static final int CAPTURE_IMAGE = 3;
 	
-	static final int UPLOAD_GDRIVE = 1;
-	static final int  DOWNLOAD_GDRIVE = 2;
+	static final int UPLOAD_GDRIVE = 1;	
 	static int actAfterAccountPicker;
 
 	static final String SPREADSHEET_INS_TEMP_NAME = "INS_temp";
@@ -93,14 +123,15 @@ public class MainActivity extends FragmentActivity {
 	com.google.api.services.drive.model.File fileOnGoogleDrive = null;
 	
 	private MyDatabase DBINS;
-	
-  	private static Uri fileUri;
+	  	
     private static Drive service;
 	private GoogleAccountCredential credential;	  
 	    				
 	private String valData, valTipoOper, valChiFa, valADa, valPersonale, valValore, valCategoria, valDescrizione, valNote;
 	private boolean fileAccessOK;
 	
+	
+	Menu myMainMenu;
 	private boolean fileSqliteAccessOK;
 	
 	public static String fileName, fileNameFull;
@@ -124,8 +155,16 @@ public class MainActivity extends FragmentActivity {
     // *************************************************************************
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+    	
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // We create a new AuthSession so that we can use the Dropbox API.
+        AndroidAuthSession session = buildSession();
+        mApi = new DropboxAPI<AndroidAuthSession>(session);
+        
+        checkDropboxAppKeySetup();
+                
         
 		Spinner spinner;
 		ArrayAdapter<CharSequence> adapter;
@@ -197,7 +236,7 @@ public class MainActivity extends FragmentActivity {
 			mycursor = DBINS.fetchProducts();
 			while ( mycursor.moveToNext() ) {
 
-			    Log.i("MyActivity", " FANTUZ --> " +
+			    Log.i(TAG, " FANTUZ --> " +
 			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.ProductsMetaData.DATA_OPERAZIONE_KEY) ) +
 			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.ProductsMetaData.TIPO_OPERAZIONE_KEY) ) + 
 			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.ProductsMetaData.CHI_FA_KEY) ) +
@@ -227,6 +266,11 @@ public class MainActivity extends FragmentActivity {
         
         initTextValue();
     
+
+        // Display the proper UI state if logged in or not
+        setDropboxLoggedIn(mApi.getSession().isLinked());
+
+
     }
 
 
@@ -250,20 +294,7 @@ public class MainActivity extends FragmentActivity {
             if (actAfterAccountPicker == UPLOAD_GDRIVE){
                 this.progDia = ProgressDialog.show(this, "INS..", "Uploading Data...", true);
                 new uploadFileToGDrive().execute("");            	
-            } else if (actAfterAccountPicker == DOWNLOAD_GDRIVE){ 
-	            //this.progDia = ProgressDialog.show(this, "INS..", "Downloading Data...", true);
-	            try {
-	            	
-	            	showToast(fileOnGoogleDrive.getTitle());
-	            	//downloadFile(service, fileOnGoogleDrive);
-	            	
-	            	downloadFile(false,fileOnGoogleDrive);
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-	            //new downloadFromGDrive().execute();
-            }
+            } 
           }
         }
         break;
@@ -273,19 +304,7 @@ public class MainActivity extends FragmentActivity {
         	if (actAfterAccountPicker == UPLOAD_GDRIVE){
                 this.progDia = ProgressDialog.show(this, "INS..", "Uploading Data...", true);
                 new uploadFileToGDrive().execute("");            	
-            } else if (actAfterAccountPicker == DOWNLOAD_GDRIVE){ 
-	            //this.progDia = ProgressDialog.show(this, "INS..", "Downloading Data...", true);
-	            try {
-	            	showToast(fileOnGoogleDrive.getTitle());
-	            	//downloadFile(service, fileOnGoogleDrive);
-	            	
-					downloadFile(true,fileOnGoogleDrive);
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}	            
-	            //new downloadFromGDrive().execute();
-            }
+            } 
         } else {
           startActivityForResult(credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);          
         }
@@ -375,122 +394,6 @@ public class MainActivity extends FragmentActivity {
         }        
     	
       }
-    
-
-
-    // *************************************************************************
-    // download file di testo in google drive, Task asincrono
-    // *************************************************************************
-    private static InputStream downloadFile(Drive service, File file) {
-        if (file.getDownloadUrl() != null && file.getDownloadUrl().length() > 0) {
-          try {
-            HttpResponse resp =
-                service.getRequestFactory().buildGetRequest(new GenericUrl(file.getDownloadUrl()))
-                    .execute();
-            return resp.getContent();
-          } catch (IOException e) {
-            // An error occurred.
-            e.printStackTrace();
-            return null;
-          }
-        } else {
-          // The file doesn't have any content stored on Drive.
-          return null;
-        }
-      }
-
-    private static void downloadFile(boolean useDirectDownload, File uploadedFile)
-    	      throws IOException {
-    	    // create parent directory (if necessary)
-    	    java.io.File parentDir = new java.io.File(myGlobal.getStorageFantDir().getPath() + java.io.File.separator + "download\\");
-    	    if (!parentDir.exists() && !parentDir.mkdirs()) {
-    	      throw new IOException("Unable to create parent directory");
-    	    }
-    	    OutputStream out = new FileOutputStream(new java.io.File(parentDir, uploadedFile.getTitle()));
-
-    	    Drive.Files.Get get = service.files().get(uploadedFile.getId());
-    	    MediaHttpDownloader downloader = get.getMediaHttpDownloader();
-    	    downloader.setDirectDownloadEnabled(useDirectDownload);
-    	    //downloader.setProgressListener(new FileDownloadProgressListener());
-    	    downloader.download(new GenericUrl(uploadedFile.getDownloadUrl()), out);
-    	  }
-    
-    private class downloadFromGDrive  extends AsyncTask<Void, Integer, Boolean> {
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-        	//
-			showToast("Downloading... ");
-			
-			try {
-				List<File> resultList = new ArrayList<File>();
-				
-				com.google.api.services.drive.model.File fileGD;
-				
-				com.google.api.services.drive.Drive.Files.List request; 
-				request = service.files().list().setQ("trashed = false");
-				do {
-					try {
-						FileList files = request.execute();
-						resultList.addAll(files.getItems());
-						request.setPageToken(files.getNextPageToken());
-					} catch(IOException e){
-		                System.out.println("An error occurred: " + e);
-		                request.setPageToken(null);
-		            }
-				} while(request.getPageToken() != null && request.getPageToken().length() > 0);
-				
-			    for(File file : resultList){
-			        Log.i("MyActivity","FANTUZ GDrive List file : " + file.getTitle() + "ID:" + file.getId());
-			    }				
-				
-			    
-			    //Drive.Files.Get myGet = drive.files.
-				fileGD = service.files().get("1SUGDxtBWLL1Yw0HZWLeqdhmblo6Cfs7QVuyQS0BkgcE").execute();
-				fileGD.getId();
-			    java.io.File toFile = new java.io.File(myGlobal.getStorageFantDir().getPath() + java.io.File.separator);
-			    toFile.createNewFile();
-			    HttpDownloadManager downloader = new HttpDownloadManager(fileGD, toFile);
-			    downloader.setListener(new HttpDownloadManager.FileDownloadProgressListener() {
-			
-			        public void downloadProgress(long bytesRead, long totalBytes) {
-			            Log.i("chauster",Long.toString(totalBytes));
-			            Log.i("chauster",Long.toString(bytesRead));
-			        }
-			
-			        @Override
-			        public void downloadFinished() {
-			            // TODO Auto-generated method stub
-			        }
-			
-			        @Override
-			        public void downloadFailedWithError(Exception e) {
-			            // TODO Auto-generated method stub  
-			        }                       
-			    });
-			    return downloader.download(service);
-			} catch (IOException e) {
-			    e.printStackTrace();
-			}
-            
-			return false;
-        }  	
-        	
-
-        @Override
-        protected void onPostExecute(Boolean result) {
-        	if (MainActivity.this.progDia != null) {
-        		MainActivity.this.progDia.dismiss();
-        	}
-        }
-
-        @Override
-        protected void onPreExecute() {        	
-        }
-
-
-      }
-    
     
     
     
@@ -662,8 +565,10 @@ public class MainActivity extends FragmentActivity {
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+    	super.onCreateOptionsMenu(menu);
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+        this.myMainMenu = menu;
         return true;
     }
 
@@ -674,10 +579,15 @@ public class MainActivity extends FragmentActivity {
         {
         	case R.id.action_upload:        	
                 credential = GoogleAccountCredential.usingOAuth2(this, Arrays.asList(DriveScopes.DRIVE));
-                actAfterAccountPicker = UPLOAD_GDRIVE;
                 startActivityForResult(credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
                 return true;
-                
+
+        	case R.id.action_uploadDB:        	
+        		java.io.File file = new java.io.File(fileNameFull);
+                UploadToDropbox upload = new UploadToDropbox(this, mApi, DROPBOX_INS_DIR, file);
+                upload.execute();
+                return true;
+
         	case R.id.action_sync:
     	        //Put up the Yes/No message box
     	    	AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -694,7 +604,6 @@ public class MainActivity extends FragmentActivity {
     	    	.setNegativeButton("No", null)						//Do nothing on no
     	    	.show();
     	    	
-
         		return true;
 
         	case R.id.action_readfile:
@@ -710,10 +619,25 @@ public class MainActivity extends FragmentActivity {
               return true;
 
         	case R.id.action_downloadDB:
-                credential = GoogleAccountCredential.usingOAuth2(this, Arrays.asList(DriveScopes.DRIVE));
-                actAfterAccountPicker = DOWNLOAD_GDRIVE;
-                startActivityForResult(credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);                
+        		DownloadFromDropbox download = new DownloadFromDropbox(this, mApi, DROPBOX_INS_DIR, 
+        				myGlobal.getStorageFantDir().getPath() + java.io.File.separator + LOCAL_FILE);
+                download.execute();
               return true;
+              
+        	case R.id.action_authDropbox:        		
+                if (mDropboxLoggedIn) {
+                    logOutDropbox();
+                } else {
+                    // Start the remote authentication
+                    if (USE_OAUTH1) {
+                        mApi.getSession().startAuthentication(MainActivity.this);
+                    } else {
+                        mApi.getSession().startOAuth2Authentication(MainActivity.this);
+                    }
+                }
+
+
+        		return true;
               
         	case R.id.action_settings:
             	showToast("Menu setting not available");
@@ -727,6 +651,20 @@ public class MainActivity extends FragmentActivity {
         }
     }
     
+    
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+    	// Funzione richiamata ogni volta che viene presentato il MENU
+    	MenuItem myMenuitem = myMainMenu.findItem(R.id.action_authDropbox);
+    	
+    	if (mDropboxLoggedIn) {
+    		myMenuitem.setTitle(R.string.action_authDropbox_logout);
+    	} else {
+    		myMenuitem.setTitle(R.string.action_authDropbox_login);
+    	}
+    	
+        return super.onPrepareOptionsMenu(menu);
+    }
     // *************************************************************************
     // Controllo valori inseriti
     // *************************************************************************
@@ -860,8 +798,6 @@ public class MainActivity extends FragmentActivity {
     	boolean mExternalStorageWriteable = false;
     	
         
-    	
-    	
         // definisco nome file usando IMEI telefono per avere file diversi da tel diversi
         TelephonyManager tMgr =(TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
         final String mIMEIstr;
@@ -903,8 +839,7 @@ public class MainActivity extends FragmentActivity {
     	    	if (!checkFile.exists()) {
     	    		if (!checkFile.createNewFile())
     	    			return false;
-    	    	}    			
-    			fileUri = Uri.fromFile(new java.io.File(fileNameFull));
+    	    	}    			    			
     			return true;
     		} catch (Exception ioe) {
     			return false;
@@ -1280,5 +1215,142 @@ public class MainActivity extends FragmentActivity {
 
    
     
-	    
+    
+    
+
+    /**
+     * Shows keeping the access keys returned from Trusted Authenticator in a local
+     * store, rather than storing user name & password, and re-authenticating each
+     * time (which is not to be done, ever).
+     */
+    private void loadAuth(AndroidAuthSession session) {
+        SharedPreferences prefs = getSharedPreferences(ACCOUNT_PREFS_NAME, 0);
+        String key = prefs.getString(ACCESS_KEY_NAME, null);
+        String secret = prefs.getString(ACCESS_SECRET_NAME, null);
+        if (key == null || secret == null || key.length() == 0 || secret.length() == 0) return;
+
+        if (key.equals("oauth2:")) {
+            // If the key is set to "oauth2:", then we can assume the token is for OAuth 2.
+            session.setOAuth2AccessToken(secret);
+        } else {
+            // Still support using old OAuth 1 tokens.
+            session.setAccessTokenPair(new AccessTokenPair(key, secret));
+        }
+    }
+
+    /**
+     * Shows keeping the access keys returned from Trusted Authenticator in a local
+     * store, rather than storing user name & password, and re-authenticating each
+     * time (which is not to be done, ever).
+     */
+    private void storeAuth(AndroidAuthSession session) {
+        // Store the OAuth 2 access token, if there is one.
+        String oauth2AccessToken = session.getOAuth2AccessToken();
+        if (oauth2AccessToken != null) {
+            SharedPreferences prefs = getSharedPreferences(ACCOUNT_PREFS_NAME, 0);
+            Editor edit = prefs.edit();
+            edit.putString(ACCESS_KEY_NAME, "oauth2:");
+            edit.putString(ACCESS_SECRET_NAME, oauth2AccessToken);
+            edit.commit();
+            return;
+        }
+        // Store the OAuth 1 access token, if there is one.  This is only necessary if
+        // you're still using OAuth 1.
+        AccessTokenPair oauth1AccessToken = session.getAccessTokenPair();
+        if (oauth1AccessToken != null) {
+            SharedPreferences prefs = getSharedPreferences(ACCOUNT_PREFS_NAME, 0);
+            Editor edit = prefs.edit();
+            edit.putString(ACCESS_KEY_NAME, oauth1AccessToken.key);
+            edit.putString(ACCESS_SECRET_NAME, oauth1AccessToken.secret);
+            edit.commit();
+            return;
+        }
+    }
+
+
+    private AndroidAuthSession buildSession() {
+        AppKeyPair appKeyPair = new AppKeyPair(APP_KEY, APP_SECRET);
+
+        AndroidAuthSession session = new AndroidAuthSession(appKeyPair);
+        loadAuth(session);
+        return session;
+    }   
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        AndroidAuthSession session = mApi.getSession();
+
+        // The next part must be inserted in the onResume() method of the
+        // activity from which session.startAuthentication() was called, so
+        // that Dropbox authentication completes properly.
+        if (session.authenticationSuccessful()) {
+            try {
+                // Mandatory call to complete the auth
+                session.finishAuthentication();
+
+                // Store it locally in our app for later use
+                storeAuth(session);
+                setDropboxLoggedIn(true);
+            } catch (IllegalStateException e) {
+                showToast("Couldn't authenticate with Dropbox:" + e.getLocalizedMessage());
+                Log.i(TAG, "Error authenticating", e);
+            }
+        }
+    }
+
+    private void logOutDropbox() {
+        // Remove credentials from the session
+        mApi.getSession().unlink();
+        // Clear our stored keys
+        clearKeys();
+        // Change UI state to display logged out version
+        setDropboxLoggedIn(false);
+    }
+
+    private void clearKeys() {
+        SharedPreferences prefs = getSharedPreferences(ACCOUNT_PREFS_NAME, 0);
+        Editor edit = prefs.edit();
+        edit.clear();
+        edit.commit();
+    }
+    /**
+     * Convenience function to change UI state based on being logged in
+     */
+    private void setDropboxLoggedIn(boolean loggedIn) {
+        	
+    	mDropboxLoggedIn = loggedIn;
+    	if (loggedIn) {
+    		//mSubmit.setText("Unlink from Dropbox");
+            //mDisplay.setVisibility(View.VISIBLE);
+    	} else {
+    		//mSubmit.setText("Link with Dropbox");
+            //mDisplay.setVisibility(View.GONE);            
+    	}
+    }
+
+    private void checkDropboxAppKeySetup() {
+        // Check to make sure that we have a valid app key
+        if (APP_KEY.startsWith("CHANGE") ||
+                APP_SECRET.startsWith("CHANGE")) {
+            showToast("You must apply for an app key and secret from developers.dropbox.com, and add them to the DBRoulette ap before trying it.");
+            finish();
+            return;
+        }
+
+        // Check if the app has set up its manifest properly.
+        Intent testIntent = new Intent(Intent.ACTION_VIEW);
+        String scheme = "db-" + APP_KEY;
+        String uri = scheme + "://" + AuthActivity.AUTH_VERSION + "/test";
+        testIntent.setData(Uri.parse(uri));
+        PackageManager pm = getPackageManager();
+        if (0 == pm.queryIntentActivities(testIntent, 0).size()) {
+            showToast("URL scheme in your app's " +
+                    "manifest is not set up correctly. You should have a " +
+                    "com.dropbox.client2.android.AuthActivity with the " +
+                    "scheme: " + scheme);
+            finish();
+        }
+    }
+
 }

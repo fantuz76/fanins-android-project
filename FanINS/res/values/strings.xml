@@ -3,9 +3,13 @@
 
     <string name="titolo1">Inserire Dati</string>
     <string name="app_name">FanINS</string>
-    <string name="action_upload">Upload txt</string>
+    <string name="action_upload">Upload google</string>
+    <string name="action_uploadDB">Upload DB su Dropbox</string>
     <string name="action_sync">Scrivi txt dentro INS_temp</string>
     <string name="action_settings">Settings</string>
+    <string name="action_authDropbox_login">Login Dropbox</string>
+    <string name="action_authDropbox_logout">Logout Dropbox</string>
+    
     <string name="strOK">OK>></string>
     <string name="desc_imgData">Data_image</string>
     <string name="desc_refresh">refresh_image</string>
