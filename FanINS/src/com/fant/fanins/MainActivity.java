@@ -2,9 +2,12 @@ package com.fant.fanins;
 
 //import java.io.File;
 
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -48,7 +51,11 @@ import android.widget.Toast;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
+import com.google.api.client.googleapis.media.MediaHttpDownloader;
+import com.google.api.client.googleapis.media.MediaHttpUploader;
 import com.google.api.client.http.FileContent;
+import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpResponse;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
@@ -83,7 +90,7 @@ public class MainActivity extends FragmentActivity {
 	static final String LOCAL_DB_FILENAME = "INSbase_loc.sqlite";	
 	static final String REMOTE_DB_FILENAME = "INSbase.sqlite";
 	
-	
+	com.google.api.services.drive.model.File fileOnGoogleDrive = null;
 	
 	private MyDatabase DBINS;
 	
@@ -239,12 +246,23 @@ public class MainActivity extends FragmentActivity {
             credential.setSelectedAccountName(accountName);
             
             service = getDriveService(credential);
+
             if (actAfterAccountPicker == UPLOAD_GDRIVE){
                 this.progDia = ProgressDialog.show(this, "INS..", "Uploading Data...", true);
                 new uploadFileToGDrive().execute("");            	
             } else if (actAfterAccountPicker == DOWNLOAD_GDRIVE){ 
-	            this.progDia = ProgressDialog.show(this, "INS..", "Downloading Data...", true);
-	            new downloadFromGDrive().execute();
+	            //this.progDia = ProgressDialog.show(this, "INS..", "Downloading Data...", true);
+	            try {
+	            	
+	            	showToast(fileOnGoogleDrive.getTitle());
+	            	//downloadFile(service, fileOnGoogleDrive);
+	            	
+	            	downloadFile(false,fileOnGoogleDrive);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	            //new downloadFromGDrive().execute();
             }
           }
         }
@@ -256,8 +274,17 @@ public class MainActivity extends FragmentActivity {
                 this.progDia = ProgressDialog.show(this, "INS..", "Uploading Data...", true);
                 new uploadFileToGDrive().execute("");            	
             } else if (actAfterAccountPicker == DOWNLOAD_GDRIVE){ 
-	            this.progDia = ProgressDialog.show(this, "INS..", "Downloading Data...", true);
-	            new downloadFromGDrive().execute();
+	            //this.progDia = ProgressDialog.show(this, "INS..", "Downloading Data...", true);
+	            try {
+	            	showToast(fileOnGoogleDrive.getTitle());
+	            	//downloadFile(service, fileOnGoogleDrive);
+	            	
+					downloadFile(true,fileOnGoogleDrive);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}	            
+	            //new downloadFromGDrive().execute();
             }
         } else {
           startActivityForResult(credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);          
@@ -292,7 +319,12 @@ public class MainActivity extends FragmentActivity {
           
           com.google.api.services.drive.model.File file = null;
 		try {
-			file = service.files().insert(body, mediaContent).execute();
+			
+			//file = service.files().insert(body, mediaContent).execute();
+			Drive.Files.Insert insert = service.files().insert(body, mediaContent);
+			MediaHttpUploader uploader = insert.getMediaHttpUploader();
+			uploader.setDirectUploadEnabled(true);
+			fileOnGoogleDrive = insert.execute();
         } catch (UserRecoverableAuthIOException e) {
             startActivityForResult(e.getIntent(), REQUEST_AUTHORIZATION);
             showToast("Error UserRecoverableAuthIOException: " );		
@@ -347,9 +379,41 @@ public class MainActivity extends FragmentActivity {
 
 
     // *************************************************************************
-    // Upload file di testo in google drive, Task asincrono
+    // download file di testo in google drive, Task asincrono
     // *************************************************************************
-    
+    private static InputStream downloadFile(Drive service, File file) {
+        if (file.getDownloadUrl() != null && file.getDownloadUrl().length() > 0) {
+          try {
+            HttpResponse resp =
+                service.getRequestFactory().buildGetRequest(new GenericUrl(file.getDownloadUrl()))
+                    .execute();
+            return resp.getContent();
+          } catch (IOException e) {
+            // An error occurred.
+            e.printStackTrace();
+            return null;
+          }
+        } else {
+          // The file doesn't have any content stored on Drive.
+          return null;
+        }
+      }
+
+    private static void downloadFile(boolean useDirectDownload, File uploadedFile)
+    	      throws IOException {
+    	    // create parent directory (if necessary)
+    	    java.io.File parentDir = new java.io.File(myGlobal.getStorageFantDir().getPath() + java.io.File.separator + "download\\");
+    	    if (!parentDir.exists() && !parentDir.mkdirs()) {
+    	      throw new IOException("Unable to create parent directory");
+    	    }
+    	    OutputStream out = new FileOutputStream(new java.io.File(parentDir, uploadedFile.getTitle()));
+
+    	    Drive.Files.Get get = service.files().get(uploadedFile.getId());
+    	    MediaHttpDownloader downloader = get.getMediaHttpDownloader();
+    	    downloader.setDirectDownloadEnabled(useDirectDownload);
+    	    //downloader.setProgressListener(new FileDownloadProgressListener());
+    	    downloader.download(new GenericUrl(uploadedFile.getDownloadUrl()), out);
+    	  }
     
     private class downloadFromGDrive  extends AsyncTask<Void, Integer, Boolean> {
 
@@ -380,6 +444,8 @@ public class MainActivity extends FragmentActivity {
 			        Log.i("MyActivity","FANTUZ GDrive List file : " + file.getTitle() + "ID:" + file.getId());
 			    }				
 				
+			    
+			    //Drive.Files.Get myGet = drive.files.
 				fileGD = service.files().get("1SUGDxtBWLL1Yw0HZWLeqdhmblo6Cfs7QVuyQS0BkgcE").execute();
 				fileGD.getId();
 			    java.io.File toFile = new java.io.File(myGlobal.getStorageFantDir().getPath() + java.io.File.separator);
@@ -589,7 +655,8 @@ public class MainActivity extends FragmentActivity {
     
     
     private Drive getDriveService(GoogleAccountCredential credential) {
-        return new Drive.Builder(AndroidHttp.newCompatibleTransport(), new GsonFactory(), credential)
+        return new Drive.Builder(AndroidHttp.newCompatibleTransport(), new GsonFactory(), credential).setApplicationName(
+                "Google-DriveSample/1.0")
             .build();
     }
     
