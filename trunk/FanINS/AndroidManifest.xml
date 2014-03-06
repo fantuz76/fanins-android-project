@@ -37,11 +37,26 @@
             android:name="com.fant.fanins.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
+			                
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+		<activity
+	        android:name="com.dropbox.client2.android.AuthActivity"
+	        android:configChanges="orientation|keyboard"
+	        android:launchMode="singleTask" >
+	        <intent-filter>
+				<!-- Change this to be db- followed by your app key -->
+				<data android:scheme="db-7dlkc5hdc0cvk82" />
+					
+	            <action android:name="android.intent.action.VIEW" />
+	
+	            <category android:name="android.intent.category.BROWSABLE" />
+	            <category android:name="android.intent.category.DEFAULT" />
+	        </intent-filter>
+    	</activity>        
         <activity
             android:name="com.fant.fanins.ReadTxtActivity"
             android:label="@string/title_activity_read_txt" >
