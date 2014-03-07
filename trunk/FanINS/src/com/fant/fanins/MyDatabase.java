@@ -50,7 +50,7 @@ public class MyDatabase {
 
         static class DataINStable {  // i metadati della tabella, accessibili ovunque
             static final String INSDATA_TABLE = "myINSData";
-            //static final String ID = "_id";
+            static final String ID = "_id";
             static final String DATA_OPERAZIONE_KEY = "DataOperazione";                
             static final String TIPO_OPERAZIONE_KEY = "TipoOperazione";
             static final String CHI_FA_KEY = "ChiFa";
@@ -66,7 +66,8 @@ public class MyDatabase {
     }
         
         private static final String INSDATA_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS "  //codice sql di creazione della tabella
-                + DataINStable.INSDATA_TABLE + " ("                         
+                + DataINStable.INSDATA_TABLE + " ("
+                + DataINStable.ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + ", "
                 + DataINStable.DATA_OPERAZIONE_KEY + TYPE_DB_STRING + ", "
                 + DataINStable.TIPO_OPERAZIONE_KEY + TYPE_DB_STRING + ", "
                 + DataINStable.CHI_FA_KEY + TYPE_DB_STRING + ", "

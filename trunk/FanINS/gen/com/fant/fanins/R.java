@@ -241,12 +241,12 @@ containing a value of this type.
         public static final int TextNote=0x7f06001c;
         public static final int TextValore=0x7f060015;
         public static final int action_authDropbox=0x7f060024;
-        public static final int action_downloadDB=0x7f060023;
-        public static final int action_readfile=0x7f060022;
+        public static final int action_downloadDB=0x7f060020;
+        public static final int action_readfile=0x7f060023;
         public static final int action_settings=0x7f060025;
-        public static final int action_sync=0x7f060021;
-        public static final int action_upload=0x7f06001f;
-        public static final int action_uploadDB=0x7f060020;
+        public static final int action_sync=0x7f060022;
+        public static final int action_upload=0x7f060021;
+        public static final int action_uploadDB=0x7f06001f;
         public static final int appVersion=0x7f06001d;
         public static final int hybrid=0x7f060004;
         public static final int imgbtnOK=0x7f060008;

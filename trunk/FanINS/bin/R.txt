@@ -88,12 +88,12 @@ int id TextDescrizione 0x7f06001a
 int id TextNote 0x7f06001c
 int id TextValore 0x7f060015
 int id action_authDropbox 0x7f060024
-int id action_downloadDB 0x7f060023
-int id action_readfile 0x7f060022
+int id action_downloadDB 0x7f060020
+int id action_readfile 0x7f060023
 int id action_settings 0x7f060025
-int id action_sync 0x7f060021
-int id action_upload 0x7f06001f
-int id action_uploadDB 0x7f060020
+int id action_sync 0x7f060022
+int id action_upload 0x7f060021
+int id action_uploadDB 0x7f06001f
 int id appVersion 0x7f06001d
 int id hybrid 0x7f060004
 int id imgbtnOK 0x7f060008
