@@ -51,17 +51,19 @@ public class DownloadFromDropbox extends AsyncTask<Void, Long, Boolean> {
     // Note that, since we use a single file name here for simplicity, you
     // won't be able to use this code for two simultaneous downloads.
     private static String local_file_name;
+    private static String dropbox_file_name;
     
-    private final static String FILE_NAME_TO_DOWNLOAD = "INSbase.sqlite";
+
 
     public DownloadFromDropbox(Context context, DropboxAPI<?> api,
-            String dropboxPath, String localFile) {
+            String dropboxPath, String dropboxFile, String localFile) {
         // We set the context this way so we don't accidentally leak activities
         mContext = context.getApplicationContext();
 
         mApi = api;
         mPath = dropboxPath;
         local_file_name = localFile;
+        dropbox_file_name = dropboxFile;
 
         mDialog = new ProgressDialog(context);
         mDialog.setMax(100);
@@ -80,8 +82,8 @@ public class DownloadFromDropbox extends AsyncTask<Void, Long, Boolean> {
         });
 
         mDialog.show();
-    }
-
+    }    
+    
     @Override
     protected Boolean doInBackground(Void... params) {
         try {
@@ -102,7 +104,7 @@ public class DownloadFromDropbox extends AsyncTask<Void, Long, Boolean> {
             ArrayList<Entry> thumbs = new ArrayList<Entry>();
             for (Entry ent: dirent.contents) {
             	
-                if (new String(ent.fileName()).equals(FILE_NAME_TO_DOWNLOAD)) {
+                if (new String(ent.fileName()).equals(dropbox_file_name)) {
                     // Add it to the list of thumbs we can choose from
                     thumbs.add(ent);
                 }
@@ -114,7 +116,7 @@ public class DownloadFromDropbox extends AsyncTask<Void, Long, Boolean> {
 
             if (thumbs.size() == 0) {
                 // No thumbs in that directory
-                mErrorMsg = "Not find: " + FILE_NAME_TO_DOWNLOAD ;
+                mErrorMsg = "Not find: " + dropbox_file_name ;
                 return false;
             }
 

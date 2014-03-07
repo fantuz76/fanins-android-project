@@ -1,9 +1,10 @@
 package com.fant.fanins;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -11,7 +12,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.net.Uri;
 
 public class MyDatabase {  
 
@@ -20,7 +20,6 @@ public class MyDatabase {
         Context mContext;
     	
         // file di default
-    	private static String local_SQL_creation_file = "";    	  	
         private static final String DB_DEFAULT_NAME= myGlobal.getStorageFantDir().getPath() + java.io.File.separator +  "INSbase.sqlite";//nome del db
         private static final int DB_VERSION=1; //numero di versione del nostro db
 
@@ -37,21 +36,7 @@ public class MyDatabase {
             mDbHelper=new DbHelper(ctx, strDBNAME, null, DB_VERSION);   //quando istanziamo questa classe, istanziamo anche l'helper (vedi sotto)     
         }
 
-        // Costruttore con parametro DB_NAME e fileCreazioneSQL
-        public MyDatabase(Context ctx, String strDBNAME, String _creationFileSQL){
-            mContext=ctx;
-            
-            try  {
-    	    	// Se non esiste imposto a "" e userò stringa default
-    	    	java.io.File checkFile = new java.io.File(_creationFileSQL);
-    	    	if (!checkFile.exists()) {
-    	    		_creationFileSQL = "";
-    	    	}    			    			
-    		} catch (Exception ioe) {    			
-    		}            
-            local_SQL_creation_file = _creationFileSQL;
-            mDbHelper=new DbHelper(ctx, strDBNAME, null, DB_VERSION);   //quando istanziamo questa classe, istanziamo anche l'helper (vedi sotto)     
-        }
+
 
         public void open(){  //il database su cui agiamo è leggibile/scrivibile
         	// Richiamare questo metodo significa rendere scrivibile il database
@@ -63,7 +48,7 @@ public class MyDatabase {
                 mDb.close();
         }
 
-        static class ProductsMetaData {  // i metadati della tabella, accessibili ovunque
+        static class DataINStable {  // i metadati della tabella, accessibili ovunque
             static final String INSDATA_TABLE = "myINSData";
             //static final String ID = "_id";
             static final String DATA_OPERAZIONE_KEY = "DataOperazione";                
@@ -81,18 +66,18 @@ public class MyDatabase {
     }
         
         private static final String INSDATA_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS "  //codice sql di creazione della tabella
-                + ProductsMetaData.INSDATA_TABLE + " ("                         
-                + ProductsMetaData.DATA_OPERAZIONE_KEY + TYPE_DB_STRING + ", "
-                + ProductsMetaData.TIPO_OPERAZIONE_KEY + TYPE_DB_STRING + ", "
-                + ProductsMetaData.CHI_FA_KEY + TYPE_DB_STRING + ", "
-                + ProductsMetaData.A_DA_KEY + TYPE_DB_STRING + ", "
-                + ProductsMetaData.C_PERS_KEY + TYPE_DB_STRING + ", "
-                + ProductsMetaData.VALORE_KEY + " REAL COLLATE RTRIM, "
-                + ProductsMetaData.CATEGORIA_KEY + TYPE_DB_STRING + ", "
-                + ProductsMetaData.GENERICA_KEY + TYPE_DB_STRING + ", "
-                + ProductsMetaData.DESCRIZIONE_KEY + TYPE_DB_STRING + ", "                
-                + ProductsMetaData.NOTE_KEY + TYPE_DB_STRING + ", "
-                + ProductsMetaData.SPECIAL_NOTE_KEY + TYPE_DB_STRING + ");" ;
+                + DataINStable.INSDATA_TABLE + " ("                         
+                + DataINStable.DATA_OPERAZIONE_KEY + TYPE_DB_STRING + ", "
+                + DataINStable.TIPO_OPERAZIONE_KEY + TYPE_DB_STRING + ", "
+                + DataINStable.CHI_FA_KEY + TYPE_DB_STRING + ", "
+                + DataINStable.A_DA_KEY + TYPE_DB_STRING + ", "
+                + DataINStable.C_PERS_KEY + TYPE_DB_STRING + ", "
+                + DataINStable.VALORE_KEY + " REAL COLLATE RTRIM, "
+                + DataINStable.CATEGORIA_KEY + TYPE_DB_STRING + ", "
+                + DataINStable.GENERICA_KEY + TYPE_DB_STRING + ", "
+                + DataINStable.DESCRIZIONE_KEY + TYPE_DB_STRING + ", "                
+                + DataINStable.NOTE_KEY + TYPE_DB_STRING + ", "
+                + DataINStable.SPECIAL_NOTE_KEY + TYPE_DB_STRING + ");" ;
                 
                 
         
@@ -101,24 +86,26 @@ public class MyDatabase {
         public void insertRecordDataIns(String _valData, String _valTipoOper, String _valChiFa, String _valADa, 
         		String _valPersonale, String _valValore, String _valCategoria, String _valDescrizione, String _valNote, String _valspecialNote){ //metodo per inserire i dati
                 ContentValues cv=new ContentValues();
-                cv.put(ProductsMetaData.DATA_OPERAZIONE_KEY, _valData);
-                cv.put(ProductsMetaData.TIPO_OPERAZIONE_KEY, _valTipoOper);
-                cv.put(ProductsMetaData.CHI_FA_KEY, _valChiFa);
-                cv.put(ProductsMetaData.A_DA_KEY, _valADa);
-                cv.put(ProductsMetaData.C_PERS_KEY, _valPersonale);
-                cv.put(ProductsMetaData.VALORE_KEY, _valValore);
-                cv.put(ProductsMetaData.CATEGORIA_KEY, _valCategoria);
-                cv.put(ProductsMetaData.GENERICA_KEY, "");
-                cv.put(ProductsMetaData.DESCRIZIONE_KEY, _valDescrizione);
-                cv.put(ProductsMetaData.NOTE_KEY, _valNote);
-                cv.put(ProductsMetaData.SPECIAL_NOTE_KEY, _valspecialNote);
+                cv.put(DataINStable.DATA_OPERAZIONE_KEY, _valData);
+                cv.put(DataINStable.TIPO_OPERAZIONE_KEY, _valTipoOper);
+                cv.put(DataINStable.CHI_FA_KEY, _valChiFa);
+                cv.put(DataINStable.A_DA_KEY, _valADa);
+                cv.put(DataINStable.C_PERS_KEY, _valPersonale);
+                cv.put(DataINStable.VALORE_KEY, _valValore);
+                cv.put(DataINStable.CATEGORIA_KEY, _valCategoria);
+                cv.put(DataINStable.GENERICA_KEY, "");
+                cv.put(DataINStable.DESCRIZIONE_KEY, _valDescrizione);
+                cv.put(DataINStable.NOTE_KEY, _valNote);
+                cv.put(DataINStable.SPECIAL_NOTE_KEY, _valspecialNote);
 
-                mDb.insert(ProductsMetaData.INSDATA_TABLE, null, cv);
+                mDb.insert(DataINStable.INSDATA_TABLE, null, cv);
         }
         
         public Cursor fetchProducts(){ //metodo per fare la query di tutti i dati
-                return mDb.query(ProductsMetaData.INSDATA_TABLE, null,null,null,null,null,null);               
+                return mDb.query(DataINStable.INSDATA_TABLE, null,null,null,null,null,null);                
         }
+        
+    
 
 
  
@@ -154,14 +141,6 @@ public class MyDatabase {
                 @Override
                 public void onCreate(SQLiteDatabase _db) { //solo quando il db viene creato, creiamo la tabella
                 	_db.execSQL(INSDATA_TABLE_CREATE);
-                		/*
-                		if (local_SQL_creation_file == ""){
-                			_db.execSQL(INSDATA_TABLE_CREATE);
-                		} else {
-                			String table_data_create = readDBCreationFromFile(local_SQL_creation_file);
-                			_db.execSQL(table_data_create);
-                		}*/
-                        
                 }
 
                 @Override

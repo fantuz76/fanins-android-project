@@ -61,6 +61,7 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
+import com.google.common.io.Files;
 import com.google.gdata.client.spreadsheet.SpreadsheetService;
 import com.google.gdata.data.spreadsheet.CellEntry;
 import com.google.gdata.data.spreadsheet.CellFeed;
@@ -75,7 +76,7 @@ import com.google.gdata.data.spreadsheet.WorksheetFeed;
 
 public class MainActivity extends FragmentActivity {
 
-	private static final String TAG = "FANTUZ_Activity";
+	
     ///////////////////////////////////////////////////////////////////////////
     //                          DROPBOX.                      				 //
     ///////////////////////////////////////////////////////////////////////////
@@ -103,8 +104,8 @@ public class MainActivity extends FragmentActivity {
     
     private boolean mDropboxLoggedIn;
 	java.io.File retFileDropbox;
-	private final String DROPBOX_INS_DIR = "/INS/";
-	private final String LOCAL_FILE = "INSbase_download.sqlite";
+	private final String DROPBOX_INS_DIR = "/INS/";	
+	
 	
 	
 	
@@ -116,13 +117,11 @@ public class MainActivity extends FragmentActivity {
 
 	static final String SPREADSHEET_INS_TEMP_NAME = "INS_temp";
 	
-	static final String SQL_CREATE_EMPTYDB_FILENAME = "createEmptyDB.sql";
-	static final String LOCAL_DB_FILENAME = "INSbase_loc.sqlite";	
-	static final String REMOTE_DB_FILENAME = "INSbase.sqlite";
+
 	
 	com.google.api.services.drive.model.File fileOnGoogleDrive = null;
 	
-	private MyDatabase DBINS;
+	private MyDatabase DBINSlocal, DBINSdownloaded;
 	  	
     private static Drive service;
 	private GoogleAccountCredential credential;	  
@@ -223,36 +222,43 @@ public class MainActivity extends FragmentActivity {
 		
 		// prepara file
 		fileAccessOK = prepFileisOK();
-		DBINS = new MyDatabase(
+		DBINSlocal = new MyDatabase(
 				getApplicationContext(), 
-				myGlobal.getStorageFantDir().getPath() + java.io.File.separator +  LOCAL_DB_FILENAME);
+				myGlobal.getStorageFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_DB_FILENAME);
+				
+		DBINSdownloaded = new MyDatabase(
+				getApplicationContext(), 
+				myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_DOWNLOADED_DB_FILE);
+		
+		
+		
 		
 		fileSqliteAccessOK = true;		
-		DBINS.open();
-		if (DBINS.fetchProducts().getCount() == 0) {
+		DBINSlocal.open();
+		if (DBINSlocal.fetchProducts().getCount() == 0) {
 			assert true;	// nop
 		} else {
 			Cursor mycursor;
-			mycursor = DBINS.fetchProducts();
+			mycursor = DBINSlocal.fetchProducts();
 			while ( mycursor.moveToNext() ) {
 
-			    Log.i(TAG, " FANTUZ --> " +
-			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.ProductsMetaData.DATA_OPERAZIONE_KEY) ) +
-			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.ProductsMetaData.TIPO_OPERAZIONE_KEY) ) + 
-			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.ProductsMetaData.CHI_FA_KEY) ) +
-			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.ProductsMetaData.A_DA_KEY) ) +
-			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.ProductsMetaData.C_PERS_KEY) ) +
-			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.ProductsMetaData.VALORE_KEY) ) +
-			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.ProductsMetaData.CATEGORIA_KEY) ) +
-			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.ProductsMetaData.GENERICA_KEY) ) +
-			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.ProductsMetaData.DESCRIZIONE_KEY) ) + 
-			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.ProductsMetaData.NOTE_KEY) )
+			    Log.i(myGlobal.TAG, " FANTUZ --> " +
+			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.DATA_OPERAZIONE_KEY) ) +
+			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY) ) + 
+			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.CHI_FA_KEY) ) +
+			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.A_DA_KEY) ) +
+			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.C_PERS_KEY) ) +
+			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.VALORE_KEY) ) +
+			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.CATEGORIA_KEY) ) +
+			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.GENERICA_KEY) ) +
+			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.DESCRIZIONE_KEY) ) + 
+			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.NOTE_KEY) )
 			    );
 			    
 			}   
 
 		}
-		DBINS.close();
+		DBINSlocal.close();
 		
 		if (!fileAccessOK) {
 			showToast("Error file create: " + fileNameFull);
@@ -335,8 +341,6 @@ public class MainActivity extends FragmentActivity {
           body.setTitle(fileContent.getName());
           body.setMimeType(_metaData);
 
-          
-          com.google.api.services.drive.model.File file = null;
 		try {
 			
 			//file = service.files().insert(body, mediaContent).execute();
@@ -346,18 +350,17 @@ public class MainActivity extends FragmentActivity {
 			fileOnGoogleDrive = insert.execute();
         } catch (UserRecoverableAuthIOException e) {
             startActivityForResult(e.getIntent(), REQUEST_AUTHORIZATION);
-            showToast("Error UserRecoverableAuthIOException: " );		
+            showToast("Error UserRecoverableAuthIOException: " );
+            return (false);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			showToast("Error IOException: " + e.getMessage());
+			return (false);
 		}
-          
-          if (file != null) {
-        	  return (true);
-          } else {
-        	  return (false);        	  
-          }
+                    
+        return (true);
+         
     }
 
 
@@ -368,11 +371,11 @@ public class MainActivity extends FragmentActivity {
 
         @Override
         protected String doInBackground(String... params) {
-        	if (uploadSingleFile(myGlobal.getStorageFantDir().getPath(), fileName, "text/plain"))
+        	if (uploadSingleFile(myGlobal.getStorageFantDir().getPath() , fileName, "text/plain"))
         		showToast("Uploaded: " + fileName);
 		
-        	if (uploadSingleFile(myGlobal.getStorageFantDir().getPath(), LOCAL_DB_FILENAME, "application/octet-stream"))
-        		showToast("Uploaded: " + LOCAL_DB_FILENAME);
+        	if (uploadSingleFile(myGlobal.getStorageFantDir().getPath() , myGlobal.LOCAL_DB_FILENAME, "application/octet-stream"))
+        		showToast("Uploaded: " + myGlobal.LOCAL_DB_FILENAME);
         	
         	return "Executed";
         }      
@@ -577,17 +580,36 @@ public class MainActivity extends FragmentActivity {
     {
         switch(item.getItemId())
         {
-        	case R.id.action_upload:        	
-                credential = GoogleAccountCredential.usingOAuth2(this, Arrays.asList(DriveScopes.DRIVE));
-                startActivityForResult(credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
-                return true;
+
 
         	case R.id.action_uploadDB:        	
-        		java.io.File file = new java.io.File(fileNameFull);
-                UploadToDropbox upload = new UploadToDropbox(this, mApi, DROPBOX_INS_DIR, file);
+        		Calendar c = Calendar.getInstance();
+        		SimpleDateFormat df = new SimpleDateFormat("MM-dd-yyyy@HHmmss", Locale.ITALY);
+        		String formattedDate = df.format(c.getTime());
+
+    	    	// adesso, una volta caricato lo rinomino così resta nella SD del telefono come backup
+    	    	java.io.File oldFile = new java.io.File(fileNameFull);
+    	    	java.io.File newFile = new java.io.File(fileNameFull.replace(".txt", "_" + formattedDate + ".txt"));
+    	    	
+    	    	//Now invoke the renameTo() method on the reference, oldFile in this case
+    	    	
+			try {
+				Files.copy(oldFile, newFile);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	    	
+                UploadToDropbox upload = new UploadToDropbox(this, mApi, DROPBOX_INS_DIR, newFile);
                 upload.execute();
                 return true;
-
+                
+        	case R.id.action_downloadDB:
+        		DownloadFromDropbox download = new DownloadFromDropbox(this, mApi, DROPBOX_INS_DIR, myGlobal.REMOTE_DB_FILENAME,
+        				myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator + myGlobal.LOCAL_DOWNLOADED_DB_FILE);
+                download.execute();
+              return true;
+              
         	case R.id.action_sync:
     	        //Put up the Yes/No message box
     	    	AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -606,6 +628,11 @@ public class MainActivity extends FragmentActivity {
     	    	
         		return true;
 
+        	case R.id.action_upload:        	
+                credential = GoogleAccountCredential.usingOAuth2(this, Arrays.asList(DriveScopes.DRIVE));
+                startActivityForResult(credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
+                return true;
+                
         	case R.id.action_readfile:
             	showToast("Menu setting not available");
             	//showDatePickerDialog(MainActivity.this);
@@ -618,11 +645,7 @@ public class MainActivity extends FragmentActivity {
                 startActivity(intent);
               return true;
 
-        	case R.id.action_downloadDB:
-        		DownloadFromDropbox download = new DownloadFromDropbox(this, mApi, DROPBOX_INS_DIR, 
-        				myGlobal.getStorageFantDir().getPath() + java.io.File.separator + LOCAL_FILE);
-                download.execute();
-              return true;
+
               
         	case R.id.action_authDropbox:        		
                 if (mDropboxLoggedIn) {
@@ -954,9 +977,9 @@ public class MainActivity extends FragmentActivity {
         	if (checkAllValues()) {
         		saveDataOnFile() ;
         		
-        		DBINS.open();
-        		DBINS.insertRecordDataIns(valData, valTipoOper, valChiFa, valADa, valPersonale, valValore, valCategoria, valDescrizione, valNote, "");
-        		DBINS.close();
+        		DBINSlocal.open();
+        		DBINSlocal.insertRecordDataIns(valData, valTipoOper, valChiFa, valADa, valPersonale, valValore, valCategoria, valDescrizione, valNote, "");
+        		DBINSlocal.close();
         	} else {
         		showToast("Dati non corretti nessun file caricato");
         	}
@@ -1294,7 +1317,7 @@ public class MainActivity extends FragmentActivity {
                 setDropboxLoggedIn(true);
             } catch (IllegalStateException e) {
                 showToast("Couldn't authenticate with Dropbox:" + e.getLocalizedMessage());
-                Log.i(TAG, "Error authenticating", e);
+                Log.i(myGlobal.TAG, "Error authenticating", e);
             }
         }
     }
