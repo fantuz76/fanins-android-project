@@ -7,10 +7,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.widget.SimpleCursorAdapter;
-import android.util.Log;
 import android.view.Menu;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 
 public class ReadTxtActivity extends ListActivity {
@@ -78,6 +75,33 @@ public class ReadTxtActivity extends ListActivity {
 		} else {
 			Cursor mycursor;
 			mycursor = DBINSlocal.fetchProducts();
+			//startManagingCursor(mycursor);
+			
+			super.onCreate(savedInstanceState);
+			
+		
+
+		    dataAdapter = new SimpleCursorAdapter(
+		    	    this, android.R.layout.simple_list_item_2, 
+		    	    mycursor, 
+		    	    new String[] 
+		    	    		{ MyDatabase.DataINStable.DATA_OPERAZIONE_KEY, 
+		    	    		MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY, 
+		    	    		MyDatabase.DataINStable.CHI_FA_KEY, 
+		    	    		MyDatabase.DataINStable.A_DA_KEY, 
+		    	    		MyDatabase.DataINStable.C_PERS_KEY, 
+		    	    		MyDatabase.DataINStable.VALORE_KEY, 
+		    	    		MyDatabase.DataINStable.VALORE_KEY, 
+		    	    		MyDatabase.DataINStable.DATA_OPERAZIONE_KEY, 
+		    	    		MyDatabase.DataINStable.VALORE_KEY, 
+		    	    		MyDatabase.DataINStable.VALORE_KEY}, 
+		    	    new int[]
+		    	    		{ android.R.id.text1, android.R.id.text2, android.R.id.text1, android.R.id.text2, android.R.id.text2, android.R.id.text2, android.R.id.text2, android.R.id.text2, android.R.id.text2, android.R.id.text2 },
+		    	    0);
+		    setListAdapter(dataAdapter);
+		    
+		    
+			/*
 			while ( mycursor.moveToNext() ) {
 
 			    Log.i(myGlobal.TAG, " FANTUZ --> " +
@@ -93,51 +117,9 @@ public class ReadTxtActivity extends ListActivity {
 			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.NOTE_KEY) )
 			    );
 			
-			    // The desired columns to be bound
-			    String[] columns = new String[] {
-			    		MyDatabase.DataINStable.DATA_OPERAZIONE_KEY,
-			    		MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY,
-			    		MyDatabase.DataINStable.CHI_FA_KEY,
-			    		MyDatabase.DataINStable.A_DA_KEY,
-			    		MyDatabase.DataINStable.C_PERS_KEY,
-			    		MyDatabase.DataINStable.VALORE_KEY,
-			    		MyDatabase.DataINStable.CATEGORIA_KEY,
-			    		MyDatabase.DataINStable.GENERICA_KEY
-			    };
 			    
-			    // the XML defined views which the data will be bound to
-			    int[] to = new int[] { 
-			      	10,
-			      	10,
-			      	20,
-			      	30,
-			      	10,
-			      	10,
-			      	20,
-			      	30,
-
-			    };
-			   
-			    
-			    dataAdapter = new SimpleCursorAdapter(
-			    	    this, R.layout.activity_read_txt, 
-			    	    mycursor, 
-			    	    columns, 
-			    	    to,
-			    	    0);
-			    
-			    ListView listView;
-			    listView = (ListView) findViewById(android.R.id.list);
-			    // Assign adapter to ListView
-			    listView.setAdapter(dataAdapter);
-
-			    
-		        String[] my_string_list = getResources().getStringArray(R.array.Categoria);
-		        listView = (ListView)findViewById(android.R.id.list);        
-		        ArrayAdapter<String> arrayAdapter =
-		                new ArrayAdapter<String>(this, R.layout.list_item, R.id.label, columns);
-		        listView.setAdapter(arrayAdapter);			    
-			}   
+		           
+			}   */
 
 		}
 		DBINSlocal.close();
@@ -165,4 +147,6 @@ public class ReadTxtActivity extends ListActivity {
 		return true;
 	}
 
+	
+	
 }
