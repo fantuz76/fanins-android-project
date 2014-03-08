@@ -458,10 +458,12 @@ containing a value of this type.
         public static final int CustTextTitle=0x7f0b0003;
     }
     public static final class xml {
-        public static final int pref_data_sync=0x7f040000;
-        public static final int pref_general=0x7f040001;
-        public static final int pref_headers=0x7f040002;
-        public static final int pref_notification=0x7f040003;
+        public static final int fragmented_preferences=0x7f040000;
+        public static final int pref_data_sync=0x7f040001;
+        public static final int pref_general=0x7f040002;
+        public static final int pref_headers=0x7f040003;
+        public static final int pref_notification=0x7f040004;
+        public static final int preference_headers=0x7f040005;
     }
     public static final class styleable {
         /** Attributes that can be used with a AdsAttrs.

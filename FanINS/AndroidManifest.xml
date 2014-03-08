@@ -65,6 +65,10 @@
             android:name="com.fant.fanins.SettingsActivity"
             android:label="@string/title_activity_settings" >
         </activity>
-    </application>
+        <activity
+            android:name="com.fant.fanins.MySettings"
+            android:label="@string/title_activity_settings" >
+        </activity>
+</application>
 
 </manifest>
