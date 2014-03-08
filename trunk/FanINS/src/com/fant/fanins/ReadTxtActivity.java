@@ -78,10 +78,8 @@ public class ReadTxtActivity extends ListActivity {
 			//startManagingCursor(mycursor);
 			
 			super.onCreate(savedInstanceState);
-			
-		
-
-		    dataAdapter = new SimpleCursorAdapter(
+			/*
+			dataAdapter = new SimpleCursorAdapter(
 		    	    this, android.R.layout.simple_list_item_2, 
 		    	    mycursor, 
 		    	    new String[] 
@@ -91,14 +89,41 @@ public class ReadTxtActivity extends ListActivity {
 		    	    		MyDatabase.DataINStable.A_DA_KEY, 
 		    	    		MyDatabase.DataINStable.C_PERS_KEY, 
 		    	    		MyDatabase.DataINStable.VALORE_KEY, 
-		    	    		MyDatabase.DataINStable.VALORE_KEY, 
-		    	    		MyDatabase.DataINStable.DATA_OPERAZIONE_KEY, 
-		    	    		MyDatabase.DataINStable.VALORE_KEY, 
-		    	    		MyDatabase.DataINStable.VALORE_KEY}, 
+		    	    		MyDatabase.DataINStable.CATEGORIA_KEY, 
+		    	    		MyDatabase.DataINStable.GENERICA_KEY, 
+		    	    		MyDatabase.DataINStable.DESCRIZIONE_KEY, 
+		    	    		MyDatabase.DataINStable.NOTE_KEY}, 
 		    	    new int[]
 		    	    		{ android.R.id.text1, android.R.id.text2, android.R.id.text1, android.R.id.text2, android.R.id.text2, android.R.id.text2, android.R.id.text2, android.R.id.text2, android.R.id.text2, android.R.id.text2 },
 		    	    0);
-		    setListAdapter(dataAdapter);
+		    	    */
+			dataAdapter = new SimpleCursorAdapter(
+		    	    this, R.layout.list_item, 
+		    	    mycursor, 
+		    	    new String[] 
+		    	    		{ MyDatabase.DataINStable.DATA_OPERAZIONE_KEY, 
+		    	    		MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY, 
+		    	    		MyDatabase.DataINStable.CHI_FA_KEY, 
+		    	    		MyDatabase.DataINStable.A_DA_KEY, 
+		    	    		MyDatabase.DataINStable.C_PERS_KEY, 
+		    	    		MyDatabase.DataINStable.VALORE_KEY, 
+		    	    		MyDatabase.DataINStable.CATEGORIA_KEY,  
+		    	    		MyDatabase.DataINStable.DESCRIZIONE_KEY, 
+		    	    		MyDatabase.DataINStable.NOTE_KEY}, 
+		    	    new int[]
+		    	    		{ R.id.dataText, 
+		    	    		R.id.tipooperazioneText, 
+		    	    		R.id.chifaText, 
+		    	    		R.id.adaText, 
+		    	    		R.id.cpersText, 
+		    	    		R.id.valoreText, 
+		    	    		R.id.categoriaText, 
+		    	    		R.id.descrizioneText, 
+		    	    		R.id.noteText},
+		    	    0);
+
+			setListAdapter(dataAdapter);
+		    
 		    
 		    
 			/*

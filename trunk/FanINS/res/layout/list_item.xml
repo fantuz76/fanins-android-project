@@ -1,10 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/label"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:padding="10dip"
-        android:textSize="14dip"
-        android:textStyle="bold" >
-</TextView>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent" android:layout_height="fill_parent"
+        android:orientation="vertical" android:weightSum="10">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:weightSum="10" >
+
+            <TextView
+                android:id="@+id/dataText"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="3"
+                android:text="Nome:"
+                android:textStyle="italic" />
+
+            <TextView
+                android:id="@+id/tipooperazioneText"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="2"
+                android:text="prova2" />
+
+            <TextView
+                android:id="@+id/chifaText"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:text="chifa" />
+
+            <TextView
+                android:id="@+id/adaText"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:text="prova2" />
+
+            <TextView
+                android:id="@+id/cpersText"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:text="prova2" />
+
+            <TextView
+                android:id="@+id/valoreText"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="2"
+                android:text="prova2"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" >
+
+            <TextView
+                android:id="@+id/categoriaText"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="2"
+                android:text="prova2" />
+
+            <TextView
+                android:id="@+id/descrizioneText"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="2"
+                android:text="prova2" />
+
+            <TextView
+                android:id="@+id/noteText"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="2"
+                android:text="note" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
