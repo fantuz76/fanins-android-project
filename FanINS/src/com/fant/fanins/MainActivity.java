@@ -634,13 +634,14 @@ public class MainActivity extends FragmentActivity {
                 return true;
                 
         	case R.id.action_readfile:
-            	showToast("Menu setting not available");
+            	//showToast("Menu setting not available");
             	//showDatePickerDialog(MainActivity.this);
+        		
                 Intent intent = new Intent(this, ReadTxtActivity.class);
-                EditText editText = (EditText) findViewById(R.id.TextDescrizione);
-                String message = editText.getText().toString();
-
-				intent.putExtra(EXTRA_MESSAGE, message);
+                
+                //EditText editText = (EditText) findViewById(R.id.TextDescrizione);
+                //String message = editText.getText().toString();
+				//intent.putExtra(EXTRA_MESSAGE, message);
                 
                 startActivity(intent);
               return true;

@@ -240,20 +240,26 @@ containing a value of this type.
         public static final int TextDescrizione=0x7f06001a;
         public static final int TextNote=0x7f06001c;
         public static final int TextValore=0x7f060015;
-        public static final int action_authDropbox=0x7f060024;
-        public static final int action_downloadDB=0x7f060020;
-        public static final int action_readfile=0x7f060023;
-        public static final int action_settings=0x7f060025;
-        public static final int action_sync=0x7f060022;
-        public static final int action_upload=0x7f060021;
-        public static final int action_uploadDB=0x7f06001f;
+        public static final int action_authDropbox=0x7f06002c;
+        public static final int action_downloadDB=0x7f060028;
+        public static final int action_readfile=0x7f06002b;
+        public static final int action_settings=0x7f06002d;
+        public static final int action_sync=0x7f06002a;
+        public static final int action_upload=0x7f060029;
+        public static final int action_uploadDB=0x7f060027;
+        public static final int adaText=0x7f060021;
         public static final int appVersion=0x7f06001d;
+        public static final int categoriaText=0x7f060024;
+        public static final int chifaText=0x7f060020;
+        public static final int cpersText=0x7f060022;
+        public static final int dataText=0x7f06001e;
+        public static final int descrizioneText=0x7f060025;
         public static final int hybrid=0x7f060004;
         public static final int imgbtnOK=0x7f060008;
         public static final int imgbtnReset=0x7f060006;
-        public static final int label=0x7f06001e;
         public static final int none=0x7f060000;
         public static final int normal=0x7f060001;
+        public static final int noteText=0x7f060026;
         public static final int satellite=0x7f060002;
         public static final int terrain=0x7f060003;
         public static final int textView1=0x7f06000b;
@@ -265,6 +271,8 @@ containing a value of this type.
         public static final int textView8=0x7f060019;
         public static final int textView9=0x7f06001b;
         public static final int textViewTitle=0x7f060007;
+        public static final int tipooperazioneText=0x7f06001f;
+        public static final int valoreText=0x7f060023;
     }
     public static final class integer {
         public static final int google_play_services_version=0x7f080000;

@@ -116,6 +116,6 @@
     <string name="versione">Ver:</string>
     <string name="action_readfile">Read File</string>
     <string name="action_downloadDB">Download DB</string>    
-    <string name="VersionNameString">1.2</string>
+    <string name="VersionNameString">1.3</string>
 
 </resources>
