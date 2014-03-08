@@ -666,7 +666,8 @@ public class MainActivity extends FragmentActivity {
         	case R.id.action_settings:
             	showToast("Menu setting not available");
             	//showDatePickerDialog(MainActivity.this);
-                Intent intentSettings = new Intent(this, SettingsActivity.class);                
+                //Intent intentSettings = new Intent(this, SettingsActivity.class);                
+                Intent intentSettings = new Intent(this, MySettings.class);
                 startActivity(intentSettings);
               return true;
 
