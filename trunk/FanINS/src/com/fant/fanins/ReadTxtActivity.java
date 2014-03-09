@@ -24,17 +24,7 @@ public class ReadTxtActivity extends ListActivity {
 		setContentView(R.layout.activity_read_txt);
 
 
-		try {
-			versionName = this.getPackageManager()
-            	    .getPackageInfo(this.getPackageName(), 0).versionName;
-		} catch (NameNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			versionName = "Errore versione non rilevata";
-		}
 
-		TextView stFrom  = (TextView) findViewById(R.id.appVersion);
-		stFrom.setText(versionName);
 		
 		
 		// storing string resources into Array
