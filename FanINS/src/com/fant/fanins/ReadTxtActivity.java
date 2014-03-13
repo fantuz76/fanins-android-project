@@ -1,18 +1,16 @@
 package com.fant.fanins;
 
-import com.fant.fanins.MyDatabase.DataINStable;
-
 import android.app.ListActivity;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.util.Log;
 import android.view.Menu;
-import android.widget.TextView;
+import android.widget.Toast;
 
 public class ReadTxtActivity extends ListActivity {
 
-	private MyDatabase DBINSlocal, DBINSdownloaded;
+	private MyDatabase DBINStoread;
 	
 	public static String versionName = "";
 	
@@ -23,134 +21,68 @@ public class ReadTxtActivity extends ListActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_read_txt);
 
-
-
 		
-		
-		// storing string resources into Array
-        //String[] my_string_list = getResources().getStringArray(R.array.Categoria);
-         
-        // Binding resources Array to ListAdapter
-        //this.setListAdapter(new ArrayAdapter<String>(this, R.layout.list_item, R.id.textView1, my_string_list));
-/*
-        ArrayAdapter<CharSequence> adapter1;
-		adapter1 = ArrayAdapter.createFromResource(this, R.array.tipo_operazione, android.R.layout.simple_spinner_item);	// Create an ArrayAdapter using the string array and a default spinner layout		
-		adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);		// Specify the layout to use when the list of choices appears
-*/	
-		//spinner.setAdapter(adapter1);	// Apply the adapter to the spinner
-
-      /*
-        String[] my_string_list = getResources().getStringArray(R.array.Categoria);
-        ListView listView = (ListView)findViewById(android.R.id.list);        
-        ArrayAdapter<String> arrayAdapter =
-                new ArrayAdapter<String>(this, R.layout.list_item, R.id.label, my_string_list);
-        listView.setAdapter(arrayAdapter);
-     */
-
-		// prepara file
-		
-		DBINSlocal = new MyDatabase(
-				getApplicationContext(), 
-				myGlobal.getStorageFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_DB_FILENAME);
-				
-		DBINSdownloaded = new MyDatabase(
-				getApplicationContext(), 
-				myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator + myGlobal.LOCAL_DOWNLOADED_DB_FILE);
-		
-		
-	
-		DBINSlocal.open();
-		if (DBINSlocal.fetchProducts().getCount() == 0) {
-			assert true;	// nop
-		} else {
-			Cursor mycursor;
-			mycursor = DBINSlocal.fetchProducts();
-			//startManagingCursor(mycursor);
+		try {
+			// recupero info extra e decido qual DB usare
+			Bundle bun = getIntent().getExtras();
+			String readDBtype = bun.getString("readDBtype");
 			
-			super.onCreate(savedInstanceState);
-			/*
-			dataAdapter = new SimpleCursorAdapter(
-		    	    this, android.R.layout.simple_list_item_2, 
-		    	    mycursor, 
-		    	    new String[] 
-		    	    		{ MyDatabase.DataINStable.DATA_OPERAZIONE_KEY, 
-		    	    		MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY, 
-		    	    		MyDatabase.DataINStable.CHI_FA_KEY, 
-		    	    		MyDatabase.DataINStable.A_DA_KEY, 
-		    	    		MyDatabase.DataINStable.C_PERS_KEY, 
-		    	    		MyDatabase.DataINStable.VALORE_KEY, 
-		    	    		MyDatabase.DataINStable.CATEGORIA_KEY, 
-		    	    		MyDatabase.DataINStable.GENERICA_KEY, 
-		    	    		MyDatabase.DataINStable.DESCRIZIONE_KEY, 
-		    	    		MyDatabase.DataINStable.NOTE_KEY}, 
-		    	    new int[]
-		    	    		{ android.R.id.text1, android.R.id.text2, android.R.id.text1, android.R.id.text2, android.R.id.text2, android.R.id.text2, android.R.id.text2, android.R.id.text2, android.R.id.text2, android.R.id.text2 },
-		    	    0);
-		    	    */
-			dataAdapter = new SimpleCursorAdapter(
-		    	    this, R.layout.list_item, 
-		    	    mycursor, 
-		    	    new String[] 
-		    	    		{ MyDatabase.DataINStable.DATA_OPERAZIONE_KEY, 
-		    	    		MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY, 
-		    	    		MyDatabase.DataINStable.CHI_FA_KEY, 
-		    	    		MyDatabase.DataINStable.A_DA_KEY, 
-		    	    		MyDatabase.DataINStable.C_PERS_KEY, 
-		    	    		MyDatabase.DataINStable.VALORE_KEY, 
-		    	    		MyDatabase.DataINStable.CATEGORIA_KEY,  
-		    	    		MyDatabase.DataINStable.DESCRIZIONE_KEY, 
-		    	    		MyDatabase.DataINStable.NOTE_KEY}, 
-		    	    new int[]
-		    	    		{ R.id.dataText, 
-		    	    		R.id.tipooperazioneText, 
-		    	    		R.id.chifaText, 
-		    	    		R.id.adaText, 
-		    	    		R.id.cpersText, 
-		    	    		R.id.valoreText, 
-		    	    		R.id.categoriaText, 
-		    	    		R.id.descrizioneText, 
-		    	    		R.id.noteText},
-		    	    0);
 
-			setListAdapter(dataAdapter);
-		    
-		    
-		    
-			/*
-			while ( mycursor.moveToNext() ) {
+			if (readDBtype.equals("full")) {
+				DBINStoread = new MyDatabase(
+						getApplicationContext(), 
+						myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator + myGlobal.LOCAL_FULL_DB_FILE);
+			} else {
+				DBINStoread = new MyDatabase(
+						getApplicationContext(), 
+						myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_DB_FILENAME);
+			}
 
-			    Log.i(myGlobal.TAG, " FANTUZ --> " +
-			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.DATA_OPERAZIONE_KEY) ) +
-			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY) ) + 
-			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.CHI_FA_KEY) ) +
-			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.A_DA_KEY) ) +
-			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.C_PERS_KEY) ) +
-			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.VALORE_KEY) ) +
-			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.CATEGORIA_KEY) ) +
-			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.GENERICA_KEY) ) +
-			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.DESCRIZIONE_KEY) ) + 
-			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.NOTE_KEY) )
-			    );
+
 			
-			    
-		           
-			}   */
+			DBINStoread.open();
+			Cursor mycursor = null;
+			//mycursor = DBINStoread.fetchDati();
+			mycursor = DBINStoread.rawQuery("SELECT * FROM " + MyDatabase.DataINStable.TABELLA_INSDATA + " ORDER BY " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" DESC",  null );
+			if (mycursor.getCount() == 0) {
+				assert true;	// nop
+			} else {
+				super.onCreate(savedInstanceState);
+			
+				dataAdapter = new SimpleCursorAdapter(
+			    	    this, R.layout.list_item, 
+			    	    mycursor, 
+			    	    new String[] 
+			    	    		{ MyDatabase.DataINStable.DATA_OPERAZIONE_KEY, 
+			    	    		MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY, 
+			    	    		MyDatabase.DataINStable.CHI_FA_KEY, 
+			    	    		MyDatabase.DataINStable.A_DA_KEY, 
+			    	    		MyDatabase.DataINStable.C_PERS_KEY, 
+			    	    		MyDatabase.DataINStable.VALORE_KEY, 
+			    	    		MyDatabase.DataINStable.CATEGORIA_KEY,  
+			    	    		MyDatabase.DataINStable.DESCRIZIONE_KEY, 
+			    	    		MyDatabase.DataINStable.NOTE_KEY}, 
+			    	    new int[]
+			    	    		{ R.id.dataText, 
+			    	    		R.id.tipooperazioneText, 
+			    	    		R.id.chifaText, 
+			    	    		R.id.adaText, 
+			    	    		R.id.cpersText, 
+			    	    		R.id.valoreText, 
+			    	    		R.id.categoriaText, 
+			    	    		R.id.descrizioneText, 
+			    	    		R.id.noteText},
+			    	    0);
 
-		}
-		DBINSlocal.close();
-/*
-        String[] my_string_list = getResources().getStringArray(R.array.Categoria);
-        ListView listView = (ListView)findViewById(android.R.id.list);        
-        ArrayAdapter<String> arrayAdapter =
-                new ArrayAdapter<String>(this, R.layout.list_item, R.id.label, my_string_list);
-        listView.setAdapter(arrayAdapter);
-		
-		List<Contact> contact = new ArrayList<Contact>(); 
-		contact=getAllContacts();     
-		ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, contact); 
-		 listContent.setAdapter(adapter);
-        
-        */
+				setListAdapter(dataAdapter);
+
+			}
+			DBINStoread.close();
+		} catch (Exception e) {
+    		e.printStackTrace();
+    		showToast("Error Exception: " + e.getMessage());
+    	}
+
         
 		
 	}
@@ -163,5 +95,18 @@ public class ReadTxtActivity extends ListActivity {
 	}
 
 	
+
+    // *************************************************************************
+    // Mostra messaggio toast 
+    // *************************************************************************
+    public void showToast(final String toast) {
+        runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            Toast.makeText(getApplicationContext(), toast, Toast.LENGTH_LONG).show();
+          }
+        });
+      }
+
 	
 }

@@ -148,6 +148,9 @@ public class UploadToDropbox extends AsyncTask<Void, Long, Boolean> {
         mDialog.dismiss();
         if (result) {
             showToast("File successfully uploaded");
+            // adesso Cancello il file newFile
+            mFile.delete();
+            
         } else {
             showToast(mErrorMsg);
         }

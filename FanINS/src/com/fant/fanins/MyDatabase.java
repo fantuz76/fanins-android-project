@@ -3,12 +3,11 @@ package com.fant.fanins;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -19,6 +18,8 @@ public class MyDatabase {
         DbHelper mDbHelper;
         Context mContext;
     	
+        
+        
         // file di default
         private static final String DB_DEFAULT_NAME= myGlobal.getStorageFantDir().getPath() + java.io.File.separator +  "INSbase.sqlite";//nome del db
         private static final int DB_VERSION=1; //numero di versione del nostro db
@@ -49,7 +50,7 @@ public class MyDatabase {
         }
 
         static class DataINStable {  // i metadati della tabella, accessibili ovunque
-            static final String INSDATA_TABLE = "myINSData";
+            static final String TABELLA_INSDATA = "myINSData";
             static final String ID = "_id";
             static final String DATA_OPERAZIONE_KEY = "DataOperazione";                
             static final String TIPO_OPERAZIONE_KEY = "TipoOperazione";
@@ -65,8 +66,8 @@ public class MyDatabase {
             
     }
         
-        private static final String INSDATA_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS "  //codice sql di creazione della tabella
-                + DataINStable.INSDATA_TABLE + " ("
+        private static final String TABELLA_INSDATA_CREATE = "CREATE TABLE IF NOT EXISTS "  //codice sql di creazione della tabella
+                + DataINStable.TABELLA_INSDATA + " ("
                 + DataINStable.ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + ", "
                 + DataINStable.DATA_OPERAZIONE_KEY + TYPE_DB_STRING + ", "
                 + DataINStable.TIPO_OPERAZIONE_KEY + TYPE_DB_STRING + ", "
@@ -85,7 +86,7 @@ public class MyDatabase {
         //i seguenti 2 metodi servono per la lettura/scrittura del db. aggiungete e modificate a discrezione
         
         public void insertRecordDataIns(String _valData, String _valTipoOper, String _valChiFa, String _valADa, 
-        		String _valPersonale, String _valValore, String _valCategoria, String _valDescrizione, String _valNote, String _valspecialNote){ //metodo per inserire i dati
+        		String _valPersonale, float _valValore, String _valCategoria, String _valDescrizione, String _valNote, String _valspecialNote){ //metodo per inserire i dati
                 ContentValues cv=new ContentValues();
                 cv.put(DataINStable.DATA_OPERAZIONE_KEY, _valData);
                 cv.put(DataINStable.TIPO_OPERAZIONE_KEY, _valTipoOper);
@@ -99,39 +100,37 @@ public class MyDatabase {
                 cv.put(DataINStable.NOTE_KEY, _valNote);
                 cv.put(DataINStable.SPECIAL_NOTE_KEY, _valspecialNote);
 
-                mDb.insert(DataINStable.INSDATA_TABLE, null, cv);
+                mDb.insert(DataINStable.TABELLA_INSDATA, null, cv);
         }
+
+        //---deletes a particular title---
+        public boolean deleteDatabyID(String _IDval) 
+        {
+            return mDb.delete(DataINStable.TABELLA_INSDATA,
+            		DataINStable.ID + "=" + _IDval
+            		, null) > 0;
+        }      
         
-        public Cursor fetchProducts(){ //metodo per fare la query di tutti i dati
-                return mDb.query(DataINStable.INSDATA_TABLE, null,null,null,null,null,null);                
+        public Cursor fetchDati(){ //metodo per fare la query di tutti i dati
+                return mDb.query(DataINStable.TABELLA_INSDATA, null,null,null,null,null,null);                
         }
         
     
+        public Cursor rawQuery(String _sqlQuery, String[] _args){ //metodo per fare la query di tutti i dati
+            return mDb.rawQuery(_sqlQuery, _args);
+        }
 
-
- 
+        //Execute a single SQL statement that is NOT a SELECT or any other SQL statement that returns data.
+        public void execSQLsimple(String _sqlStr) throws SQLException {        	
+        	mDb.execSQL(_sqlStr);        	
+        }
         
-    	private String readDBCreationFromFile(String _nomeFileSQL) {
-
-    		//Read text from file
-    		StringBuilder text = new StringBuilder();
-
-    		try {
-    		    BufferedReader br = new BufferedReader(new FileReader(_nomeFileSQL));
-    		    String line;
-
-    		    while ((line = br.readLine()) != null) {
-    		        text.append(line);    		        
-    		        text.append(System.getProperty("line.separator"));
-    		    }
-    		}
-    		catch (IOException e) {
-    		    //You'll need to add proper error handling here
-    			
-    		}
-    		
-    		return(text.toString());
-    	}
+        //Execute a single SQL statement that is NOT a SELECT/INSERT/UPDATE/DELETE.
+        public void execSQLarg(String _sqlStr, String[] _selectionArgs){ 
+            mDb.execSQL(_sqlStr, _selectionArgs);                
+        } 
+        
+    
     	
         private class DbHelper extends SQLiteOpenHelper { //classe che ci aiuta nella creazione del db
 
@@ -141,7 +140,7 @@ public class MyDatabase {
 
                 @Override
                 public void onCreate(SQLiteDatabase _db) { //solo quando il db viene creato, creiamo la tabella
-                	_db.execSQL(INSDATA_TABLE_CREATE);
+                	_db.execSQL(TABELLA_INSDATA_CREATE);
                 }
 
                 @Override
@@ -149,7 +148,8 @@ public class MyDatabase {
                         //qui mettiamo eventuali modifiche al db, se nella nostra nuova versione della app, il db cambia numero di versione
 
                 }
-
+                
+        
         }
                 
 

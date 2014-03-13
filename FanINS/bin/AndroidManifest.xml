@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!-- android:versionCode = intero  che si incrementa di uno ogni volta che si vuole differenziare
+	 android:versionName = stringa che identifica la versione così come presentata all'utente ex 2.3.4
+-->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.fant.fanins"
-    android:versionCode="3"
-    android:versionName="@string/VersionNameString" >
+    package="com.fant.fanins"        
+    android:versionCode="4"
+    android:versionName="1.4.0" >
 
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -59,7 +63,7 @@
     	</activity>        
         <activity
             android:name="com.fant.fanins.ReadTxtActivity"
-            android:label="@string/title_activity_read_txt" >
+            android:label="@string/title_activity_read_DB" >
         </activity>
         <activity
             android:name="com.fant.fanins.SettingsActivity"
@@ -67,8 +71,13 @@
         </activity>
         <activity
             android:name="com.fant.fanins.MySettings"
-            android:label="@string/title_activity_settings" >
+            android:label="@string/title_activity_MySettings" >
         </activity>
+        <activity
+            android:name="com.fant.fanins.SyncDBActivity"
+            android:label="@string/title_activity_SyncDB" >
+        </activity>        
+        
 </application>
 
 </manifest>

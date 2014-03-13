@@ -1,13 +1,13 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <EditTextPreference android:capitalize="words" 
-        android:defaultValue="@string/VersionNameString" 
+        android:defaultValue="numero versione" 
         android:inputType="textCapWords" 
         android:key="example_text" 
         android:maxLines="1" 
         android:selectAllOnFocus="true" 
         android:singleLine="true" 
-        android:title="@string/versione" />
+        android:title="Versione Fant" />
     
     <CheckBoxPreference
         android:defaultValue="true"
