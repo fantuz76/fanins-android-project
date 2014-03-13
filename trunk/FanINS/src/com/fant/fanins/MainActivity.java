@@ -25,7 +25,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -61,7 +60,6 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
-import com.google.common.io.Files;
 import com.google.gdata.client.spreadsheet.SpreadsheetService;
 import com.google.gdata.data.spreadsheet.CellEntry;
 import com.google.gdata.data.spreadsheet.CellFeed;
@@ -121,7 +119,7 @@ public class MainActivity extends FragmentActivity {
 	
 	com.google.api.services.drive.model.File fileOnGoogleDrive = null;
 	
-	private MyDatabase DBINSlocal, DBINSdownloaded;
+	private MyDatabase DBINSlocal;
 	  	
     private static Drive service;
 	private GoogleAccountCredential credential;	  
@@ -147,7 +145,6 @@ public class MainActivity extends FragmentActivity {
 	
 	private ProgressDialog progDia = null;
 	
-	public final static String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE";
 
     // *************************************************************************
 	// OnCreate
@@ -222,43 +219,14 @@ public class MainActivity extends FragmentActivity {
 		
 		// prepara file
 		fileAccessOK = prepFileisOK();
-		DBINSlocal = new MyDatabase(
-				getApplicationContext(), 
-				myGlobal.getStorageFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_DB_FILENAME);
-				
-		DBINSdownloaded = new MyDatabase(
-				getApplicationContext(), 
-				myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_DOWNLOADED_DB_FILE);
+		
+		fileSqliteAccessOK = prepDBfilesisOK();
 		
 		
 		
 		
-		fileSqliteAccessOK = true;		
-		DBINSlocal.open();
-		if (DBINSlocal.fetchProducts().getCount() == 0) {
-			assert true;	// nop
-		} else {
-			Cursor mycursor;
-			mycursor = DBINSlocal.fetchProducts();
-			while ( mycursor.moveToNext() ) {
 
-			    Log.i(myGlobal.TAG, " FANTUZ --> " +
-			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.DATA_OPERAZIONE_KEY) ) +
-			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY) ) + 
-			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.CHI_FA_KEY) ) +
-			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.A_DA_KEY) ) +
-			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.C_PERS_KEY) ) +
-			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.VALORE_KEY) ) +
-			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.CATEGORIA_KEY) ) +
-			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.GENERICA_KEY) ) +
-			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.DESCRIZIONE_KEY) ) + 
-			    		mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.NOTE_KEY) )
-			    );
-			    
-			}   
-
-		}
-		DBINSlocal.close();
+		
 		
 		if (!fileAccessOK) {
 			showToast("Error file create: " + fileNameFull);
@@ -353,7 +321,6 @@ public class MainActivity extends FragmentActivity {
             showToast("Error UserRecoverableAuthIOException: " );
             return (false);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			showToast("Error IOException: " + e.getMessage());
 			return (false);
@@ -374,7 +341,7 @@ public class MainActivity extends FragmentActivity {
         	if (uploadSingleFile(myGlobal.getStorageFantDir().getPath() , fileName, "text/plain"))
         		showToast("Uploaded: " + fileName);
 		
-        	if (uploadSingleFile(myGlobal.getStorageFantDir().getPath() , myGlobal.LOCAL_DB_FILENAME, "application/octet-stream"))
+        	if (uploadSingleFile(myGlobal.getStorageDatabaseFantDir().getPath() , myGlobal.LOCAL_DB_FILENAME, "application/octet-stream"))
         		showToast("Uploaded: " + myGlobal.LOCAL_DB_FILENAME);
         	
         	return "Executed";
@@ -425,7 +392,6 @@ public class MainActivity extends FragmentActivity {
         	    List<SpreadsheetEntry> spreadsheetList = feed.getEntries();
 
         	    if (spreadsheetList.size() == 0) {
-        	      // TODO: There were no spreadsheets, act accordingly.
         	    	showToast("No sheets found");
         	    } else {
 
@@ -468,7 +434,7 @@ public class MainActivity extends FragmentActivity {
 	            	    // Se file txt OK carico tutto nel fiel excel 
 	            	    if (fileAccessOK) {		            	    	
 		            		Calendar c = Calendar.getInstance();
-		            		SimpleDateFormat df = new SimpleDateFormat("MM-dd-yyyy@HH'h'mm'm'ss's'", Locale.ITALY);
+		            		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd@HH'h'mm'm'ss's'", Locale.ITALY);
 		            		String formattedDate = df.format(c.getTime());
 	            	    	CellEntry newCell;
 	            	    	String ValToWrite = "";
@@ -535,7 +501,6 @@ public class MainActivity extends FragmentActivity {
         	    }
         	  } catch (Exception e) {
         		  showToast("Exception " + e.getMessage());
-        		  	
         	  }
               return "Executed";
         }      
@@ -578,102 +543,145 @@ public class MainActivity extends FragmentActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        switch(item.getItemId())
-        {
+    	Intent intent;
+
+    	switch(item.getItemId())
+    	{
 
 
-        	case R.id.action_uploadDB:        	
-        		Calendar c = Calendar.getInstance();
-        		SimpleDateFormat df = new SimpleDateFormat("MM-dd-yyyy@HHmmss", Locale.ITALY);
-        		String formattedDate = df.format(c.getTime());
+    	case R.id.action_uploadDB:        	
+    		Calendar c = Calendar.getInstance();
+    		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd@HH'h'mm'm'ss's'", Locale.ITALY);
+    		String formattedDate = df.format(c.getTime());
 
-    	    	// adesso, una volta caricato lo rinomino così resta nella SD del telefono come backup
-    	    	java.io.File oldFile = new java.io.File(fileNameFull);
-    	    	java.io.File newFile = new java.io.File(fileNameFull.replace(".txt", "_" + formattedDate + ".txt"));
-    	    	
-    	    	//Now invoke the renameTo() method on the reference, oldFile in this case
-    	    	
-			try {
-				Files.copy(oldFile, newFile);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    	    	
-                UploadToDropbox upload = new UploadToDropbox(this, mApi, DROPBOX_INS_DIR, newFile);
-                upload.execute();
-                return true;
-                
-        	case R.id.action_downloadDB:
-        		DownloadFromDropbox download = new DownloadFromDropbox(this, mApi, DROPBOX_INS_DIR, myGlobal.REMOTE_DB_FILENAME,
-        				myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator + myGlobal.LOCAL_DOWNLOADED_DB_FILE);
-                download.execute();
-              return true;
-              
-        	case R.id.action_sync:
-    	        //Put up the Yes/No message box
-    	    	AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    	    	builder    	    	
-    	    	.setTitle(R.string.action_sync)
-    	    	.setMessage("Are you sure?")
-    	    	.setIcon(android.R.drawable.ic_dialog_alert)
-    	    	.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-    	    	    public void onClick(DialogInterface dialog, int which) {    	    	    	    	    	    	
-    	        		MainActivity.this.progDia = ProgressDialog.show(MainActivity.this, "INS..", "Sync Data...", true);
-    	        		new updateINS2().execute("");    	    	    	
-    	    	    }
-    	    	})
-    	    	.setNegativeButton("No", null)						//Do nothing on no
-    	    	.show();
-    	    	
-        		return true;
+    		// adesso, una volta caricato lo rinomino così resta nella SD del telefono come backup
+    		java.io.File oldFile = new java.io.File(fileNameFull);
+    		java.io.File newFile = new java.io.File(fileNameFull.replace(".txt", "_" + formattedDate + ".txt"));    	    	
 
-        	case R.id.action_upload:        	
-                credential = GoogleAccountCredential.usingOAuth2(this, Arrays.asList(DriveScopes.DRIVE));
-                startActivityForResult(credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
-                return true;
-                
-        	case R.id.action_readfile:
-            	//showToast("Menu setting not available");
-            	//showDatePickerDialog(MainActivity.this);
-        		
-                Intent intent = new Intent(this, ReadTxtActivity.class);
-                
-                //EditText editText = (EditText) findViewById(R.id.TextDescrizione);
-                //String message = editText.getText().toString();
-				//intent.putExtra(EXTRA_MESSAGE, message);
-                
-                startActivity(intent);
-              return true;
+    		// copia
+    		try {
+    			myGlobal.copyFiles(oldFile, newFile);
+    			//myGlobal.copyFiles2(oldFile, newFile);   	    	
+    			//Files.copy(oldFile, newFile);
+    		} catch (IOException e) {				
+    			e.printStackTrace();
+    			showToast("Error IOException: " + e.getMessage());
+    		}
+
+    		// stessa cosa con il file database
+    		// adesso, una volta caricato lo rinomino così resta nella SD del telefono come backup
+    		java.io.File oldFileDB = new java.io.File(myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_FULL_DB_FILE);
+    		java.io.File newFileDB = new java.io.File(myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_FULL_DB_FILE.replace(".sqlite", "_" + formattedDate + ".sqlite"));    	    	
+
+    		// copia
+    		try {
+    			myGlobal.copyFiles(oldFileDB, newFileDB);
+    			//myGlobal.copyFiles2(oldFileDB, newFileDB);   	    	
+    			//Files.copy(oldFileDB, newFileDB);
+    		} catch (IOException e) {
+    			e.printStackTrace();
+    			showToast("Error IOException: " + e.getMessage());
+    		}
 
 
-              
-        	case R.id.action_authDropbox:        		
-                if (mDropboxLoggedIn) {
-                    logOutDropbox();
-                } else {
-                    // Start the remote authentication
-                    if (USE_OAUTH1) {
-                        mApi.getSession().startAuthentication(MainActivity.this);
-                    } else {
-                        mApi.getSession().startOAuth2Authentication(MainActivity.this);
-                    }
-                }
+    		UploadToDropbox upload = new UploadToDropbox(this, mApi, DROPBOX_INS_DIR, newFile);
+    		upload.execute();
+
+    		UploadToDropbox uploadDB = new UploadToDropbox(this, mApi, DROPBOX_INS_DIR, newFileDB);
+    		uploadDB.execute();
+
+    		// adesso Cancello il file newFile
+    		// non farlo qua se no noon upload niente
+    		//newFile.delete();
+    		return true;
+
+    	case R.id.action_downloadDB:
+    		DownloadFromDropbox download1 = new DownloadFromDropbox(this, mApi, DROPBOX_INS_DIR, myGlobal.REMOTE_DB_FILENAME,
+    				myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator + myGlobal.LOCAL_DOWNLOADED_DB_FILE);
+    		download1.execute();
+    		return true;
+
+    	case R.id.action_downloadDBfull:
+    		DownloadFromDropbox download2 = new DownloadFromDropbox(this, mApi, DROPBOX_INS_DIR, myGlobal.REMOTE_DB_FILENAME,
+    				myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator + myGlobal.LOCAL_FULL_DB_FILE);
+    		download2.execute();
+    		return true;
 
 
-        		return true;
-              
-        	case R.id.action_settings:
-            	showToast("Menu setting not available");
-            	//showDatePickerDialog(MainActivity.this);
-                //Intent intentSettings = new Intent(this, SettingsActivity.class);                
-                Intent intentSettings = new Intent(this, MySettings.class);
-                startActivity(intentSettings);
-              return true;
 
-            default:
-                  return super.onOptionsItemSelected(item);
-        }
+    	case R.id.action_sync:
+    		//Put up the Yes/No message box
+    		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    		builder    	    	
+    		.setTitle(R.string.action_sync)
+    		.setMessage("Are you sure?")
+    		.setIcon(android.R.drawable.ic_dialog_alert)
+    		.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+    			public void onClick(DialogInterface dialog, int which) {    	    	    	    	    	    	
+    				MainActivity.this.progDia = ProgressDialog.show(MainActivity.this, "INS..", "Sync Data...", true);
+    				new updateINS2().execute("");    	    	    	
+    			}
+    		})
+    		.setNegativeButton("No", null)						//Do nothing on no
+    		.show();
+
+    		return true;
+
+
+
+
+    	case R.id.action_sync_db:
+    		intent = new Intent(this, SyncDBActivity.class);
+    		startActivity(intent);
+    		return true;        		
+
+    	case R.id.action_upload:        	
+    		credential = GoogleAccountCredential.usingOAuth2(this, Arrays.asList(DriveScopes.DRIVE));
+    		startActivityForResult(credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
+    		return true;
+
+
+    	case R.id.action_readfileDBlocal:
+    		intent = new Intent(this, ReadTxtActivity.class);
+    		// passo delle informazioni all'Activity
+    		intent.putExtra("readDBtype","local");
+    		startActivity(intent);
+    		return true;
+
+    	case R.id.action_readfileDBfull:
+    		intent = new Intent(this, ReadTxtActivity.class);
+    		// passo delle informazioni all'Activity
+    		intent.putExtra("readDBtype","full");
+    		startActivity(intent);
+    		return true;
+
+
+    	case R.id.action_authDropbox:        		
+    		if (mDropboxLoggedIn) {
+    			logOutDropbox();
+    		} else {
+    			// Start the remote authentication
+    			if (USE_OAUTH1) {
+    				mApi.getSession().startAuthentication(MainActivity.this);
+    			} else {
+    				mApi.getSession().startOAuth2Authentication(MainActivity.this);
+    			}
+    		}
+
+
+    		return true;
+
+    	case R.id.action_settings:
+    		showToast("Menu setting not available");
+    		//showDatePickerDialog(MainActivity.this);
+    		//Intent intentSettings = new Intent(this, SettingsActivity.class);                
+    		Intent intentSettings = new Intent(this, MySettings.class);
+    		startActivity(intentSettings);
+    		return true;
+
+    	default:
+    		return super.onOptionsItemSelected(item);
+    	}
     }
     
     
@@ -816,6 +824,35 @@ public class MainActivity extends FragmentActivity {
 
     
     // *************************************************************************
+    // Preparo file database, se non ci sono li crea 
+    // *************************************************************************    
+    public boolean prepDBfilesisOK(){
+    	MyDatabase DBINStmp;
+
+    	try  {
+    		DBINSlocal = new MyDatabase(
+    				getApplicationContext(), 
+    				myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_DB_FILENAME);
+
+    		DBINSlocal.open();
+    		DBINSlocal.close();
+
+    		DBINStmp = new MyDatabase(
+    				getApplicationContext(), 
+    				myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_FULL_DB_FILE);
+
+    		DBINStmp.open();
+    		DBINStmp.close();
+    		return true;
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		showToast("Error Exception: " + e.getMessage());
+    		return false;
+    	}
+
+    }
+    
+    // *************************************************************************
     // Preparo file di testo, controllo consistenza 
     // *************************************************************************
     public boolean prepFileisOK() {
@@ -867,6 +904,7 @@ public class MainActivity extends FragmentActivity {
     	    	}    			    			
     			return true;
     		} catch (Exception ioe) {
+    			ioe.printStackTrace();
     			return false;
     		}
     		
@@ -884,49 +922,62 @@ public class MainActivity extends FragmentActivity {
     	if (!fileAccessOK) {
     		showToast("Error file create: " + fileNameFull);
     	} else {    	
-	        //Put up the Yes/No message box
-	    	AlertDialog.Builder builder = new AlertDialog.Builder(this);
-	    	builder
-	    	.setTitle("Save Data file: " + fileName)
-	    	.setMessage("Are you sure?")
-	    	.setIcon(android.R.drawable.ic_dialog_alert)
-	    	.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-	    	    public void onClick(DialogInterface dialog, int which) {			      	
+    		//Put up the Yes/No message box
+    		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    		builder
+    		.setTitle("Save Data file: " + fileName)
+    		.setMessage("Are you sure?")
+    		.setIcon(android.R.drawable.ic_dialog_alert)
+    		.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+    			public void onClick(DialogInterface dialog, int which) {			      	
 
-	    	    	// Scrivo dati nel file, modalità append	    	    	
-	    	    	try  {
-    	    	    	FileWriter fw = new FileWriter(fileNameFull, true);
+    				// Scrivo dati nel file, modalità append	    	    	
+    				try  {
+    					FileWriter fw = new FileWriter(fileNameFull, true);
 
-    	    			// Scrivo separando i campi da TAB
-    	    			fw.append(valData + '\t');
-    	    			fw.append(valTipoOper + '\t');
-    	    			fw.append(valChiFa + '\t');
-    	    			fw.append(valADa + '\t');
-    	    			fw.append(valPersonale + '\t');
-    	    			fw.append(valValore + '\t');
-    	    			fw.append(valCategoria + '\t');
-    	    			fw.append('\t');					// Categoria Generica è vuota la calcola poi file excel
-    	    			fw.append(valDescrizione + '\t');
-    	    			fw.append(valNote + '\t');
+    					// Scrivo separando i campi da TAB
+    					fw.append(valData + '\t');
+    					fw.append(valTipoOper + '\t');
+    					fw.append(valChiFa + '\t');
+    					fw.append(valADa + '\t');
+    					fw.append(valPersonale + '\t');
+    					fw.append(valValore + '\t');
+    					fw.append(valCategoria + '\t');
+    					fw.append('\t');					// Categoria Generica è vuota la calcola poi file excel
+    					fw.append(valDescrizione + '\t');
+    					fw.append(valNote + '\t');
 
-    	                fw.append('\n');
-    			
-    	    			fw.flush();
-    	    			fw.close();
-    	    			
-    	    	    	showToast("Dati Salvati");
-	    	    	} catch (IOException ioe)
-	    		      {ioe.printStackTrace();}
-	    	    	
-	    	    }
-	    	})
-	    	.setNegativeButton("No", null)						//Do nothing on no
-	    	.show();
+    					fw.append('\n');
 
-	    }
+    					fw.flush();
+    					fw.close();
+
+    					// Lo metto nel DB (converto anche Valore come float)
+    		        	Float myFloatValore = (float) 0;
+    		        	myFloatValore = Float.parseFloat(valValore);
+
+    	        		DBINSlocal.open();
+    	        		DBINSlocal.insertRecordDataIns(valData, valTipoOper, valChiFa, valADa, valPersonale, myFloatValore, valCategoria, valDescrizione, valNote, "");
+    	        		DBINSlocal.close();
+
+    					showToast("Dati Salvati");
+    				} catch (IOException ioe) {    					
+    					showToast("Error IOException: " + ioe.getMessage());
+    					ioe.printStackTrace();
+    				} catch (Exception e){
+    					showToast("Error Exception: " + e.getMessage());
+    					e.printStackTrace();    					
+    				}
+
+    			}
+    		})
+    		.setNegativeButton("No", null)						//Do nothing on no
+    		.show();
+
+    	}
     }
-    
-    
+
+
     
     // *************************************************************************
     // Mostra messaggio toast 
@@ -978,10 +1029,6 @@ public class MainActivity extends FragmentActivity {
         	
         	if (checkAllValues()) {
         		saveDataOnFile() ;
-        		
-        		DBINSlocal.open();
-        		DBINSlocal.insertRecordDataIns(valData, valTipoOper, valChiFa, valADa, valPersonale, valValore, valCategoria, valDescrizione, valNote, "");
-        		DBINSlocal.close();
         	} else {
         		showToast("Dati non corretti nessun file caricato");
         	}

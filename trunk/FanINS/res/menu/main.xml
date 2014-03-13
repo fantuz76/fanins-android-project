@@ -10,12 +10,24 @@
 		android:orderInCategory="100" 
 		android:showAsAction="never" 
 		android:title="@string/action_downloadDB" />
+
 	
+    <item android:id="@+id/action_downloadDBfull" 
+		android:orderInCategory="100" 
+		android:showAsAction="never" 
+		android:title="@string/action_downloadDBfull" />
+        	
     <item
         android:id="@+id/action_upload"
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="@string/action_upload"/>    
+
+    <item
+        android:id="@+id/action_sync_db"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/action_sync_db"/>
     
     
     <item
@@ -26,12 +38,18 @@
 
     
     <item
-        android:id="@+id/action_readfile"
+        android:id="@+id/action_readfileDBlocal"
         android:orderInCategory="100"
         android:showAsAction="never"
-        android:title="@string/action_readfile"/>
+        android:title="@string/action_readfileDBlocal"/>
 
-   	        
+   	
+    <item
+        android:id="@+id/action_readfileDBfull"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/action_readfileDBfull"/>
+    
     <item
         android:id="@+id/action_authDropbox"
         android:orderInCategory="100"
