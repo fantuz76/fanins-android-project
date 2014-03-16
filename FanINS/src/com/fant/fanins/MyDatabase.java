@@ -1,8 +1,6 @@
 package com.fant.fanins;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.File;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -12,11 +10,17 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.dropbox.client2.DropboxAPI;
+import com.dropbox.client2.android.AndroidAuthSession;
+
 public class MyDatabase {  
 
         SQLiteDatabase mDb;
         DbHelper mDbHelper;
         Context mContext;
+        DropboxAPI<AndroidAuthSession> mApiPar;
+        String parDBName;
+        boolean downloadifcreate = false;
     	
         
         
@@ -28,17 +32,19 @@ public class MyDatabase {
         
         public MyDatabase(Context ctx){
                 mContext=ctx;
-                mDbHelper=new DbHelper(ctx, DB_DEFAULT_NAME, null, DB_VERSION);   //quando istanziamo questa classe, istanziamo anche l'helper (vedi sotto)     
+                mDbHelper=new DbHelper(ctx, DB_DEFAULT_NAME, null, DB_VERSION);   //quando istanziamo questa classe, istanziamo anche l'helper (vedi sotto)
+                downloadifcreate = false;
         }
 
         // Costruttore con parametro DB_NAME
         public MyDatabase(Context ctx, String strDBNAME){
+        	parDBName=strDBNAME;
             mContext=ctx;
-            mDbHelper=new DbHelper(ctx, strDBNAME, null, DB_VERSION);   //quando istanziamo questa classe, istanziamo anche l'helper (vedi sotto)     
+            mDbHelper=new DbHelper(ctx, strDBNAME, null, DB_VERSION);   //quando istanziamo questa classe, istanziamo anche l'helper (vedi sotto)
+            downloadifcreate = false;
         }
 
-
-
+  
         public void open(){  //il database su cui agiamo è leggibile/scrivibile
         	// Richiamare questo metodo significa rendere scrivibile il database
         	// Se non esiste automaticamente scatena onCreate di SQLiteOpenHelper
@@ -74,7 +80,7 @@ public class MyDatabase {
                 + DataINStable.CHI_FA_KEY + TYPE_DB_STRING + ", "
                 + DataINStable.A_DA_KEY + TYPE_DB_STRING + ", "
                 + DataINStable.C_PERS_KEY + TYPE_DB_STRING + ", "
-                + DataINStable.VALORE_KEY + " REAL COLLATE RTRIM, "
+                + DataINStable.VALORE_KEY + TYPE_DB_STRING + ","
                 + DataINStable.CATEGORIA_KEY + TYPE_DB_STRING + ", "
                 + DataINStable.GENERICA_KEY + TYPE_DB_STRING + ", "
                 + DataINStable.DESCRIZIONE_KEY + TYPE_DB_STRING + ", "                
@@ -86,7 +92,7 @@ public class MyDatabase {
         //i seguenti 2 metodi servono per la lettura/scrittura del db. aggiungete e modificate a discrezione
         
         public void insertRecordDataIns(String _valData, String _valTipoOper, String _valChiFa, String _valADa, 
-        		String _valPersonale, float _valValore, String _valCategoria, String _valDescrizione, String _valNote, String _valspecialNote){ //metodo per inserire i dati
+        		String _valPersonale, String _valValore, String _valCategoria, String _valDescrizione, String _valNote, String _valspecialNote){ //metodo per inserire i dati
                 ContentValues cv=new ContentValues();
                 cv.put(DataINStable.DATA_OPERAZIONE_KEY, _valData);
                 cv.put(DataINStable.TIPO_OPERAZIONE_KEY, _valTipoOper);
@@ -140,7 +146,10 @@ public class MyDatabase {
 
                 @Override
                 public void onCreate(SQLiteDatabase _db) { //solo quando il db viene creato, creiamo la tabella
-                	_db.execSQL(TABELLA_INSDATA_CREATE);
+
+                	
+                	//_db.execSQL(TABELLA_INSDATA_CREATE);
+                	
                 }
 
                 @Override

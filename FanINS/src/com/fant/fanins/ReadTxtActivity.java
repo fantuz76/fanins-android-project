@@ -1,11 +1,20 @@
 package com.fant.fanins;
 
+import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.widget.SimpleCursorAdapter;
-import android.util.Log;
 import android.view.Menu;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.ListView;
 import android.widget.Toast;
 
 public class ReadTxtActivity extends ListActivity {
@@ -13,13 +22,28 @@ public class ReadTxtActivity extends ListActivity {
 	private MyDatabase DBINStoread;
 	
 	public static String versionName = "";
+	static ListView myListActivity;
 	
-	private SimpleCursorAdapter dataAdapter;
+	private static SimpleCursorAdapter dataAdapter;
+	private int posizioneDaEditare;
+	private Cursor mycursor = null;
+	private String querystr = "";
+	
+	Context mycontext;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		//Remove title bar
+		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+		//Remove notification bar
+		//this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
 		setContentView(R.layout.activity_read_txt);
+
+		
+		mycontext = this;
 
 		
 		try {
@@ -29,10 +53,20 @@ public class ReadTxtActivity extends ListActivity {
 			
 
 			if (readDBtype.equals("full")) {
+				if (myGlobal.statoDBLocalFull == false) {
+					showToast("Errore di presenza file DB: " + myGlobal.LOCAL_FULL_DB_FILE);
+					finish();
+					return;
+				}
 				DBINStoread = new MyDatabase(
 						getApplicationContext(), 
 						myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator + myGlobal.LOCAL_FULL_DB_FILE);
 			} else {
+				if (myGlobal.statoDBLocal == false) {
+					showToast("Errore di presenza file DB: " + myGlobal.LOCAL_DB_FILENAME);
+					finish();
+					return;
+				}
 				DBINStoread = new MyDatabase(
 						getApplicationContext(), 
 						myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_DB_FILENAME);
@@ -41,9 +75,14 @@ public class ReadTxtActivity extends ListActivity {
 
 			
 			DBINStoread.open();
-			Cursor mycursor = null;
+			
 			//mycursor = DBINStoread.fetchDati();
-			mycursor = DBINStoread.rawQuery("SELECT * FROM " + MyDatabase.DataINStable.TABELLA_INSDATA + " ORDER BY " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" DESC",  null );
+			querystr = "SELECT * FROM " + MyDatabase.DataINStable.TABELLA_INSDATA ;
+			if (readDBtype.equals("full")) {
+				querystr = querystr + " ORDER BY " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" DESC";
+			}
+			mycursor = DBINStoread.rawQuery(querystr,  null );
+			
 			if (mycursor.getCount() == 0) {
 				assert true;	// nop
 			} else {
@@ -78,6 +117,75 @@ public class ReadTxtActivity extends ListActivity {
 
 			}
 			DBINStoread.close();
+						 
+			myListActivity = getListView();
+
+			myListActivity.setOnItemClickListener(new OnItemClickListener() {
+
+		        @Override
+		        public void onItemClick(AdapterView<?> arg0, View view, int pos,
+		            long id) {
+		            // TODO Auto-generated method stub
+
+		            //some code here...
+
+		            //String posit = values.get(pos).toString();
+		        	showToast("Pressione");
+		            
+		        }
+		    });
+			
+			myListActivity.setOnItemLongClickListener(new OnItemLongClickListener() {
+
+			    @Override
+			    public boolean onItemLongClick(AdapterView<?> arg0, View view,
+			            int pos, long id) {
+			    	
+			    	posizioneDaEditare = pos;
+
+			    	
+			    	CharSequence sceltePopup1[] = new CharSequence[] {"modifica", "elimina", "seleziona"};
+
+			    	AlertDialog.Builder builder = new AlertDialog.Builder(mycontext);
+			    	//builder.setTitle("Scegliere operazione");
+			    	builder.setItems(sceltePopup1, new DialogInterface.OnClickListener() {
+			    		
+			    	    @Override
+			    	    public void onClick(DialogInterface dialog, int which) {
+			    	        // the user clicked on colors[which]
+			    	    	
+			    	    	switch (which) {
+			    	    	case 0:
+			    	    		break;
+			    	    		
+			    	    	case 1:
+				    	    	mycursor.moveToPosition(posizioneDaEditare);
+				    	    	String _dbID = mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.ID));
+				    	    	DBINStoread.open();
+				    	    	DBINStoread.deleteDatabyID(_dbID);
+				    	    	mycursor = DBINStoread.rawQuery(querystr,  null );
+				    	    	dataAdapter.changeCursor(mycursor);
+				    	    	dataAdapter.notifyDataSetChanged();		                    
+				    	    	
+				    	    	DBINStoread.close();
+				    	    	
+				    	    	showToast("Cancellato elemento _id=" + _dbID);			    	    		
+			    	    		break;
+
+			    	    	default:
+			    	    		break;
+			    	    	}
+			    	    				    	    	
+			    	    }
+			    	});
+			    	builder.show();
+
+			    	
+			        return true;
+			    }
+			});
+
+
 		} catch (Exception e) {
     		e.printStackTrace();
     		showToast("Error Exception: " + e.getMessage());
@@ -94,7 +202,7 @@ public class ReadTxtActivity extends ListActivity {
 		return true;
 	}
 
-	
+
 
     // *************************************************************************
     // Mostra messaggio toast 

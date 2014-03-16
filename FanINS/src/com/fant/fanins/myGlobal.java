@@ -11,11 +11,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Environment;
 import android.widget.Toast;
 
+import com.dropbox.client2.DropboxAPI;
+import com.dropbox.client2.android.AndroidAuthSession;
 import com.google.common.io.Files;
 
 
@@ -25,9 +26,14 @@ public class myGlobal
 	public static final String TAG = "FANTUZ_Activity";
 	
 	public static final String LOCAL_DB_FILENAME = "INSbase_loc.sqlite";	
-	public static final String REMOTE_DB_FILENAME = "INSbase.sqlite";	
+	public static final String REMOTE_DB_FILENAME = "INSbase.sqlite";
+	public static final String REMOTE_DB_FILENAME_EMPTY = "INSbase_loc_empty.sqlite";
 	public static final String LOCAL_DOWNLOADED_DB_FILE = "INSbase_download.sqlite";
 	public static final String LOCAL_FULL_DB_FILE = "INSbase_full.sqlite";
+	public static final String DROPBOX_INS_DIR = "/INS/";
+	public static boolean statoDBLocal;
+	public static boolean statoDBLocalFull;
+	public static DropboxAPI<AndroidAuthSession> mApiDropbox;
 	
     Context mContext;
     

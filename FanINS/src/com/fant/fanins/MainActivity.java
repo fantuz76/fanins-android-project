@@ -1,7 +1,7 @@
 package com.fant.fanins;
 
-//import java.io.File;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -59,7 +59,6 @@ import com.google.api.client.http.FileContent;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
-import com.google.api.services.drive.model.File;
 import com.google.gdata.client.spreadsheet.SpreadsheetService;
 import com.google.gdata.data.spreadsheet.CellEntry;
 import com.google.gdata.data.spreadsheet.CellFeed;
@@ -94,7 +93,7 @@ public class MainActivity extends FragmentActivity {
 
     private static final boolean USE_OAUTH1 = false;
 
-    DropboxAPI<AndroidAuthSession> mApi;
+    
 
     ///////////////////////////////////////////////////////////////////////////
     //                                 End DROPBOX                           //
@@ -102,7 +101,7 @@ public class MainActivity extends FragmentActivity {
     
     private boolean mDropboxLoggedIn;
 	java.io.File retFileDropbox;
-	private final String DROPBOX_INS_DIR = "/INS/";	
+		
 	
 	
 	
@@ -157,10 +156,13 @@ public class MainActivity extends FragmentActivity {
 
         // We create a new AuthSession so that we can use the Dropbox API.
         AndroidAuthSession session = buildSession();
-        mApi = new DropboxAPI<AndroidAuthSession>(session);
+        myGlobal.mApiDropbox = new DropboxAPI<AndroidAuthSession>(session);
         
         checkDropboxAppKeySetup();
                 
+
+        // Display the proper UI state if logged in or not
+        setDropboxLoggedIn(myGlobal.mApiDropbox.getSession().isLinked());
         
 		Spinner spinner;
 		ArrayAdapter<CharSequence> adapter;
@@ -241,9 +243,6 @@ public class MainActivity extends FragmentActivity {
         initTextValue();
     
 
-        // Display the proper UI state if logged in or not
-        setDropboxLoggedIn(mApi.getSession().isLinked());
-
 
     }
 
@@ -305,7 +304,7 @@ public class MainActivity extends FragmentActivity {
 
           // File's metadata.
           com.google.api.services.drive.model.File body;
-          body = new File();
+          body = new com.google.api.services.drive.model.File();
           body.setTitle(fileContent.getName());
           body.setMimeType(_metaData);
 
@@ -571,11 +570,13 @@ public class MainActivity extends FragmentActivity {
     		// stessa cosa con il file database
     		// adesso, una volta caricato lo rinomino così resta nella SD del telefono come backup
     		java.io.File oldFileDB = new java.io.File(myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_FULL_DB_FILE);
-    		java.io.File newFileDB = new java.io.File(myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_FULL_DB_FILE.replace(".sqlite", "_" + formattedDate + ".sqlite"));    	    	
+    		java.io.File newFileDB = new java.io.File(myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_FULL_DB_FILE.replace(".sqlite", "_" + formattedDate + ".sqlite"));
+    		java.io.File newFileDB2 = new java.io.File(myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.REMOTE_DB_FILENAME);
 
     		// copia
     		try {
     			myGlobal.copyFiles(oldFileDB, newFileDB);
+    			myGlobal.copyFiles(oldFileDB, newFileDB2);
     			//myGlobal.copyFiles2(oldFileDB, newFileDB);   	    	
     			//Files.copy(oldFileDB, newFileDB);
     		} catch (IOException e) {
@@ -584,10 +585,12 @@ public class MainActivity extends FragmentActivity {
     		}
 
 
-    		UploadToDropbox upload = new UploadToDropbox(this, mApi, DROPBOX_INS_DIR, newFile);
+
+    		UploadToDropbox upload = new UploadToDropbox(this, myGlobal.mApiDropbox, myGlobal.DROPBOX_INS_DIR, newFile, false, false);
     		upload.execute();
 
-    		UploadToDropbox uploadDB = new UploadToDropbox(this, mApi, DROPBOX_INS_DIR, newFileDB);
+    		// il file REMOTE_DB_FILENAME lo cancello dalla SD dopo upload e tento anche un backup del file remoto
+    		UploadToDropbox uploadDB = new UploadToDropbox(this, myGlobal.mApiDropbox, myGlobal.DROPBOX_INS_DIR, newFileDB2, true, true);
     		uploadDB.execute();
 
     		// adesso Cancello il file newFile
@@ -595,14 +598,16 @@ public class MainActivity extends FragmentActivity {
     		//newFile.delete();
     		return true;
 
+	
+    		
     	case R.id.action_downloadDB:
-    		DownloadFromDropbox download1 = new DownloadFromDropbox(this, mApi, DROPBOX_INS_DIR, myGlobal.REMOTE_DB_FILENAME,
+    		DownloadFromDropbox download1 = new DownloadFromDropbox(this, myGlobal.mApiDropbox, myGlobal.DROPBOX_INS_DIR, myGlobal.REMOTE_DB_FILENAME,
     				myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator + myGlobal.LOCAL_DOWNLOADED_DB_FILE);
     		download1.execute();
     		return true;
 
     	case R.id.action_downloadDBfull:
-    		DownloadFromDropbox download2 = new DownloadFromDropbox(this, mApi, DROPBOX_INS_DIR, myGlobal.REMOTE_DB_FILENAME,
+    		DownloadFromDropbox download2 = new DownloadFromDropbox(this, myGlobal.mApiDropbox, myGlobal.DROPBOX_INS_DIR, myGlobal.REMOTE_DB_FILENAME,
     				myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator + myGlobal.LOCAL_FULL_DB_FILE);
     		download2.execute();
     		return true;
@@ -631,6 +636,9 @@ public class MainActivity extends FragmentActivity {
 
 
     	case R.id.action_sync_db:
+    		if ((myGlobal.statoDBLocal == false) || (myGlobal.statoDBLocalFull == false)) {
+				showToast("Errore presenza file DB locale!");
+			}
     		intent = new Intent(this, SyncDBActivity.class);
     		startActivity(intent);
     		return true;        		
@@ -662,9 +670,9 @@ public class MainActivity extends FragmentActivity {
     		} else {
     			// Start the remote authentication
     			if (USE_OAUTH1) {
-    				mApi.getSession().startAuthentication(MainActivity.this);
+    				myGlobal.mApiDropbox.getSession().startAuthentication(MainActivity.this);
     			} else {
-    				mApi.getSession().startOAuth2Authentication(MainActivity.this);
+    				myGlobal.mApiDropbox.getSession().startOAuth2Authentication(MainActivity.this);
     			}
     		}
 
@@ -829,20 +837,80 @@ public class MainActivity extends FragmentActivity {
     public boolean prepDBfilesisOK(){
     	MyDatabase DBINStmp;
 
+    	
     	try  {
-    		DBINSlocal = new MyDatabase(
-    				getApplicationContext(), 
-    				myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_DB_FILENAME);
+    		// controllo presenza dei file Database locali
+    		
+    		File filechk;
+    		filechk = new File(myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_DB_FILENAME);
+    		if(!filechk.exists()) {
+    			// file non esiste devo scaricarlo?
+    			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    			builder
+    			.setTitle("File non trovato: " + myGlobal.LOCAL_DB_FILENAME)
+    			.setMessage("Scaricarlo da DropBox?")
+    			.setIcon(android.R.drawable.ic_dialog_alert)
+    			.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+    				public void onClick(DialogInterface dialog, int which) {			      	
+    		    		DownloadFromDropbox download2 = new DownloadFromDropbox(MainActivity.this, myGlobal.mApiDropbox, myGlobal.DROPBOX_INS_DIR, myGlobal.REMOTE_DB_FILENAME_EMPTY,
+    		    				myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator + myGlobal.LOCAL_DB_FILENAME);
+    		    		download2.execute();
+    				}
+    			})
+    			.setNegativeButton("No", new DialogInterface.OnClickListener() {
+    				public void onClick(DialogInterface dialog, int which) {			      	    		    		
+    		    		showToast("File inesistente e non scaricato possibili errori nel programma!");
+    		    		myGlobal.statoDBLocal = false;
+    				}
+    			})
+    			.show();    			
+    			
+    		} else {
+    		
+	    		DBINSlocal = new MyDatabase(
+	    				this, 
+	    				myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_DB_FILENAME);
+	
+	    		DBINSlocal.open();
+	    		DBINSlocal.close();
+	    		myGlobal.statoDBLocal = true;
+    		}
 
-    		DBINSlocal.open();
-    		DBINSlocal.close();
+    		
+    		filechk = new File(myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_FULL_DB_FILE);
+    		if(!filechk.exists()) {
+    			// file non esiste devo scaricarlo?
+    			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    			builder
+    			.setTitle("File non trovato: " + myGlobal.LOCAL_FULL_DB_FILE)
+    			.setMessage("Scaricarlo da DropBox?")
+    			.setIcon(android.R.drawable.ic_dialog_alert)
+    			.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+    				public void onClick(DialogInterface dialog, int which) {			      	
+    		    		DownloadFromDropbox download2 = new DownloadFromDropbox(MainActivity.this, myGlobal.mApiDropbox, myGlobal.DROPBOX_INS_DIR, myGlobal.REMOTE_DB_FILENAME,
+    		    				myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator + myGlobal.LOCAL_FULL_DB_FILE);
+    		    		download2.execute();
+    				}
+    			})
+    			.setNegativeButton("No", new DialogInterface.OnClickListener() {
+    				public void onClick(DialogInterface dialog, int which) {			      	    		    		
+    		    		showToast("File inesistente e non scaricato possibili errori nel programma!");
+    		    		myGlobal.statoDBLocalFull = false;
+    				}
+    			})
+    			.show();    			
+    			
+    		} else {
+        		DBINStmp = new MyDatabase(
+        				this, 
+        				myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_FULL_DB_FILE);
 
-    		DBINStmp = new MyDatabase(
-    				getApplicationContext(), 
-    				myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_FULL_DB_FILE);
+        		DBINStmp.open();
+        		DBINStmp.close();
+        		myGlobal.statoDBLocalFull = true;
+    		}
+    		
 
-    		DBINStmp.open();
-    		DBINStmp.close();
     		return true;
     	} catch (Exception e) {
     		e.printStackTrace();
@@ -953,11 +1021,14 @@ public class MainActivity extends FragmentActivity {
     					fw.close();
 
     					// Lo metto nel DB (converto anche Valore come float)
-    		        	Float myFloatValore = (float) 0;
-    		        	myFloatValore = Float.parseFloat(valValore);
+    		        	//Float myFloatValore = (float) 0;
+    		        	//myFloatValore = Float.parseFloat(valValore);
 
+    					if (myGlobal.statoDBLocal == false) {
+    						showToast("Errore presenza file DB locale!");
+    					}
     	        		DBINSlocal.open();
-    	        		DBINSlocal.insertRecordDataIns(valData, valTipoOper, valChiFa, valADa, valPersonale, myFloatValore, valCategoria, valDescrizione, valNote, "");
+    	        		DBINSlocal.insertRecordDataIns(valData, valTipoOper, valChiFa, valADa, valPersonale, valValore, valCategoria, valDescrizione, valNote, "");
     	        		DBINSlocal.close();
 
     					showToast("Dati Salvati");
@@ -1351,7 +1422,7 @@ public class MainActivity extends FragmentActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        AndroidAuthSession session = mApi.getSession();
+        AndroidAuthSession session = myGlobal.mApiDropbox.getSession();
 
         // The next part must be inserted in the onResume() method of the
         // activity from which session.startAuthentication() was called, so
@@ -1373,7 +1444,7 @@ public class MainActivity extends FragmentActivity {
 
     private void logOutDropbox() {
         // Remove credentials from the session
-        mApi.getSession().unlink();
+    	myGlobal.mApiDropbox.getSession().unlink();
         // Clear our stored keys
         clearKeys();
         // Change UI state to display logged out version
