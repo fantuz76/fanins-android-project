@@ -4,13 +4,13 @@ import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.Menu;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
@@ -19,6 +19,8 @@ import android.widget.Toast;
 
 public class ReadTxtActivity extends ListActivity {
 
+	static final int MY_REQUEST_MODIFY_DATA = 1;
+	
 	private MyDatabase DBINStoread;
 	
 	public static String versionName = "";
@@ -156,6 +158,32 @@ public class ReadTxtActivity extends ListActivity {
 			    	    	
 			    	    	switch (which) {
 			    	    	case 0:
+			    	    		mycursor.moveToPosition(posizioneDaEditare);
+			    	    		Intent intent = new Intent(ReadTxtActivity.this, ModifyDataActivity.class);
+			    	    		
+			    	    		
+			    	    		
+			    	    		// Passo parametri a nuova activity, con lo stesso nome della colonna DataBase
+			    	    		intent.putExtra(MyDatabase.DataINStable.DATA_OPERAZIONE_KEY, 
+			    	    				mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.DATA_OPERAZIONE_KEY)));
+			    	    		intent.putExtra(MyDatabase.DataINStable.CHI_FA_KEY, 
+			    	    				mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.CHI_FA_KEY)));
+			    	    		intent.putExtra(MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY, 
+			    	    				mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY)));
+			    	    		intent.putExtra(MyDatabase.DataINStable.A_DA_KEY, 
+			    	    				mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.A_DA_KEY)));
+			    	    		intent.putExtra(MyDatabase.DataINStable.C_PERS_KEY, 
+			    	    				mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.C_PERS_KEY)));
+			    	    		intent.putExtra(MyDatabase.DataINStable.VALORE_KEY, 
+			    	    				mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.VALORE_KEY)));
+			    	    		intent.putExtra(MyDatabase.DataINStable.CATEGORIA_KEY, 
+			    	    				mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.CATEGORIA_KEY)));
+			    	    		intent.putExtra(MyDatabase.DataINStable.DESCRIZIONE_KEY, 
+			    	    				mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.DESCRIZIONE_KEY)));
+			    	    		intent.putExtra(MyDatabase.DataINStable.NOTE_KEY, 
+			    	    				mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.NOTE_KEY)));
+			    	    		
+			    	    		startActivityForResult(intent, MY_REQUEST_MODIFY_DATA);
 			    	    		break;
 			    	    		
 			    	    	case 1:
@@ -216,5 +244,38 @@ public class ReadTxtActivity extends ListActivity {
         });
       }
 
+
+    protected void onActivityResult(int requestCode, int resultCode,
+    		Intent data) {
+    	if (requestCode == MY_REQUEST_MODIFY_DATA) {
+    		if (resultCode == RESULT_OK) {
+    			String _dbID = mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.ID));
+    			mycursor.moveToPosition(posizioneDaEditare);
+
+    			DBINStoread.open();
+    			int numElemMod = DBINStoread.updateRecordDataIns(
+    					_dbID, 
+    					data.getStringExtra(MyDatabase.DataINStable.DATA_OPERAZIONE_KEY), 
+    					data.getStringExtra(MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY), 
+    					data.getStringExtra(MyDatabase.DataINStable.CHI_FA_KEY), 
+    					data.getStringExtra(MyDatabase.DataINStable.A_DA_KEY), 
+    					data.getStringExtra(MyDatabase.DataINStable.C_PERS_KEY), 
+    					data.getStringExtra(MyDatabase.DataINStable.VALORE_KEY), 
+    					data.getStringExtra(MyDatabase.DataINStable.CATEGORIA_KEY), 
+    					data.getStringExtra(MyDatabase.DataINStable.DESCRIZIONE_KEY), 
+    					data.getStringExtra(MyDatabase.DataINStable.NOTE_KEY), 
+    					"");
+    			mycursor = DBINStoread.rawQuery(querystr,  null );
+    			dataAdapter.changeCursor(mycursor);
+    			dataAdapter.notifyDataSetChanged();		                    
+
+    			DBINStoread.close();
+
+    			showToast("Modificati " + numElemMod + " elementi. _id=" + _dbID);			    	    		
+
+
+    		}
+    	}
+  }
 	
 }

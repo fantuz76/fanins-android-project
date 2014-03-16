@@ -5,8 +5,8 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.fant.fanins"        
-    android:versionCode="4"
-    android:versionName="1.4.0" >
+    android:versionCode="5"
+    android:versionName="1.5.0" >
 
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -76,7 +76,12 @@
         <activity
             android:name="com.fant.fanins.SyncDBActivity"
             android:label="@string/title_activity_SyncDB" >
-        </activity>        
+        </activity>
+        <activity
+            android:name="com.fant.fanins.ModifyDataActivity"
+            android:label="@string/title_activity_ModifyData" >
+        </activity>
+                
         
 </application>
 

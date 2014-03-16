@@ -89,7 +89,7 @@ public class MyDatabase {
                 
                 
         
-        //i seguenti 2 metodi servono per la lettura/scrittura del db. aggiungete e modificate a discrezione
+        //i seguenti metodi servono per la lettura/scrittura del db. aggiungete e modificate a discrezione
         
         public void insertRecordDataIns(String _valData, String _valTipoOper, String _valChiFa, String _valADa, 
         		String _valPersonale, String _valValore, String _valCategoria, String _valDescrizione, String _valNote, String _valspecialNote){ //metodo per inserire i dati
@@ -109,6 +109,26 @@ public class MyDatabase {
                 mDb.insert(DataINStable.TABELLA_INSDATA, null, cv);
         }
 
+        
+        public int updateRecordDataIns(String _IDval, String _valData, String _valTipoOper, String _valChiFa, String _valADa, 
+        		String _valPersonale, String _valValore, String _valCategoria, String _valDescrizione, String _valNote, String _valspecialNote){ //metodo per inserire i dati
+                ContentValues cv=new ContentValues();
+                cv.put(DataINStable.DATA_OPERAZIONE_KEY, _valData);
+                cv.put(DataINStable.TIPO_OPERAZIONE_KEY, _valTipoOper);
+                cv.put(DataINStable.CHI_FA_KEY, _valChiFa);
+                cv.put(DataINStable.A_DA_KEY, _valADa);
+                cv.put(DataINStable.C_PERS_KEY, _valPersonale);
+                cv.put(DataINStable.VALORE_KEY, _valValore);
+                cv.put(DataINStable.CATEGORIA_KEY, _valCategoria);
+                cv.put(DataINStable.GENERICA_KEY, "");
+                cv.put(DataINStable.DESCRIZIONE_KEY, _valDescrizione);
+                cv.put(DataINStable.NOTE_KEY, _valNote);
+                cv.put(DataINStable.SPECIAL_NOTE_KEY, _valspecialNote);
+
+                //
+                return mDb.update(DataINStable.TABELLA_INSDATA, cv, DataINStable.ID + "=" + _IDval, null);
+        }
+        
         //---deletes a particular title---
         public boolean deleteDatabyID(String _IDval) 
         {

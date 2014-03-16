@@ -119,8 +119,7 @@ public class DownloadFromDropbox extends AsyncTask<Void, Long, Boolean> {
                 return false;
             }
 
-            // Now pick a random one
-            //int index = (int)(Math.random() * thumbs.size());
+            // Now pick the first one
             Entry ent = thumbs.get(0);
             String path = ent.path;
             mFileLen = ent.bytes;

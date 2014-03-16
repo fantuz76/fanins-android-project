@@ -101,5 +101,76 @@ public class myGlobal
     }     
  
 
+    public static boolean checkData(String _valData)  {
+    	String dataStr = _valData;    		
+		String[] splitData = {""};
+		int giorno, mese, anno;
+		boolean changed = false, errData = false;
+		
+		if (dataStr.contains("/")) {
+				splitData = dataStr.split("/");
+		} else if (dataStr.contains(".")) {
+			splitData = dataStr.split(".");        				
+		} else if (dataStr.contains(" ")) {
+			splitData = dataStr.split(" ");        				
+		} else if (dataStr.contains("-")) {
+			splitData = dataStr.split("-");        				
+		}
+		if (splitData.length > 2 ) {
+			anno = (int) Integer.parseInt(splitData[0]);
+			if (anno<0 || anno >2299) {
+				anno = 2014;
+				errData = changed = true;				
+			}
+		}		
+		if (splitData.length > 0 ) {
+			mese = (int) Integer.parseInt(splitData[1]);
+			if (mese<0 || mese >12) {
+				mese = 1;
+				errData = changed = true;
+			}
+		}
+		if (splitData.length > 1 ) {
+			giorno = (int) Integer.parseInt(splitData[2]);
+			if (giorno<0 || giorno >31) {
+				giorno = 1;
+				errData = changed = true;
+			}
+		}
+
+
+
+		// reg exp per MM-dd-yyyy o MM/dd/yyyy o MM.dd.yyyy
+    	//String regEx = "^(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])[- /.](19|20)\\d\\d$";
+		
+		// reg exp per yyyy-MM-dd o yyyy/MM/dd ecc...		
+    	String regEx = "^(19|20)\\d\\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$";
+    	if (_valData.matches(regEx) && !errData) 
+    		return(true);
+    	else
+    		return(false);    	
+    }
+    
+    public static boolean checkValore(String _valValore)  {
+    	float myFloat;
+    	String regEx = "^(-)?\\d*(\\.\\d*)?$";
+    	
+    	
+    	if (_valValore == "") return false;
+    	
+    	try {
+    		myFloat = Float.parseFloat(_valValore);
+    	} catch (Exception e) {
+    		return false;
+    	}
+    	
+    	if (myFloat == 0) return false;
+    	
+    	if (_valValore.matches(regEx)) 
+    		return(true);
+    	else
+    		return(false);
+    	
+    }
 
 }
