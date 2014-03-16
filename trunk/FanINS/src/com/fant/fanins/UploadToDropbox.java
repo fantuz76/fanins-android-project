@@ -5,12 +5,16 @@ package com.fant.fanins;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.dropbox.client2.DropboxAPI;
@@ -41,9 +45,12 @@ public class UploadToDropbox extends AsyncTask<Void, Long, Boolean> {
     private ProgressDialog mDialog;
 
     private String mErrorMsg;
+    
+    private boolean cancellaAllaFine;
+    private boolean tentaBackup;
 
 
-    public UploadToDropbox(Context context, DropboxAPI<?> api, String dropboxPath, File file) {
+    public UploadToDropbox(Context context, DropboxAPI<?> api, String dropboxPath, File file, boolean _cancellaAllaFine, boolean _tentaBackup) {
         // We set the context this way so we don't accidentally leak activities
         mContext = context.getApplicationContext();
 
@@ -51,6 +58,10 @@ public class UploadToDropbox extends AsyncTask<Void, Long, Boolean> {
         mApi = api;
         mPath = dropboxPath;
         mFile = file;
+        cancellaAllaFine = _cancellaAllaFine;
+        tentaBackup = _tentaBackup;
+        
+
 
         mDialog = new ProgressDialog(context);
         mDialog.setMax(100);
@@ -70,10 +81,27 @@ public class UploadToDropbox extends AsyncTask<Void, Long, Boolean> {
     @Override
     protected Boolean doInBackground(Void... params) {
         try {
+    		
             // By creating a request, we get a handle to the putFile operation,
             // so we can cancel it later if we want to
             FileInputStream fis = new FileInputStream(mFile);
-            String path = mPath + mFile.getName();
+            String path = mPath + mFile.getName();    
+            
+            if (tentaBackup) {
+            	// prima di fare upload di qualsiasi file tento di farne una copia di backup
+            	Calendar c = Calendar.getInstance();
+            	SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd@HH'h'mm'm'ss's'", Locale.ITALY);
+            	String formattedDate = df.format(c.getTime());
+
+            	try {
+            		DropboxAPI.Entry newEntry = mApi.copy(path, path + ".bkup_" + formattedDate);
+            	} catch (DropboxUnlinkedException e) {
+            		Log.e(myGlobal.TAG, "User has unlinked." + e.getMessage());
+            	} catch (DropboxException e) {
+            		Log.e(myGlobal.TAG, "Something went wrong while copying."  + e.getMessage());
+            	}
+            }
+            
             mRequest = mApi.putFileOverwriteRequest(path, fis, mFile.length(),
                     new ProgressListener() {
                 @Override
@@ -148,9 +176,10 @@ public class UploadToDropbox extends AsyncTask<Void, Long, Boolean> {
         mDialog.dismiss();
         if (result) {
             showToast("File successfully uploaded");
-            // adesso Cancello il file newFile
-            mFile.delete();
-            
+            if (cancellaAllaFine) {
+            	// adesso Cancello il file newFile
+            	mFile.delete();
+            }
         } else {
             showToast(mErrorMsg);
         }

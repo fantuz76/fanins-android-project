@@ -35,15 +35,14 @@ import com.dropbox.client2.exception.DropboxUnlinkedException;
 public class DownloadFromDropbox extends AsyncTask<Void, Long, Boolean> {
 
 	//java.io.File myFileDropbox;
-	private static final String TAG = "FANTUZ_Activity";
+	
 	
     private Context mContext;
     private ProgressDialog mDialog;
     private DropboxAPI<?> mApi;
     private String mPath;    
 
-    private FileOutputStream mFos;
-
+    
     private boolean mCanceled;
     private Long mFileLen;
     private String mErrorMsg;
@@ -143,7 +142,7 @@ public class DownloadFromDropbox extends AsyncTask<Void, Long, Boolean> {
 	                    publishProgress(bytes);
 	                }
 	            });
-				Log.i(TAG, "The file's rev is: " + info.getMetadata().rev);
+				Log.i(myGlobal.TAG, "The file's rev is: " + info.getMetadata().rev);
 			} catch (FileNotFoundException e1) {
                 mErrorMsg = "Couldn't create a local file to store the image";
                 return false;
