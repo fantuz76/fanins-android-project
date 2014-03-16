@@ -43,7 +43,7 @@ public class SyncDBActivity extends Activity {
 	
 	
     // *************************************************************************
-    // Upload file di testo in google drive, Task asincrono
+    // Classe che esegue in background sincronizzazione Database
     // *************************************************************************
     private class SyncAllDBData  extends AsyncTask<Void, Long, Boolean> {
     	private UploadRequest mRequest;
@@ -51,13 +51,20 @@ public class SyncDBActivity extends Activity {
     	private String mPath;
     	private ProgressDialog mDialog;
         private Long mFileLen;
+        private Long totProgressLen;
         private String mErrorMsg;
         Cursor mycursor;
         private int faseTask;
 
-    	
+    	// *******************************
+        // Costruttore, prepara tuttoe mostra dialog
+    	// *******************************        
     	public SyncAllDBData() {
 
+    		// riferimento totale progress
+    		totProgressLen = Long.valueOf(500);
+    		
+    		
             mPath = myGlobal.DROPBOX_INS_DIR;
             faseTask = 0;
                         
@@ -82,16 +89,21 @@ public class SyncDBActivity extends Activity {
     	}
        
         
+    	// *******************************
+    	// Operazioni da eseguire in background
+    	// *******************************
         @Override
         protected Boolean doInBackground(Void... params) {
         	String path;
         	
+        	
+        	
         	try {
-                if (mCanceled) {
-                    return false;
-                }
-
+                if (mCanceled) return false;
                 
+
+            	// *******************************
+                // Innanzi tutto scarico ultima versione del file da DropBox
                 
                 // Get the metadata for a directory
                 Entry dirent = myGlobal.mApiDropbox.metadata(mPath, 1000, null, true, null);
@@ -104,30 +116,27 @@ public class SyncDBActivity extends Activity {
 
                 // Make a list of everything in it that we can get a thumbnail for
                 ArrayList<Entry> thumbs = new ArrayList<Entry>();
-                for (Entry ent: dirent.contents) {
-                	
+                for (Entry ent: dirent.contents) {                	
                     if (new String(ent.fileName()).equals(myGlobal.REMOTE_DB_FILENAME)) {
                         // Add it to the list of thumbs we can choose from
                         thumbs.add(ent);
                     }
                 }
 
-                if (mCanceled) {
-                    return false;
-                }
-
+                if (mCanceled) return false;
+                
                 if (thumbs.size() == 0) {
                     // No thumbs in that directory
                     mErrorMsg = "Not find: " + myGlobal.REMOTE_DB_FILENAME ;
                     return false;
                 }
 
-                // Now pick a random one
-                //int index = (int)(Math.random() * thumbs.size());
+                // Now pick the first one
                 Entry ent = thumbs.get(0);
                 path = ent.path;
                 mFileLen = ent.bytes;
                 
+                publishProgress((totProgressLen/10));
                 faseTask++;
 
     			try {
@@ -143,8 +152,8 @@ public class SyncDBActivity extends Activity {
     	                }
 
     	                @Override
-    	                public void onProgress(long bytes, long total) {
-    	                    publishProgress(bytes);
+    	                public void onProgress(long bytes, long total) {    	                	
+    	                    publishProgress((totProgressLen/10) + (bytes/mFileLen * (totProgressLen/2)));
     	                }
     	            });
     				Log.i(myGlobal.TAG, "The file's rev is: " + info.getMetadata().rev);
@@ -152,15 +161,11 @@ public class SyncDBActivity extends Activity {
                     mErrorMsg = "Couldn't create a local file to store the image";
                     return false;
     			}
+    			
+    			
+    			
                 
-    			
-    			
-    			
-    			
-    			
-    			
-    			
-    			
+    			publishProgress((totProgressLen/2));
     			faseTask++;
 
     			
@@ -238,7 +243,7 @@ public class SyncDBActivity extends Activity {
 
     	    	
 
-        		
+    	    	publishProgress((totProgressLen*2/3));
     	    	faseTask++;
         		
         		
@@ -284,7 +289,8 @@ public class SyncDBActivity extends Activity {
 
                     @Override
                     public void onProgress(long bytes, long total) {
-                        publishProgress(bytes);
+                        //publishProgress(bytes);
+                        publishProgress(((totProgressLen * 2/3)) + (bytes/mFileLen * (totProgressLen * 1/3)) );
                     }
                 });
 
@@ -371,7 +377,7 @@ public class SyncDBActivity extends Activity {
 
         @Override
         protected void onProgressUpdate(Long... progress) {
-            int percent = (int)(100.0*(double)progress[0]/mFileLen + 0.5);
+            int percent = (int)(100.0*(double)progress[0]/totProgressLen + 0.5);
             mDialog.setProgress(percent);
             if (faseTask == 1) {
             	mDialog.setMessage("Downloading " + myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator + myGlobal.LOCAL_DOWNLOADED_DB_FILE);

@@ -35,4 +35,7 @@
         <item name="android:shadowRadius">1.2</item> 
         <item name="android:textStyle">bold</item>
     </style>
+    
+    <color name="TitleGreen">#47BD00</color>
+    <color name="TitleYellow">#D7DF01</color>
 </resources>

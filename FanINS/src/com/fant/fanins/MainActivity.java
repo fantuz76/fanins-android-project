@@ -25,6 +25,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -44,6 +45,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dropbox.client2.DropboxAPI;
@@ -143,6 +145,7 @@ public class MainActivity extends FragmentActivity {
 	ArrayAdapter<CharSequence> adapterADaTxt;
 	
 	private ProgressDialog progDia = null;
+	TextView textTitle;
 	
 
     // *************************************************************************
@@ -167,6 +170,9 @@ public class MainActivity extends FragmentActivity {
 		Spinner spinner;
 		ArrayAdapter<CharSequence> adapter;
 		
+		textTitle = (TextView) findViewById(R.id.textViewTitle);
+		textTitle.setText(R.string.titolo1);
+		textTitle.setTextColor(getResources().getColor(R.color.TitleYellow));
 
 		EditText editTextData = (EditText) findViewById(R.id.TextData);
 		editTextData.setOnTouchListener(new ClickDataButton());
@@ -710,12 +716,12 @@ public class MainActivity extends FragmentActivity {
     // Controllo valori inseriti
     // *************************************************************************
     public boolean checkAllValues()  {
-    	if (!(checkData())) {
+    	if (!(myGlobal.checkData(valData))) {
     		showToast("Data Sbagliata");    		
     		return false;
     	}
     	
-    	if (!checkValore()) {
+    	if (!myGlobal.checkValore(valValore)) {
     		showToast("Valore € Sbagliato");
     		return false;
     	} 
@@ -733,80 +739,9 @@ public class MainActivity extends FragmentActivity {
     }
     
     
-    public boolean checkData()  {
-    	String dataStr = valData;    		
-		String[] splitData = {""};
-		int giorno, mese, anno;
-		boolean changed = false, errData = false;
-		
-		if (dataStr.contains("/")) {
-				splitData = dataStr.split("/");
-		} else if (dataStr.contains(".")) {
-			splitData = dataStr.split(".");        				
-		} else if (dataStr.contains(" ")) {
-			splitData = dataStr.split(" ");        				
-		} else if (dataStr.contains("-")) {
-			splitData = dataStr.split("-");        				
-		}
-		if (splitData.length > 2 ) {
-			anno = (int) Integer.parseInt(splitData[0]);
-			if (anno<0 || anno >2299) {
-				anno = 2014;
-				errData = changed = true;				
-			}
-		}		
-		if (splitData.length > 0 ) {
-			mese = (int) Integer.parseInt(splitData[1]);
-			if (mese<0 || mese >12) {
-				mese = 1;
-				errData = changed = true;
-			}
-		}
-		if (splitData.length > 1 ) {
-			giorno = (int) Integer.parseInt(splitData[2]);
-			if (giorno<0 || giorno >31) {
-				giorno = 1;
-				errData = changed = true;
-			}
-		}
 
-		if (changed) {
-			showToast("Attenzione: Errore Data.");
-		}
 
-		// reg exp per MM-dd-yyyy o MM/dd/yyyy o MM.dd.yyyy
-    	//String regEx = "^(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])[- /.](19|20)\\d\\d$";
-		
-		// reg exp per yyyy-MM-dd o yyyy/MM/dd ecc...		
-    	String regEx = "^(19|20)\\d\\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$";
-    	if (valData.matches(regEx) && !errData) 
-    		return(true);
-    	else
-    		return(false);    	
-    }
     
-
-    public boolean checkValore()  {
-    	float myFloat;
-    	String regEx = "^(-)?\\d*(\\.\\d*)?$";
-    	
-    	
-    	if (valValore == "") return false;
-    	
-    	try {
-    		myFloat = Float.parseFloat(valValore);
-    	} catch (Exception e) {
-    		return false;
-    	}
-    	
-    	if (myFloat == 0) return false;
-    	
-    	if (valValore.matches(regEx)) 
-    		return(true);
-    	else
-    		return(false);
-    	
-    }
  
     public boolean checkCategoria()  {
     	List<String> lsCat = Arrays.asList(arrCategoria);    	
@@ -817,17 +752,20 @@ public class MainActivity extends FragmentActivity {
     }
     
     public boolean checkADa()  {
-    	List<String> lsCat = Arrays.asList(arrADa);    	
+    	List<String> lsCat = Arrays.asList(arrADa);
+
+    	// non ammissibile
+    	if  ( (valTipoOper.equalsIgnoreCase("Spostamento")) && (valADa.equals("")) ) {
+    		return false;
+    	}
+    	
+    	// tutti valori ammessi, anche cose nuove
     	if (lsCat.contains(valADa))  {
     		return(true);
     	} else {
-    		if (valTipoOper=="Spostamento" && (valADa == "")) {
-    			return(false);
-    		} else {
-    			return(true);
-    		}
+    		return(true);
     	}
-    	
+
     }
 
     
@@ -993,8 +931,8 @@ public class MainActivity extends FragmentActivity {
     		//Put up the Yes/No message box
     		AlertDialog.Builder builder = new AlertDialog.Builder(this);
     		builder
-    		.setTitle("Save Data file: " + fileName)
-    		.setMessage("Are you sure?")
+    		.setTitle("Salvare Dati")
+    		.setMessage("Sicuro?")
     		.setIcon(android.R.drawable.ic_dialog_alert)
     		.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
     			public void onClick(DialogInterface dialog, int which) {			      	
@@ -1030,7 +968,8 @@ public class MainActivity extends FragmentActivity {
     	        		DBINSlocal.open();
     	        		DBINSlocal.insertRecordDataIns(valData, valTipoOper, valChiFa, valADa, valPersonale, valValore, valCategoria, valDescrizione, valNote, "");
     	        		DBINSlocal.close();
-
+    	        		
+    	        		textTitle.setTextColor(getResources().getColor(R.color.TitleGreen));
     					showToast("Dati Salvati");
     				} catch (IOException ioe) {    					
     					showToast("Error IOException: " + ioe.getMessage());
@@ -1080,8 +1019,9 @@ public class MainActivity extends FragmentActivity {
         	final Spinner editTextChiFa = (Spinner) findViewById(R.id.SpinnerChiFa);    				
         	valChiFa = editTextChiFa.getSelectedItem().toString();
 
-        	final Spinner editTextADa = (Spinner) findViewById(R.id.SpinnerADa);    				
-        	valADa = editTextADa.getSelectedItem().toString();
+        	//final Spinner editTextADa = (Spinner) findViewById(R.id.SpinnerADa);    				
+        	//valADa = editTextADa.getSelectedItem().toString();
+        	valADa = textADa.getText().toString();
 
         	final Spinner editTextPersonale = (Spinner) findViewById(R.id.SpinnerPersonale);    				
         	valPersonale = editTextPersonale.getSelectedItem().toString();
@@ -1115,7 +1055,7 @@ public class MainActivity extends FragmentActivity {
 		
 	    @Override
 	    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-	    		    	
+	    	textTitle.setTextColor(getResources().getColor(R.color.TitleYellow));	    	
 	    	if (parentView.getId() == R.id.SpinnerCategoria) {
 	    		AutoCompleteTextView textViewCat = (AutoCompleteTextView) findViewById(R.id.TextAutocompleteCategoria);
 	    		textViewCat.setText(spinCategoria.getSelectedItem().toString().trim());
@@ -1143,7 +1083,7 @@ public class MainActivity extends FragmentActivity {
 
         @Override
         public void onFocusChange(View v, boolean hasFocus) {
-            //showToast("Focus changed");
+        	textTitle.setTextColor(getResources().getColor(R.color.TitleYellow));
             if ((v.getId() == R.id.TextAutocompleteCategoria && !hasFocus) || (v.getId() == R.id.TextAutocompleteADa && !hasFocus)) {
             	showToast("Performing validation");
                 ((AutoCompleteTextView)v).performValidation();
@@ -1277,6 +1217,7 @@ public class MainActivity extends FragmentActivity {
 			
 			EditText editTextData = (EditText) getActivity().findViewById(R.id.TextData);
 			editTextData.setText(formattedDate);
+			
 
 		}
 	}
@@ -1285,7 +1226,8 @@ public class MainActivity extends FragmentActivity {
     
     class ClickDataButton implements View.OnTouchListener {
     	@Override
-        public boolean onTouch(View v, MotionEvent event) {        
+        public boolean onTouch(View v, MotionEvent event) {
+    		textTitle.setTextColor(getResources().getColor(R.color.TitleYellow));
     		if (MotionEvent.ACTION_UP == event.getAction()) {
         	    DialogFragment newFragment = new DatePickerFragment();
         	    newFragment.show(getSupportFragmentManager(), "datePicker");    			
@@ -1312,7 +1254,9 @@ public class MainActivity extends FragmentActivity {
     
 
     public void initTextValue() {
- 
+    	
+    	textTitle.setTextColor(getResources().getColor(R.color.TitleYellow));
+    	
 		Spinner spinner;
 		EditText myeditText;
 		//ArrayAdapter<CharSequence> adapter;

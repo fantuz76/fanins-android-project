@@ -162,6 +162,8 @@ containing a value of this type.
         public static final int zOrderOnTop=0x7f01000f;
     }
     public static final class color {
+        public static final int TitleGreen=0x7f05000a;
+        public static final int TitleYellow=0x7f05000b;
         public static final int common_action_bar_splitter=0x7f050009;
         /**  Sign-in Button Colors 
          */
@@ -174,8 +176,8 @@ containing a value of this type.
         public static final int common_signin_btn_light_text_disabled=0x7f050006;
         public static final int common_signin_btn_light_text_focused=0x7f050007;
         public static final int common_signin_btn_light_text_pressed=0x7f050005;
-        public static final int common_signin_btn_text_dark=0x7f05000a;
-        public static final int common_signin_btn_text_light=0x7f05000b;
+        public static final int common_signin_btn_text_dark=0x7f05000c;
+        public static final int common_signin_btn_text_light=0x7f05000d;
     }
     public static final class dimen {
         /**  Default screen margins, per the Android Design guidelines. 
@@ -399,42 +401,43 @@ containing a value of this type.
         /**  Long form sign-in button text [CHAR LIMIT=30] 
          */
         public static final int common_signin_button_text_long=0x7f070013;
-        public static final int desc_imgData=0x7f07002b;
-        public static final int desc_refresh=0x7f07002c;
-        public static final int pref_description_social_recommendations=0x7f070039;
+        public static final int desc_imgData=0x7f07002c;
+        public static final int desc_refresh=0x7f07002d;
+        public static final int pref_description_social_recommendations=0x7f07003a;
         /**  Example settings for Data & Sync 
          */
-        public static final int pref_header_data_sync=0x7f07003b;
+        public static final int pref_header_data_sync=0x7f07003c;
         /**  Strings related to Settings 
  Example General settings 
          */
-        public static final int pref_header_general=0x7f070037;
+        public static final int pref_header_general=0x7f070038;
         /**  Example settings for Notifications 
          */
-        public static final int pref_header_notifications=0x7f07003e;
-        public static final int pref_ringtone_silent=0x7f070041;
-        public static final int pref_title_add_friends_to_messages=0x7f07003a;
-        public static final int pref_title_new_message_notifications=0x7f07003f;
-        public static final int pref_title_ringtone=0x7f070040;
-        public static final int pref_title_social_recommendations=0x7f070038;
-        public static final int pref_title_sync_frequency=0x7f07003c;
-        public static final int pref_title_system_sync_settings=0x7f07003d;
-        public static final int pref_title_vibrate=0x7f070042;
-        public static final int strOK=0x7f07002a;
+        public static final int pref_header_notifications=0x7f07003f;
+        public static final int pref_ringtone_silent=0x7f070042;
+        public static final int pref_title_add_friends_to_messages=0x7f07003b;
+        public static final int pref_title_new_message_notifications=0x7f070040;
+        public static final int pref_title_ringtone=0x7f070041;
+        public static final int pref_title_social_recommendations=0x7f070039;
+        public static final int pref_title_sync_frequency=0x7f07003d;
+        public static final int pref_title_system_sync_settings=0x7f07003e;
+        public static final int pref_title_vibrate=0x7f070043;
+        public static final int strOK=0x7f07002b;
+        public static final int title_activity_ModifyData=0x7f07002a;
         public static final int title_activity_MySettings=0x7f070028;
         public static final int title_activity_SyncDB=0x7f070029;
         public static final int title_activity_read_DB=0x7f070027;
-        public static final int title_activity_settings=0x7f070036;
+        public static final int title_activity_settings=0x7f070037;
         public static final int titolo1=0x7f07001a;
-        public static final int titoloADa=0x7f070030;
-        public static final int titoloCategoria=0x7f070033;
-        public static final int titoloChi=0x7f07002f;
-        public static final int titoloData=0x7f07002d;
-        public static final int titoloDescrizione=0x7f070034;
-        public static final int titoloNote=0x7f070035;
-        public static final int titoloPersonale=0x7f070031;
-        public static final int titoloTipoOper=0x7f07002e;
-        public static final int titoloValore=0x7f070032;
+        public static final int titoloADa=0x7f070031;
+        public static final int titoloCategoria=0x7f070034;
+        public static final int titoloChi=0x7f070030;
+        public static final int titoloData=0x7f07002e;
+        public static final int titoloDescrizione=0x7f070035;
+        public static final int titoloNote=0x7f070036;
+        public static final int titoloPersonale=0x7f070032;
+        public static final int titoloTipoOper=0x7f07002f;
+        public static final int titoloValore=0x7f070033;
     }
     public static final class style {
         /** 

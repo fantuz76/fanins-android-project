@@ -20,6 +20,7 @@
     <string name="title_activity_read_DB">Lettura Dati</string>
     <string name="title_activity_MySettings">Impostazioni</string>
     <string name="title_activity_SyncDB">Sincronizzazione Dati</string>
+    <string name="title_activity_ModifyData">Modifica Dati</string>
     
     
 
