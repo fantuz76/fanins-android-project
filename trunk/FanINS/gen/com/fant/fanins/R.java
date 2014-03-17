@@ -9,15 +9,10 @@ package com.fant.fanins;
 
 public final class R {
     public static final class array {
-        public static final int Categoria=0x7f0a0004;
-        public static final int Personali=0x7f0a0003;
-        public static final int a_da=0x7f0a0002;
-        public static final int chi_la_fa=0x7f0a0001;
-        public static final int pref_example_list_titles=0x7f0a0005;
-        public static final int pref_example_list_values=0x7f0a0006;
-        public static final int pref_sync_frequency_titles=0x7f0a0007;
-        public static final int pref_sync_frequency_values=0x7f0a0008;
-        public static final int tipo_operazione=0x7f0a0000;
+        public static final int pref_example_list_titles=0x7f0a0000;
+        public static final int pref_example_list_values=0x7f0a0001;
+        public static final int pref_sync_frequency_titles=0x7f0a0002;
+        public static final int pref_sync_frequency_values=0x7f0a0003;
     }
     public static final class attr {
         /** 
@@ -162,6 +157,7 @@ containing a value of this type.
         public static final int zOrderOnTop=0x7f01000f;
     }
     public static final class color {
+        public static final int LightGray=0x7f05000c;
         public static final int TitleGreen=0x7f05000a;
         public static final int TitleYellow=0x7f05000b;
         public static final int common_action_bar_splitter=0x7f050009;
@@ -176,8 +172,8 @@ containing a value of this type.
         public static final int common_signin_btn_light_text_disabled=0x7f050006;
         public static final int common_signin_btn_light_text_focused=0x7f050007;
         public static final int common_signin_btn_light_text_pressed=0x7f050005;
-        public static final int common_signin_btn_text_dark=0x7f05000c;
-        public static final int common_signin_btn_text_light=0x7f05000d;
+        public static final int common_signin_btn_text_dark=0x7f05000d;
+        public static final int common_signin_btn_text_light=0x7f05000e;
     }
     public static final class dimen {
         /**  Default screen margins, per the Android Design guidelines. 
@@ -253,8 +249,8 @@ containing a value of this type.
         public static final int action_upload=0x7f06002c;
         public static final int action_uploadDB=0x7f060029;
         public static final int adaText=0x7f060023;
-        public static final int button1=0x7f06001e;
-        public static final int button2=0x7f06001f;
+        public static final int btn1=0x7f06001e;
+        public static final int btn2=0x7f06001f;
         public static final int categoriaText=0x7f060026;
         public static final int chifaText=0x7f060022;
         public static final int cpersText=0x7f060024;

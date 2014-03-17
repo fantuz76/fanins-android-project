@@ -10,6 +10,7 @@ import java.util.Locale;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
@@ -87,73 +88,67 @@ public class ModifyDataActivity extends FragmentActivity {
 		
 		textTitle = (TextView) findViewById(R.id.textViewTitle);
 		textTitle.setText("Modifica Dati");
+
+		this.findViewById(android.R.id.content).setBackgroundColor(getResources().getColor(R.color.LightGray));
 		
 		
 		EditText editTextData = (EditText) findViewById(R.id.TextData);
 		editTextData.setOnTouchListener(new ClickDataButton());
 					
-		spinner = (Spinner) findViewById(R.id.SpinnerTipoOper);
-		adapter = ArrayAdapter.createFromResource(this, R.array.tipo_operazione, android.R.layout.simple_spinner_item);	// Create an ArrayAdapter using the string array and a default spinner layout		
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);		// Specify the layout to use when the list of choices appears
-		spinner.setAdapter(adapter);	// Apply the adapter to the spinner
-				 
-		spinner = (Spinner) findViewById(R.id.SpinnerChiFa);
-		adapter = ArrayAdapter.createFromResource(this, R.array.chi_la_fa, android.R.layout.simple_spinner_item);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		spinner.setAdapter(adapter);
-				
-		spinner = (Spinner) findViewById(R.id.SpinnerPersonale);
-		adapter = ArrayAdapter.createFromResource(this, R.array.Personali, android.R.layout.simple_spinner_item);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		spinner.setAdapter(adapter);
-		
+        spinner = (Spinner) findViewById(R.id.SpinnerTipoOper);
+        adapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_item, myGlobal.arrTipoOperazione );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);		// Specify the layout to use when the list of choices appears
+        spinner.setAdapter(adapter);	// Apply the adapter to the spinner
 
-		// Categoria 
-		spinCategoria  = (Spinner) findViewById(R.id.SpinnerCategoria);
-		arrCategoria = getResources().getStringArray(R.array.Categoria);
-		adapterCat = new ArrayAdapter<String>(ModifyDataActivity.this,   android.R.layout.simple_spinner_item, arrCategoria);		
-				
-		adapterCat.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		spinCategoria.setAdapter(adapterCat);
-		//ArrayAdapter myAdap = (ArrayAdapter) spinCategoria.getAdapter();
-		spinCategoria.setOnItemSelectedListener(new SelectSpinAutocomplete());
+        spinner = (Spinner) findViewById(R.id.SpinnerChiFa);
+        adapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_item, myGlobal.arrChiFa );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
 
-		adapterCatTxt = new ArrayAdapter<String>(ModifyDataActivity.this,   android.R.layout.simple_expandable_list_item_1, arrCategoria);
-		textCategoria = (AutoCompleteTextView) findViewById(R.id.TextAutocompleteCategoria);
-		textCategoria.setAdapter(adapterCatTxt);
-		//textCategoria.setCompletionHint("Selezionare o scrivere categoria");
-		textCategoria.setOnFocusChangeListener(new ChangeFocusAutoComplete());
-		textCategoria.setValidator(new ValidateCategoria());
-		
-		
-		// A/Da
-		spinADa = (Spinner) findViewById(R.id.SpinnerADa);
-		adapterADa =  ArrayAdapter.createFromResource(this, R.array.a_da, android.R.layout.simple_spinner_item);
-		adapterADa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		spinADa.setAdapter(adapterADa);
-		// all'inizio non uso autocompletamento
-		// ma solo se accade onKeyListener
-		spinADa.setOnItemSelectedListener(null);
-		//spinADa.setOnItemSelectedListener(new SelectSpinAutocomplete());
-		spinADa.setOnTouchListener(spinnerOnTouch);
-		
-		
+        spinner = (Spinner) findViewById(R.id.SpinnerPersonale);
+        adapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_item, myGlobal.arrCPersonale );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
 
 
-		textADa = (AutoCompleteTextView) findViewById(R.id.TextAutocompleteADa);
-		arrADa = getResources().getStringArray(R.array.a_da);
-		adapterADaTxt = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_list_item_1, arrADa);
-		textADa.setAdapter(adapterADaTxt);
-		textADa.setOnFocusChangeListener(new ChangeFocusAutoComplete());		
-		textADa.setValidator(new ValidateADa());
-		
-		
-		final ImageButton buttonOK = (ImageButton) findViewById(R.id.imgbtnOK);		
+        // Categoria 
+        spinCategoria  = (Spinner) findViewById(R.id.SpinnerCategoria);
+        adapterCat = new ArrayAdapter<String>(this,   android.R.layout.simple_spinner_item, myGlobal.arrCategoria);		
+
+        adapterCat.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinCategoria.setAdapter(adapterCat);
+        spinCategoria.setOnItemSelectedListener(new SelectSpinAutocomplete());
+
+        adapterCatTxt = new ArrayAdapter<String>(this,   android.R.layout.simple_expandable_list_item_1, myGlobal.arrCategoria);
+        textCategoria = (AutoCompleteTextView) findViewById(R.id.TextAutocompleteCategoria);
+        textCategoria.setAdapter(adapterCatTxt);
+        //textCategoria.setCompletionHint("Selezionare o scrivere categoria");
+        textCategoria.setOnFocusChangeListener(new ChangeFocusAutoComplete());
+        textCategoria.setValidator(new ValidateCategoria());
+
+
+        // A/Da
+        spinADa = (Spinner) findViewById(R.id.SpinnerADa);
+
+        adapterADa =  new ArrayAdapter<CharSequence>   (this, android.R.layout.simple_spinner_item, myGlobal.arrADa );				
+        adapterADa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinADa.setAdapter(adapterADa);
+        spinADa.setOnItemSelectedListener(new SelectSpinAutocomplete());
+
+        textADa = (AutoCompleteTextView) findViewById(R.id.TextAutocompleteADa);        	
+        adapterADaTxt = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_list_item_1, myGlobal.arrADa);
+        textADa.setAdapter(adapterADaTxt);
+        textADa.setOnFocusChangeListener(new ChangeFocusAutoComplete());
+        textADa.setValidator(new ValidateADa());
+
+
+
+        final ImageButton buttonOK = (ImageButton) findViewById(R.id.imgbtnOK);		
         buttonOK.setOnClickListener(new ClickOKButton());
 
         final ImageButton buttonReset = (ImageButton)  findViewById(R.id.imgbtnReset);
         buttonReset.setOnClickListener(new ClickResetButton());
-        
+
         initTextValue();
     
 
@@ -233,7 +228,7 @@ public class ModifyDataActivity extends FragmentActivity {
 
     	case R.id.action_settings:
     		showToast("Menu setting not available");
-    		//showDatePickerDialog(MainActivity.this);
+    		//showDatePickerDialog(this);
     		//Intent intentSettings = new Intent(this, SettingsActivity.class);                
     		Intent intentSettings = new Intent(this, MySettings.class);
     		startActivity(intentSettings);
