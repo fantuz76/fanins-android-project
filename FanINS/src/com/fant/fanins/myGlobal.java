@@ -13,7 +13,6 @@ import java.util.Locale;
 
 import android.content.Context;
 import android.os.Environment;
-import android.widget.Toast;
 
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.android.AndroidAuthSession;
@@ -34,6 +33,17 @@ public class myGlobal
 	public static boolean statoDBLocal;
 	public static boolean statoDBLocalFull;
 	public static DropboxAPI<AndroidAuthSession> mApiDropbox;
+	
+	
+	
+	 
+	
+	public static String[] arrTipoOperazione;
+	public static String[] arrChiFa;
+	public static String[] arrCPersonale;
+	public static String[] arrCategoria;	
+	public static String[] arrADa;
+	
 	
     Context mContext;
     

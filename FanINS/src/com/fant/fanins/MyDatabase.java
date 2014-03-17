@@ -1,6 +1,7 @@
 package com.fant.fanins;
 
-import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -57,6 +58,12 @@ public class MyDatabase {
 
         static class DataINStable {  // i metadati della tabella, accessibili ovunque
             static final String TABELLA_INSDATA = "myINSData";
+            static final String TABELLA_CATEGORIE = "Definizioni_Categoria";
+            static final String TABELLA_ADA = "Definizioni_ADa";
+            static final String TABELLA_CPERSONALI = "Definizioni_CPers";
+            static final String TABELLA_CHIFA = "Definizioni_ChiFa";
+            static final String TABELLA_TIPOOPERAZIONE = "Definizioni_TipoOperazione";
+            
             static final String ID = "_id";
             static final String DATA_OPERAZIONE_KEY = "DataOperazione";                
             static final String TIPO_OPERAZIONE_KEY = "TipoOperazione";
@@ -156,8 +163,28 @@ public class MyDatabase {
             mDb.execSQL(_sqlStr, _selectionArgs);                
         } 
         
-    
-    	
+        public List<String> fetchValori(String _tabella){ //metodo per fare la query di tutti i dati
+            List<String> _myls = new ArrayList<String>();
+        	/*
+            static final String TABELLA_CATEGORIE = "Definizioni_Categoria";
+            static final String TABELLA_ADA = "Definizioni_ADa";
+            static final String TABELLA_CPERSONALI = "Definizioni_CPers";
+            static final String TABELLA_CHIFA = "Definizioni_ChiFa";
+            static final String TABELLA_TIPOOPERAZIONE = "Definizioni_TipoOperazione";
+            */
+        	Cursor mycurs = mDb.query(_tabella, null,null,null,null,null,null);
+        	
+        	if (mycurs.moveToFirst()) {
+        	    do {
+        	    	_myls.add(mycurs.getString(mycurs.getColumnIndex("Valori")));
+        	    } while (mycurs.moveToNext());               
+        	}
+        	return _myls;
+        }
+        
+        
+        
+
         private class DbHelper extends SQLiteOpenHelper { //classe che ci aiuta nella creazione del db
 
                 public DbHelper(Context context, String name, CursorFactory factory,int version) {

@@ -38,4 +38,6 @@
     
     <color name="TitleGreen">#47BD00</color>
     <color name="TitleYellow">#D7DF01</color>
+    <color name="LightGray">#BDBDBD</color>
+    
 </resources>

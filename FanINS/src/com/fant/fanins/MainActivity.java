@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -25,7 +26,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -105,6 +105,8 @@ public class MainActivity extends FragmentActivity {
 	java.io.File retFileDropbox;
 		
 	
+
+	
 	
 	
 	
@@ -128,18 +130,16 @@ public class MainActivity extends FragmentActivity {
 	private String valData, valTipoOper, valChiFa, valADa, valPersonale, valValore, valCategoria, valDescrizione, valNote;
 	private boolean fileAccessOK;
 	
-	
 	Menu myMainMenu;
-	private boolean fileSqliteAccessOK;
 	
 	public static String fileName, fileNameFull;
 	Spinner spinCategoria;
-	String[] arrCategoria;
+	
 	AutoCompleteTextView textCategoria;
 	ArrayAdapter<String> adapterCat;
 	ArrayAdapter<String> adapterCatTxt;
 	Spinner spinADa;
-	String[] arrADa;
+	
 	AutoCompleteTextView textADa;
 	ArrayAdapter<CharSequence> adapterADa;
 	ArrayAdapter<CharSequence> adapterADaTxt;
@@ -166,88 +166,115 @@ public class MainActivity extends FragmentActivity {
 
         // Display the proper UI state if logged in or not
         setDropboxLoggedIn(myGlobal.mApiDropbox.getSession().isLinked());
+
         
-		Spinner spinner;
-		ArrayAdapter<CharSequence> adapter;
-		
-		textTitle = (TextView) findViewById(R.id.textViewTitle);
-		textTitle.setText(R.string.titolo1);
-		textTitle.setTextColor(getResources().getColor(R.color.TitleYellow));
-
-		EditText editTextData = (EditText) findViewById(R.id.TextData);
-		editTextData.setOnTouchListener(new ClickDataButton());
-					
-		spinner = (Spinner) findViewById(R.id.SpinnerTipoOper);
-		adapter = ArrayAdapter.createFromResource(this, R.array.tipo_operazione, android.R.layout.simple_spinner_item);	// Create an ArrayAdapter using the string array and a default spinner layout		
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);		// Specify the layout to use when the list of choices appears
-		spinner.setAdapter(adapter);	// Apply the adapter to the spinner
-				 
-		spinner = (Spinner) findViewById(R.id.SpinnerChiFa);
-		adapter = ArrayAdapter.createFromResource(this, R.array.chi_la_fa, android.R.layout.simple_spinner_item);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		spinner.setAdapter(adapter);
-				
-		spinner = (Spinner) findViewById(R.id.SpinnerPersonale);
-		adapter = ArrayAdapter.createFromResource(this, R.array.Personali, android.R.layout.simple_spinner_item);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		spinner.setAdapter(adapter);
-		
-
-		// Categoria 
-		spinCategoria  = (Spinner) findViewById(R.id.SpinnerCategoria);
-		arrCategoria = getResources().getStringArray(R.array.Categoria);
-		adapterCat = new ArrayAdapter<String>(MainActivity.this,   android.R.layout.simple_spinner_item, arrCategoria);		
-				
-		adapterCat.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		spinCategoria.setAdapter(adapterCat);
-		//ArrayAdapter myAdap = (ArrayAdapter) spinCategoria.getAdapter();
-		spinCategoria.setOnItemSelectedListener(new SelectSpinAutocomplete());
-
-		adapterCatTxt = new ArrayAdapter<String>(MainActivity.this,   android.R.layout.simple_expandable_list_item_1, arrCategoria);
-		textCategoria = (AutoCompleteTextView) findViewById(R.id.TextAutocompleteCategoria);
-		textCategoria.setAdapter(adapterCatTxt);
-		//textCategoria.setCompletionHint("Selezionare o scrivere categoria");
-		textCategoria.setOnFocusChangeListener(new ChangeFocusAutoComplete());
-		textCategoria.setValidator(new ValidateCategoria());
-		
-		
-		// A/Da
-		spinADa = (Spinner) findViewById(R.id.SpinnerADa);
-		adapterADa =  ArrayAdapter.createFromResource(this, R.array.a_da, android.R.layout.simple_spinner_item);
-		adapterADa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		spinADa.setAdapter(adapterADa);
-		spinADa.setOnItemSelectedListener(new SelectSpinAutocomplete());
-		
-		textADa = (AutoCompleteTextView) findViewById(R.id.TextAutocompleteADa);
-		arrADa = getResources().getStringArray(R.array.a_da);
-		adapterADaTxt = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_list_item_1, arrADa);
-		textADa.setAdapter(adapterADaTxt);
-		textADa.setOnFocusChangeListener(new ChangeFocusAutoComplete());
-		textADa.setValidator(new ValidateADa());
-		
+        
 		// prepara file
-		fileAccessOK = prepFileisOK();
-		
-		fileSqliteAccessOK = prepDBfilesisOK();
-		
-		
-		
-		
+        fileAccessOK = prepFileisOK();
+        if (!fileAccessOK) 
+        	showToast("Errore creazione file: " + fileNameFull);
+        
+        if (!prepDBfilesisOK())
+        	showToast("Errore nel check file Database");
 
-		
-		
-		if (!fileAccessOK) {
-			showToast("Error file create: " + fileNameFull);
-		}
-		
-		final ImageButton buttonOK = (ImageButton) findViewById(R.id.imgbtnOK);		
+
+
+
+        
+
+        Spinner spinner;
+        ArrayAdapter<CharSequence> adapter;
+
+        textTitle = (TextView) findViewById(R.id.textViewTitle);
+        textTitle.setText(R.string.titolo1);
+        textTitle.setTextColor(getResources().getColor(R.color.TitleYellow));
+
+        EditText editTextData = (EditText) findViewById(R.id.TextData);
+        editTextData.setOnTouchListener(new ClickDataButton());
+
+        if (myGlobal.statoDBLocal) {
+        	// Se Database tutto a posto inizializzo array con valori 
+        	DBINSlocal.open();
+        	List<String> mylistr; 
+        	mylistr = DBINSlocal.fetchValori(MyDatabase.DataINStable.TABELLA_TIPOOPERAZIONE);
+        	myGlobal.arrTipoOperazione = mylistr.toArray(new String[0]);
+        	mylistr = DBINSlocal.fetchValori(MyDatabase.DataINStable.TABELLA_CHIFA);
+        	myGlobal.arrChiFa = mylistr.toArray(new String[0]);
+        	mylistr = DBINSlocal.fetchValori(MyDatabase.DataINStable.TABELLA_CPERSONALI);
+        	myGlobal.arrCPersonale = mylistr.toArray(new String[0]);
+        	mylistr = DBINSlocal.fetchValori(MyDatabase.DataINStable.TABELLA_CATEGORIE);
+        	myGlobal.arrCategoria = mylistr.toArray(new String[0]);
+        	mylistr = DBINSlocal.fetchValori(MyDatabase.DataINStable.TABELLA_ADA);
+        	myGlobal.arrADa = mylistr.toArray(new String[0]);
+        	DBINSlocal.close();
+        } else {
+        	// in mancanza del DB metto tutti List vuoti
+        	List<String> mylistr =  new ArrayList<String>();
+        	mylistr.add("");        	
+        	myGlobal.arrTipoOperazione = mylistr.toArray(new String[0]);        	
+        	myGlobal.arrChiFa = mylistr.toArray(new String[0]);        	
+        	myGlobal.arrCPersonale = mylistr.toArray(new String[0]);        	
+        	myGlobal.arrCategoria = mylistr.toArray(new String[0]);        	
+        	myGlobal.arrADa = mylistr.toArray(new String[0]);        	
+        }
+
+
+        spinner = (Spinner) findViewById(R.id.SpinnerTipoOper);
+        adapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_item, myGlobal.arrTipoOperazione );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);		// Specify the layout to use when the list of choices appears
+        spinner.setAdapter(adapter);	// Apply the adapter to the spinner
+
+        spinner = (Spinner) findViewById(R.id.SpinnerChiFa);
+        adapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_item, myGlobal.arrChiFa );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+
+        spinner = (Spinner) findViewById(R.id.SpinnerPersonale);
+        adapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_item, myGlobal.arrCPersonale );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+
+
+        // Categoria 
+        spinCategoria  = (Spinner) findViewById(R.id.SpinnerCategoria);
+        adapterCat = new ArrayAdapter<String>(MainActivity.this,   android.R.layout.simple_spinner_item, myGlobal.arrCategoria);		
+
+        adapterCat.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinCategoria.setAdapter(adapterCat);
+        spinCategoria.setOnItemSelectedListener(new SelectSpinAutocomplete());
+
+        adapterCatTxt = new ArrayAdapter<String>(MainActivity.this,   android.R.layout.simple_expandable_list_item_1, myGlobal.arrCategoria);
+        textCategoria = (AutoCompleteTextView) findViewById(R.id.TextAutocompleteCategoria);
+        textCategoria.setAdapter(adapterCatTxt);
+        //textCategoria.setCompletionHint("Selezionare o scrivere categoria");
+        textCategoria.setOnFocusChangeListener(new ChangeFocusAutoComplete());
+        textCategoria.setValidator(new ValidateCategoria());
+
+
+        // A/Da
+        spinADa = (Spinner) findViewById(R.id.SpinnerADa);
+
+        adapterADa =  new ArrayAdapter<CharSequence>   (this, android.R.layout.simple_spinner_item, myGlobal.arrADa );
+        adapterADa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinADa.setAdapter(adapterADa);
+        spinADa.setOnItemSelectedListener(new SelectSpinAutocomplete());
+
+        textADa = (AutoCompleteTextView) findViewById(R.id.TextAutocompleteADa);        	
+        adapterADaTxt = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_list_item_1, myGlobal.arrADa);
+        textADa.setAdapter(adapterADaTxt);
+        textADa.setOnFocusChangeListener(new ChangeFocusAutoComplete());
+        textADa.setValidator(new ValidateADa());
+
+
+
+        final ImageButton buttonOK = (ImageButton) findViewById(R.id.imgbtnOK);		
         buttonOK.setOnClickListener(new ClickOKButton());
 
         final ImageButton buttonReset = (ImageButton)  findViewById(R.id.imgbtnReset);
         buttonReset.setOnClickListener(new ClickResetButton());
-        
+
         initTextValue();
-    
+
 
 
     }
@@ -744,15 +771,21 @@ public class MainActivity extends FragmentActivity {
     
  
     public boolean checkCategoria()  {
-    	List<String> lsCat = Arrays.asList(arrCategoria);    	
-    	if (lsCat.contains(valCategoria)) 
+    	//List<String> mylistr = Arrays.asList(arrCategoria);
+    	DBINSlocal.open();
+    	List<String> mylistr = DBINSlocal.fetchValori(MyDatabase.DataINStable.TABELLA_CATEGORIE);
+    	DBINSlocal.close();
+    	if (mylistr.contains(valCategoria)) 
     		return(true);
     	else
     		return(false);    	
     }
     
     public boolean checkADa()  {
-    	List<String> lsCat = Arrays.asList(arrADa);
+    	//List<String> mylistr = Arrays.asList(arrADa);
+    	DBINSlocal.open();
+    	List<String> mylistr = DBINSlocal.fetchValori(MyDatabase.DataINStable.TABELLA_ADA);
+    	DBINSlocal.close();
 
     	// non ammissibile
     	if  ( (valTipoOper.equalsIgnoreCase("Spostamento")) && (valADa.equals("")) ) {
@@ -760,7 +793,7 @@ public class MainActivity extends FragmentActivity {
     	}
     	
     	// tutti valori ammessi, anche cose nuove
-    	if (lsCat.contains(valADa))  {
+    	if (mylistr.contains(valADa))  {
     		return(true);
     	} else {
     		return(true);
@@ -1098,8 +1131,11 @@ public class MainActivity extends FragmentActivity {
 	class ValidateCategoria implements AutoCompleteTextView.Validator {			
 		@Override
 		public boolean isValid(CharSequence text) {
-			List<String> lsCat = Arrays.asList(arrCategoria);
-			if (lsCat.contains(text.toString())) {
+			//List<String> mylistr = Arrays.asList(arrCategoria);
+	    	DBINSlocal.open();
+	    	List<String> mylistr = DBINSlocal.fetchValori(MyDatabase.DataINStable.TABELLA_CATEGORIE);
+	    	DBINSlocal.close();
+			if (mylistr.contains(text.toString())) {
 
 				int spinnerPosition = adapterCat.getPosition(text.toString());
 				spinCategoria.setSelection(spinnerPosition);
@@ -1116,21 +1152,25 @@ public class MainActivity extends FragmentActivity {
 			int numline=0, posch=0, maxposch=0, memoline=0;
              // Whatever value you return here must be in the list of valid words.
 			
-			List<String> lsCat = Arrays.asList(arrCategoria);
-			if (lsCat.contains(invalidText.toString())) {
+			//List<String> mylistr = Arrays.asList(arrCategoria);
+	    	DBINSlocal.open();
+	    	List<String> mylistr = DBINSlocal.fetchValori(MyDatabase.DataINStable.TABELLA_CATEGORIE);
+	    	DBINSlocal.close();
+
+			if (mylistr.contains(invalidText.toString())) {
 				return invalidText;
 			} else {
-				while (numline < arrCategoria.length) {
+				while (numline < myGlobal.arrCategoria.length) {
 					posch = 0;
 					boolean charCmpIsDifferent = false;
 					char cmp1, cmp2;
-					while (!charCmpIsDifferent && (posch<arrCategoria[numline].length()) && (posch<invalidText.length())) {
+					while (!charCmpIsDifferent && (posch < myGlobal.arrCategoria[numline].length()) && (posch<invalidText.length())) {
 						// confronto carattere per carattere
-						cmp1 = arrCategoria[numline].charAt(posch);
+						cmp1 = myGlobal.arrCategoria[numline].charAt(posch);
 						cmp2 = invalidText.charAt(posch);						
 						
 						// se sono lettere faccio Upcase
-						if (Character.isLetter(arrCategoria[numline].charAt(posch))) {
+						if (Character.isLetter(myGlobal.arrCategoria[numline].charAt(posch))) {
 							cmp1 = Character.toUpperCase(cmp1);
 							cmp2 = Character.toUpperCase(cmp2);						
 						}
@@ -1151,7 +1191,7 @@ public class MainActivity extends FragmentActivity {
 					
 					numline++;
 				}
-				fxTxt = arrCategoria[memoline];
+				fxTxt = myGlobal.arrCategoria[memoline];
 				showToast("Text Categoria Fixed: " + fxTxt);
 
 				int spinnerPosition = adapterCat.getPosition(fxTxt);
@@ -1168,8 +1208,11 @@ public class MainActivity extends FragmentActivity {
 	class ValidateADa implements AutoCompleteTextView.Validator {			
 		@Override
 		public boolean isValid(CharSequence text) {
-			List<String> lsADa = Arrays.asList(arrADa);
-			if (lsADa.contains(text.toString())) {
+			//List<String> mylistr = Arrays.asList(arrADa);
+	    	DBINSlocal.open();
+	    	List<String> mylistr = DBINSlocal.fetchValori(MyDatabase.DataINStable.TABELLA_ADA);
+	    	DBINSlocal.close();			
+			if (mylistr.contains(text.toString())) {
 
 				int spinnerPosition = adapterADa.getPosition(text.toString());
 				spinADa.setSelection(spinnerPosition);
@@ -1184,8 +1227,11 @@ public class MainActivity extends FragmentActivity {
 		public CharSequence fixText(CharSequence invalidText) {
 
              // Whatever value you return here must be in the list of valid words.
-			List<String> lsADa = Arrays.asList(arrADa);
-			if (lsADa.contains(invalidText.toString())) {
+			//List<String> mylistr = Arrays.asList(arrADa);
+	    	DBINSlocal.open();
+	    	List<String> mylistr = DBINSlocal.fetchValori(MyDatabase.DataINStable.TABELLA_ADA);
+	    	DBINSlocal.close();	
+			if (mylistr.contains(invalidText.toString())) {
 				return invalidText;
 			} else {				
 				return invalidText;
@@ -1259,7 +1305,6 @@ public class MainActivity extends FragmentActivity {
     	
 		Spinner spinner;
 		EditText myeditText;
-		//ArrayAdapter<CharSequence> adapter;
 		
 		Calendar c = Calendar.getInstance();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALY);

@@ -14,6 +14,8 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -21,6 +23,7 @@ public class ReadTxtActivity extends ListActivity {
 
 	static final int MY_REQUEST_MODIFY_DATA = 1;
 	
+	private String readDBtype;
 	private MyDatabase DBINStoread;
 	
 	public static String versionName = "";
@@ -51,10 +54,27 @@ public class ReadTxtActivity extends ListActivity {
 		try {
 			// recupero info extra e decido qual DB usare
 			Bundle bun = getIntent().getExtras();
-			String readDBtype = bun.getString("readDBtype");
+			readDBtype = bun.getString("readDBtype");
 			
 
 			if (readDBtype.equals("full")) {
+
+		        Button button1 = (Button) findViewById(R.id.btn1);
+		        button1.setText("Cerca");
+		        button1.setOnClickListener(new SearchTextOnDB());
+
+		        
+		        Button button2 = (Button) findViewById(R.id.btn2);
+		        button2.setText("Salta");
+		        button2.setOnClickListener(new SearchTextOnDB() {
+		        	@Override
+		            public void onClick(View v) {		        		
+		        		myListActivity.setSelection(myListActivity.getSelectedItemPosition() + (myListActivity.getCount() / 20) );
+		        	}
+		        	
+		        });
+		        
+		        
 				if (myGlobal.statoDBLocalFull == false) {
 					showToast("Errore di presenza file DB: " + myGlobal.LOCAL_FULL_DB_FILE);
 					finish();
@@ -64,6 +84,18 @@ public class ReadTxtActivity extends ListActivity {
 						getApplicationContext(), 
 						myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator + myGlobal.LOCAL_FULL_DB_FILE);
 			} else {
+		        Button button2 = (Button) findViewById(R.id.btn2);
+		        button2.setText("salta");
+		        button2.setOnClickListener(new SearchTextOnDB() {
+		        	@Override
+		            public void onClick(View v) {
+		        		myListActivity.setSelection(myListActivity.getSelectedItemPosition() + (myListActivity.getCount() / 20) );
+		        		
+		        	}
+		        	
+		        });
+				
+				
 				if (myGlobal.statoDBLocal == false) {
 					showToast("Errore di presenza file DB: " + myGlobal.LOCAL_DB_FILENAME);
 					finish();
@@ -230,7 +262,50 @@ public class ReadTxtActivity extends ListActivity {
 		return true;
 	}
 
+	
+	class SearchTextOnDB implements View.OnClickListener { 
+		@Override
+		public void onClick(View v) {
+			AlertDialog.Builder alert = new AlertDialog.Builder(ReadTxtActivity.this);
 
+			
+			alert.setMessage("Cerca Descrizione");
+
+			// Set an EditText view to get user input 
+			final EditText input = new EditText(ReadTxtActivity.this);
+			alert.setView(input);
+
+			alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					String value = input.getText().toString();
+					
+					querystr = "SELECT * FROM " + MyDatabase.DataINStable.TABELLA_INSDATA + " WHERE " +
+					MyDatabase.DataINStable.DESCRIZIONE_KEY + " LIKE '%" + value + "%'";
+					if (readDBtype.equals("full")) {
+						querystr = querystr + " ORDER BY " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" DESC";
+					}
+
+	    			DBINStoread.open();
+	    			mycursor = DBINStoread.rawQuery(querystr,  null );
+	    			dataAdapter.changeCursor(mycursor);
+	    			dataAdapter.notifyDataSetChanged();		                    
+	    			DBINStoread.close();
+
+				}
+			});
+
+			alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					// Canceled.
+				}
+			});
+
+			alert.show();
+
+		}
+	}
+
+	
 
     // *************************************************************************
     // Mostra messaggio toast 
