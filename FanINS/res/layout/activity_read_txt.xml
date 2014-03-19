@@ -16,26 +16,27 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content">
+            
 
             <Button
-                android:id="@+id/btn1"
+                android:id="@+id/btnread1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="31dp"
-                android:text="Button" />
+                                               
+                android:text="btn1" />
 
             <Button
-                android:id="@+id/btn2"
+                android:id="@+id/btnread2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Button" />
+                android:text="btn2" />
 
-            <TextView
-                android:id="@+id/textView1"
-                android:layout_width="fill_parent"
+            <Button
+                android:id="@+id/btnread3"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="CIAO" />
+                android:text="btn3" />            
 
         </LinearLayout>
 

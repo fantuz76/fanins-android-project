@@ -10,7 +10,6 @@ import java.util.Locale;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
@@ -18,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -59,13 +59,11 @@ public class ModifyDataActivity extends FragmentActivity {
 	Menu myMainMenu;
 	
 	public static String fileName, fileNameFull;
-	Spinner spinCategoria;
-	String[] arrCategoria;
+	Spinner spinCategoria;	
 	AutoCompleteTextView textCategoria;
 	ArrayAdapter<String> adapterCat;
 	ArrayAdapter<String> adapterCatTxt;
-	Spinner spinADa;
-	String[] arrADa;
+	Spinner spinADa;	
 	AutoCompleteTextView textADa;
 	ArrayAdapter<CharSequence> adapterADa;
 	ArrayAdapter<CharSequence> adapterADaTxt;
@@ -81,6 +79,9 @@ public class ModifyDataActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
     	
         super.onCreate(savedInstanceState);
+        //Remove title bar
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        
         setContentView(R.layout.activity_main);
 
         Spinner spinner;
@@ -89,8 +90,6 @@ public class ModifyDataActivity extends FragmentActivity {
 		textTitle = (TextView) findViewById(R.id.textViewTitle);
 		textTitle.setText("Modifica Dati");
 
-		this.findViewById(android.R.id.content).setBackgroundColor(getResources().getColor(R.color.LightGray));
-		
 		
 		EditText editTextData = (EditText) findViewById(R.id.TextData);
 		editTextData.setOnTouchListener(new ClickDataButton());
@@ -196,30 +195,10 @@ public class ModifyDataActivity extends FragmentActivity {
 
 	
     		
-    	case R.id.action_downloadDB:
-    		return true;
 
 
+    	case R.id.action_sync_INS_temp:
 
-
-    	case R.id.action_sync:
-
-    		return true;
-
-
-
-
-    	case R.id.action_sync_db:
-    		return true;        		
-
-    	case R.id.action_upload:        	
-    		return true;
-
-
-    	case R.id.action_readfileDBlocal:
-    		return true;
-
-    	case R.id.action_readfileDBfull:
     		return true;
 
 
@@ -228,8 +207,6 @@ public class ModifyDataActivity extends FragmentActivity {
 
     	case R.id.action_settings:
     		showToast("Menu setting not available");
-    		//showDatePickerDialog(this);
-    		//Intent intentSettings = new Intent(this, SettingsActivity.class);                
     		Intent intentSettings = new Intent(this, MySettings.class);
     		startActivity(intentSettings);
     		return true;
@@ -284,7 +261,7 @@ public class ModifyDataActivity extends FragmentActivity {
 
  
     public boolean checkCategoria()  {
-    	List<String> lsCat = Arrays.asList(arrCategoria);    	
+    	List<String> lsCat = Arrays.asList(myGlobal.arrCategoria);    	
     	if (lsCat.contains(valCategoria)) 
     		return(true);
     	else
@@ -293,7 +270,7 @@ public class ModifyDataActivity extends FragmentActivity {
 
 
     public boolean checkADa()  {
-    	List<String> lsCat = Arrays.asList(arrADa);
+    	List<String> lsCat = Arrays.asList(myGlobal.arrADa);
 
     	// non ammissibile
     	if (valTipoOper=="Spostamento" && (valADa == "")) {
@@ -394,7 +371,7 @@ public class ModifyDataActivity extends FragmentActivity {
 		
 	    @Override
 	    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-	    		    	
+	    	textTitle.setTextColor(getResources().getColor(R.color.TitleYellow));	    	
 	    	if (parentView.getId() == R.id.SpinnerCategoria) {
 	    		AutoCompleteTextView textViewCat = (AutoCompleteTextView) findViewById(R.id.TextAutocompleteCategoria);
 	    		textViewCat.setText(spinCategoria.getSelectedItem().toString().trim());
@@ -421,11 +398,11 @@ public class ModifyDataActivity extends FragmentActivity {
     class ChangeFocusAutoComplete implements View.OnFocusChangeListener {
 
         @Override
-        public void onFocusChange(View v, boolean hasFocus) {
-            //showToast("Focus changed");
+        public void onFocusChange(View v, boolean hasFocus) {        	
             if ((v.getId() == R.id.TextAutocompleteCategoria && !hasFocus) || (v.getId() == R.id.TextAutocompleteADa && !hasFocus)) {
             	showToast("Performing validation");
                 ((AutoCompleteTextView)v).performValidation();
+                textTitle.setTextColor(getResources().getColor(R.color.TitleYellow));
             } 
         }
     }
@@ -437,8 +414,8 @@ public class ModifyDataActivity extends FragmentActivity {
 	class ValidateCategoria implements AutoCompleteTextView.Validator {			
 		@Override
 		public boolean isValid(CharSequence text) {
-			List<String> lsCat = Arrays.asList(arrCategoria);
-			if (lsCat.contains(text.toString())) {
+			List<String> mylistr = Arrays.asList(myGlobal.arrCategoria);
+			if (mylistr.contains(text.toString())) {
 
 				int spinnerPosition = adapterCat.getPosition(text.toString());
 				spinCategoria.setSelection(spinnerPosition);
@@ -455,21 +432,21 @@ public class ModifyDataActivity extends FragmentActivity {
 			int numline=0, posch=0, maxposch=0, memoline=0;
              // Whatever value you return here must be in the list of valid words.
 			
-			List<String> lsCat = Arrays.asList(arrCategoria);
-			if (lsCat.contains(invalidText.toString())) {
+			List<String> mylistr = Arrays.asList(myGlobal.arrCategoria);
+			if (mylistr.contains(invalidText.toString())) {
 				return invalidText;
 			} else {
-				while (numline < arrCategoria.length) {
+				while (numline < myGlobal.arrCategoria.length) {
 					posch = 0;
 					boolean charCmpIsDifferent = false;
 					char cmp1, cmp2;
-					while (!charCmpIsDifferent && (posch<arrCategoria[numline].length()) && (posch<invalidText.length())) {
+					while (!charCmpIsDifferent && (posch<myGlobal.arrCategoria[numline].length()) && (posch<invalidText.length())) {
 						// confronto carattere per carattere
-						cmp1 = arrCategoria[numline].charAt(posch);
+						cmp1 = myGlobal.arrCategoria[numline].charAt(posch);
 						cmp2 = invalidText.charAt(posch);						
 						
 						// se sono lettere faccio Upcase
-						if (Character.isLetter(arrCategoria[numline].charAt(posch))) {
+						if (Character.isLetter(myGlobal.arrCategoria[numline].charAt(posch))) {
 							cmp1 = Character.toUpperCase(cmp1);
 							cmp2 = Character.toUpperCase(cmp2);						
 						}
@@ -490,7 +467,7 @@ public class ModifyDataActivity extends FragmentActivity {
 					
 					numline++;
 				}
-				fxTxt = arrCategoria[memoline];
+				fxTxt = myGlobal.arrCategoria[memoline];
 				showToast("Text Categoria Fixed: " + fxTxt);
 
 				int spinnerPosition = adapterCat.getPosition(fxTxt);
@@ -508,8 +485,8 @@ public class ModifyDataActivity extends FragmentActivity {
 		@Override
 		public boolean isValid(CharSequence text) {
 			
-			List<String> lsADa = Arrays.asList(arrADa);
-			if (lsADa.contains(text.toString())) {
+			List<String> mylistr = Arrays.asList(myGlobal.arrADa);
+			if (mylistr.contains(text.toString())) {
 
 				int spinnerPosition = adapterADa.getPosition(text.toString());
 				spinADa.setSelection(spinnerPosition);
@@ -524,8 +501,8 @@ public class ModifyDataActivity extends FragmentActivity {
 		public CharSequence fixText(CharSequence invalidText) {
 
              // Whatever value you return here must be in the list of valid words.
-			List<String> lsADa = Arrays.asList(arrADa);
-			if (lsADa.contains(invalidText.toString())) {
+			List<String> mylistr = Arrays.asList(myGlobal.arrADa);
+			if (mylistr.contains(invalidText.toString())) {
 				return invalidText;
 			} else {				
 				return invalidText;
@@ -565,10 +542,11 @@ public class ModifyDataActivity extends FragmentActivity {
     
     class ClickDataButton implements View.OnTouchListener {
     	@Override
-        public boolean onTouch(View v, MotionEvent event) {        
+        public boolean onTouch(View v, MotionEvent event) {    		
     		if (MotionEvent.ACTION_UP == event.getAction()) {
         	    DialogFragment newFragment = new DatePickerFragment();
-        	    newFragment.show(getSupportFragmentManager(), "datePicker");    			
+        	    newFragment.show(getSupportFragmentManager(), "datePicker");
+        	    textTitle.setTextColor(getResources().getColor(R.color.TitleYellow));
     		}
     		return false;
         }

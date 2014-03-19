@@ -89,12 +89,11 @@ public class UploadToDropbox extends AsyncTask<Void, Long, Boolean> {
             
             if (tentaBackup) {
             	// prima di fare upload di qualsiasi file tento di farne una copia di backup
-            	Calendar c = Calendar.getInstance();
-            	SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd@HH'h'mm'm'ss's'", Locale.ITALY);
-            	String formattedDate = df.format(c.getTime());
+            	
 
             	try {
-            		DropboxAPI.Entry newEntry = mApi.copy(path, path + ".bkup_" + formattedDate);
+            		@SuppressWarnings("unused")
+					DropboxAPI.Entry newEntry = mApi.copy(path, path + ".bkup_" + myGlobal.formattedDate());
             	} catch (DropboxUnlinkedException e) {
             		Log.e(myGlobal.TAG, "User has unlinked." + e.getMessage());
             	} catch (DropboxException e) {

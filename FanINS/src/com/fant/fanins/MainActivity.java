@@ -174,7 +174,7 @@ public class MainActivity extends FragmentActivity {
         if (!fileAccessOK) 
         	showToast("Errore creazione file: " + fileNameFull);
         
-        if (!prepDBfilesisOK())
+        if (!prepDBfilesisOK(false,false))
         	showToast("Errore nel check file Database");
 
 
@@ -186,7 +186,7 @@ public class MainActivity extends FragmentActivity {
         ArrayAdapter<CharSequence> adapter;
 
         textTitle = (TextView) findViewById(R.id.textViewTitle);
-        textTitle.setText(R.string.titolo1);
+        textTitle.setText(R.string.title_activity_InsertData);
         textTitle.setTextColor(getResources().getColor(R.color.TitleYellow));
 
         EditText editTextData = (EditText) findViewById(R.id.TextData);
@@ -465,9 +465,7 @@ public class MainActivity extends FragmentActivity {
 	            	    
 	            	    // Se file txt OK carico tutto nel fiel excel 
 	            	    if (fileAccessOK) {		            	    	
-		            		Calendar c = Calendar.getInstance();
-		            		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd@HH'h'mm'm'ss's'", Locale.ITALY);
-		            		String formattedDate = df.format(c.getTime());
+	            		
 	            	    	CellEntry newCell;
 	            	    	String ValToWrite = "";
 	            	    	int rowCnt;
@@ -488,7 +486,7 @@ public class MainActivity extends FragmentActivity {
 		            	    	} else if (chread == '\n') {
 		            	    		// a capo, nuova riga
 		            	    		if (colCnt == 1) {			            	    			
-		            	    			newCell = new CellEntry(rowCnt, colCnt, formattedDate);
+		            	    			newCell = new CellEntry(rowCnt, colCnt, myGlobal.formattedDate());
 					            	    cellFeed.insert(newCell);
 					            	    colCnt++;
 		            	    		}
@@ -500,7 +498,7 @@ public class MainActivity extends FragmentActivity {
 		            	    	} else if (chread == '\t') {
 		            	    		// nuovo valore
 		            	    		if (colCnt == 1) {			            	    			
-		            	    			newCell = new CellEntry(rowCnt, colCnt, formattedDate);
+		            	    			newCell = new CellEntry(rowCnt, colCnt, myGlobal.formattedDate());
 					            	    cellFeed.insert(newCell);
 					            	    colCnt++;
 		            	    		}
@@ -519,8 +517,8 @@ public class MainActivity extends FragmentActivity {
 	            	    	// adesso, una volta caricato lo rinomino così resta nella SD del telefono come backup
 	            	    	java.io.File oldFile = new java.io.File(fileNameFull);
 	            	    	//Now invoke the renameTo() method on the reference, oldFile in this case
-	            	    	oldFile.renameTo(new java.io.File(fileNameFull.replace(".txt", "_" + formattedDate + ".txt")));		            	    	
-	            	    	showToast("rinominato file txt: " + fileNameFull.replace(".txt", "_" + formattedDate + ".txt"));
+	            	    	oldFile.renameTo(new java.io.File(fileNameFull.replace(".txt", "_" + myGlobal.formattedDate() + ".txt")));		            	    	
+	            	    	showToast("rinominato file txt: " + fileNameFull.replace(".txt", "_" + myGlobal.formattedDate() + ".txt"));
 	            	    	
 	            	    	// prepara file
 	            			fileAccessOK = prepFileisOK();
@@ -581,14 +579,10 @@ public class MainActivity extends FragmentActivity {
     	{
 
 
-    	case R.id.action_uploadDB:        	
-    		Calendar c = Calendar.getInstance();
-    		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd@HH'h'mm'm'ss's'", Locale.ITALY);
-    		String formattedDate = df.format(c.getTime());
-
+    	case R.id.action_uploadDB:        	    		
     		// adesso, una volta caricato lo rinomino così resta nella SD del telefono come backup
     		java.io.File oldFile = new java.io.File(fileNameFull);
-    		java.io.File newFile = new java.io.File(fileNameFull.replace(".txt", "_" + formattedDate + ".txt"));    	    	
+    		java.io.File newFile = new java.io.File(fileNameFull.replace(".txt", "_" + myGlobal.formattedDate() + ".txt"));    	    	
 
     		// copia
     		try {
@@ -603,7 +597,7 @@ public class MainActivity extends FragmentActivity {
     		// stessa cosa con il file database
     		// adesso, una volta caricato lo rinomino così resta nella SD del telefono come backup
     		java.io.File oldFileDB = new java.io.File(myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_FULL_DB_FILE);
-    		java.io.File newFileDB = new java.io.File(myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_FULL_DB_FILE.replace(".sqlite", "_" + formattedDate + ".sqlite"));
+    		java.io.File newFileDB = new java.io.File(myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_FULL_DB_FILE.replace(".sqlite", "_" + myGlobal.formattedDate() + ".sqlite"));
     		java.io.File newFileDB2 = new java.io.File(myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.REMOTE_DB_FILENAME);
 
     		// copia
@@ -617,8 +611,6 @@ public class MainActivity extends FragmentActivity {
     			showToast("Error IOException: " + e.getMessage());
     		}
 
-
-
     		UploadToDropbox upload = new UploadToDropbox(this, myGlobal.mApiDropbox, myGlobal.DROPBOX_INS_DIR, newFile, false, false);
     		upload.execute();
 
@@ -631,8 +623,12 @@ public class MainActivity extends FragmentActivity {
     		//newFile.delete();
     		return true;
 
+    	case R.id.action_downloadDB:
+            if (!prepDBfilesisOK(true,true))
+            	showToast("Errore nel download database");
+    		return true;
 	
-    		
+    	/*	
     	case R.id.action_downloadDB:
     		DownloadFromDropbox download1 = new DownloadFromDropbox(this, myGlobal.mApiDropbox, myGlobal.DROPBOX_INS_DIR, myGlobal.REMOTE_DB_FILENAME,
     				myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator + myGlobal.LOCAL_DOWNLOADED_DB_FILE);
@@ -644,10 +640,25 @@ public class MainActivity extends FragmentActivity {
     				myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator + myGlobal.LOCAL_FULL_DB_FILE);
     		download2.execute();
     		return true;
+	
+	    case R.id.action_upload:        	
+    		credential = GoogleAccountCredential.usingOAuth2(this, Arrays.asList(DriveScopes.DRIVE));
+    		startActivityForResult(credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
+    		return true;
+*/
 
 
+    	case R.id.action_sync_db:
+    		if ((myGlobal.statoDBLocal == false) || (myGlobal.statoDBLocalFull == false)) {
+				showToast("Errore presenza file DB locale! Impossibile procedere.");
+			} else {
+				intent = new Intent(this, SyncDBActivity.class);
+				startActivity(intent);
+			}
+    		return true;        		
 
-    	case R.id.action_sync:
+
+    	case R.id.action_sync_INS_temp:
     		//Put up the Yes/No message box
     		AlertDialog.Builder builder = new AlertDialog.Builder(this);
     		builder    	    	
@@ -662,41 +673,81 @@ public class MainActivity extends FragmentActivity {
     		})
     		.setNegativeButton("No", null)						//Do nothing on no
     		.show();
-
-    		return true;
-
-
-
-
-    	case R.id.action_sync_db:
-    		if ((myGlobal.statoDBLocal == false) || (myGlobal.statoDBLocalFull == false)) {
-				showToast("Errore presenza file DB locale!");
-			}
-    		intent = new Intent(this, SyncDBActivity.class);
-    		startActivity(intent);
-    		return true;        		
-
-    	case R.id.action_upload:        	
-    		credential = GoogleAccountCredential.usingOAuth2(this, Arrays.asList(DriveScopes.DRIVE));
-    		startActivityForResult(credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
-    		return true;
+    		return true;    		
+    		
+    		
 
 
     	case R.id.action_readfileDBlocal:
-    		intent = new Intent(this, ReadTxtActivity.class);
-    		// passo delle informazioni all'Activity
-    		intent.putExtra("readDBtype","local");
-    		startActivity(intent);
+    		if (myGlobal.statoDBLocal == false) {
+    			showToast("Errore presenza file DB locale! Impossibile procedere.");
+    		} else {
+    			intent = new Intent(this, ReadTxtActivity.class);
+    			// passo delle informazioni all'Activity
+    			intent.putExtra("readDBtype","local");
+    			startActivity(intent);
+    		}
     		return true;
+
+
 
     	case R.id.action_readfileDBfull:
-    		intent = new Intent(this, ReadTxtActivity.class);
-    		// passo delle informazioni all'Activity
-    		intent.putExtra("readDBtype","full");
-    		startActivity(intent);
+    		if (myGlobal.statoDBLocalFull == false) {
+    			showToast("Errore presenza file DB locale! Impossibile procedere.");
+    		} else {
+    			intent = new Intent(this, ReadTxtActivity.class);
+    			// passo delle informazioni all'Activity
+    			intent.putExtra("readDBtype","full");
+    			startActivity(intent);
+    		}
     		return true;
 
 
+
+    	case R.id.action_erase_all_db:
+    		//Put up the Yes/No message box
+    		AlertDialog.Builder buildererase = new AlertDialog.Builder(this);
+    		buildererase    	    	
+    		.setTitle(R.string.action_sync)
+    		.setMessage("Sicuro di cancellare i file Database?")
+    		.setIcon(android.R.drawable.ic_dialog_alert)
+    		.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+    			public void onClick(DialogInterface dialog, int which) {    	    	    	    	    	    	
+
+    				try {
+    					java.io.File locFileDB = new java.io.File(myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_DB_FILENAME);
+    					if(!locFileDB.exists()) {
+    						showToast("File inesistente: " + locFileDB.getName());
+    						myGlobal.statoDBLocal = false;
+    					} else if (locFileDB.delete()) {
+    						showToast("Cancellato: " + locFileDB.getName());
+    						myGlobal.statoDBLocal = false;
+    					}
+    				} catch (Exception e) {
+    					showToast("Errore" + e.getMessage());
+    				}
+
+    				try {
+    					java.io.File locFileFullDB = new java.io.File(myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_FULL_DB_FILE);
+    					if(!locFileFullDB.exists()) {
+    						showToast("File inesistente: " + locFileFullDB.getName());
+    						myGlobal.statoDBLocal = false;
+    					} else if (locFileFullDB.delete()) {
+    						showToast("Cancellato: " + locFileFullDB.getName());
+    						myGlobal.statoDBLocalFull = false;
+    					}
+    				} catch (Exception e) {
+    					showToast("Errore" + e.getMessage());
+    				}
+
+    			}
+    		})
+    		.setNegativeButton("No", null)						//Do nothing on no
+    		.show();    		
+
+    		return true;
+
+    		
     	case R.id.action_authDropbox:        		
     		if (mDropboxLoggedIn) {
     			logOutDropbox();
@@ -713,8 +764,6 @@ public class MainActivity extends FragmentActivity {
     		return true;
 
     	case R.id.action_settings:
-    		showToast("Menu setting not available");
-    		//showDatePickerDialog(MainActivity.this);
     		//Intent intentSettings = new Intent(this, SettingsActivity.class);                
     		Intent intentSettings = new Intent(this, MySettings.class);
     		startActivity(intentSettings);
@@ -805,16 +854,14 @@ public class MainActivity extends FragmentActivity {
     // *************************************************************************
     // Preparo file database, se non ci sono li crea 
     // *************************************************************************    
-    public boolean prepDBfilesisOK(){
+    public boolean prepDBfilesisOK(boolean _forceDownladlocalEmpty, boolean _forceDownladlocalFull ){
     	MyDatabase DBINStmp;
-
+    	final File _local = new File(myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_DB_FILENAME);
+    	final File _full = new File(myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_FULL_DB_FILE);
     	
     	try  {
     		// controllo presenza dei file Database locali
-    		
-    		File filechk;
-    		filechk = new File(myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_DB_FILENAME);
-    		if(!filechk.exists()) {
+    		if(!_local.exists() || _forceDownladlocalEmpty) {
     			// file non esiste devo scaricarlo?
     			AlertDialog.Builder builder = new AlertDialog.Builder(this);
     			builder
@@ -831,7 +878,8 @@ public class MainActivity extends FragmentActivity {
     			.setNegativeButton("No", new DialogInterface.OnClickListener() {
     				public void onClick(DialogInterface dialog, int which) {			      	    		    		
     		    		showToast("File inesistente e non scaricato possibili errori nel programma!");
-    		    		myGlobal.statoDBLocal = false;
+    		    		if (!_local.exists())
+    		    			myGlobal.statoDBLocal = false;
     				}
     			})
     			.show();    			
@@ -848,8 +896,8 @@ public class MainActivity extends FragmentActivity {
     		}
 
     		
-    		filechk = new File(myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_FULL_DB_FILE);
-    		if(!filechk.exists()) {
+    		 
+    		if(!_full.exists() || _forceDownladlocalFull) {
     			// file non esiste devo scaricarlo?
     			AlertDialog.Builder builder = new AlertDialog.Builder(this);
     			builder
@@ -866,7 +914,8 @@ public class MainActivity extends FragmentActivity {
     			.setNegativeButton("No", new DialogInterface.OnClickListener() {
     				public void onClick(DialogInterface dialog, int which) {			      	    		    		
     		    		showToast("File inesistente e non scaricato possibili errori nel programma!");
-    		    		myGlobal.statoDBLocalFull = false;
+    		    		if (!_full.exists())
+    		    			myGlobal.statoDBLocalFull = false;
     				}
     			})
     			.show();    			
@@ -996,14 +1045,15 @@ public class MainActivity extends FragmentActivity {
     		        	//myFloatValore = Float.parseFloat(valValore);
 
     					if (myGlobal.statoDBLocal == false) {
-    						showToast("Errore presenza file DB locale!");
-    					}
-    	        		DBINSlocal.open();
-    	        		DBINSlocal.insertRecordDataIns(valData, valTipoOper, valChiFa, valADa, valPersonale, valValore, valCategoria, valDescrizione, valNote, "");
-    	        		DBINSlocal.close();
+    						showToast("Errore presenza file DB locale! Impossibile procedere.");
+    					} else {
+	    	        		DBINSlocal.open();
+	    	        		DBINSlocal.insertRecordDataIns(valData, valTipoOper, valChiFa, valADa, valPersonale, valValore, valCategoria, valDescrizione, valNote, "");
+	    	        		DBINSlocal.close();
     	        		
-    	        		textTitle.setTextColor(getResources().getColor(R.color.TitleGreen));
-    					showToast("Dati Salvati");
+	    	        		textTitle.setTextColor(getResources().getColor(R.color.TitleGreen));
+	    	        		showToast("Dati Salvati");
+    					}
     				} catch (IOException ioe) {    					
     					showToast("Error IOException: " + ioe.getMessage());
     					ioe.printStackTrace();
@@ -1115,11 +1165,11 @@ public class MainActivity extends FragmentActivity {
     class ChangeFocusAutoComplete implements View.OnFocusChangeListener {
 
         @Override
-        public void onFocusChange(View v, boolean hasFocus) {
-        	textTitle.setTextColor(getResources().getColor(R.color.TitleYellow));
+        public void onFocusChange(View v, boolean hasFocus) {        	
             if ((v.getId() == R.id.TextAutocompleteCategoria && !hasFocus) || (v.getId() == R.id.TextAutocompleteADa && !hasFocus)) {
             	showToast("Performing validation");
                 ((AutoCompleteTextView)v).performValidation();
+                textTitle.setTextColor(getResources().getColor(R.color.TitleYellow));
             } 
         }
     }
@@ -1131,10 +1181,7 @@ public class MainActivity extends FragmentActivity {
 	class ValidateCategoria implements AutoCompleteTextView.Validator {			
 		@Override
 		public boolean isValid(CharSequence text) {
-			//List<String> mylistr = Arrays.asList(arrCategoria);
-	    	DBINSlocal.open();
-	    	List<String> mylistr = DBINSlocal.fetchValori(MyDatabase.DataINStable.TABELLA_CATEGORIE);
-	    	DBINSlocal.close();
+			List<String> mylistr = Arrays.asList(myGlobal.arrCategoria);
 			if (mylistr.contains(text.toString())) {
 
 				int spinnerPosition = adapterCat.getPosition(text.toString());
@@ -1152,11 +1199,7 @@ public class MainActivity extends FragmentActivity {
 			int numline=0, posch=0, maxposch=0, memoline=0;
              // Whatever value you return here must be in the list of valid words.
 			
-			//List<String> mylistr = Arrays.asList(arrCategoria);
-	    	DBINSlocal.open();
-	    	List<String> mylistr = DBINSlocal.fetchValori(MyDatabase.DataINStable.TABELLA_CATEGORIE);
-	    	DBINSlocal.close();
-
+			List<String> mylistr = Arrays.asList(myGlobal.arrCategoria);
 			if (mylistr.contains(invalidText.toString())) {
 				return invalidText;
 			} else {
@@ -1208,10 +1251,8 @@ public class MainActivity extends FragmentActivity {
 	class ValidateADa implements AutoCompleteTextView.Validator {			
 		@Override
 		public boolean isValid(CharSequence text) {
-			//List<String> mylistr = Arrays.asList(arrADa);
-	    	DBINSlocal.open();
-	    	List<String> mylistr = DBINSlocal.fetchValori(MyDatabase.DataINStable.TABELLA_ADA);
-	    	DBINSlocal.close();			
+			
+			List<String> mylistr = Arrays.asList(myGlobal.arrADa);
 			if (mylistr.contains(text.toString())) {
 
 				int spinnerPosition = adapterADa.getPosition(text.toString());
@@ -1227,10 +1268,7 @@ public class MainActivity extends FragmentActivity {
 		public CharSequence fixText(CharSequence invalidText) {
 
              // Whatever value you return here must be in the list of valid words.
-			//List<String> mylistr = Arrays.asList(arrADa);
-	    	DBINSlocal.open();
-	    	List<String> mylistr = DBINSlocal.fetchValori(MyDatabase.DataINStable.TABELLA_ADA);
-	    	DBINSlocal.close();	
+			List<String> mylistr = Arrays.asList(myGlobal.arrADa);
 			if (mylistr.contains(invalidText.toString())) {
 				return invalidText;
 			} else {				
@@ -1272,11 +1310,11 @@ public class MainActivity extends FragmentActivity {
     
     class ClickDataButton implements View.OnTouchListener {
     	@Override
-        public boolean onTouch(View v, MotionEvent event) {
-    		textTitle.setTextColor(getResources().getColor(R.color.TitleYellow));
+        public boolean onTouch(View v, MotionEvent event) {    		
     		if (MotionEvent.ACTION_UP == event.getAction()) {
         	    DialogFragment newFragment = new DatePickerFragment();
-        	    newFragment.show(getSupportFragmentManager(), "datePicker");    			
+        	    newFragment.show(getSupportFragmentManager(), "datePicker");
+        	    textTitle.setTextColor(getResources().getColor(R.color.TitleYellow));
     		}
     		return false;
         }
@@ -1292,8 +1330,6 @@ public class MainActivity extends FragmentActivity {
         public void onClick(View v) {
             // Perform action on click
     		initTextValue();
-
-        	
         }
     };
 
@@ -1308,10 +1344,10 @@ public class MainActivity extends FragmentActivity {
 		
 		Calendar c = Calendar.getInstance();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALY);
-		String formattedDate = df.format(c.getTime());
+		String formattedDateOnly = df.format(c.getTime());
 		
 		myeditText = (EditText) findViewById(R.id.TextData);
-		myeditText.setText(formattedDate);
+		myeditText.setText(formattedDateOnly);
 		
 		myeditText = (EditText) findViewById(R.id.TextDescrizione);
 		myeditText.setText("");
