@@ -157,7 +157,13 @@ containing a value of this type.
         public static final int zOrderOnTop=0x7f01000f;
     }
     public static final class color {
+        public static final int DarkGray=0x7f05000f;
+        public static final int LightBlue=0x7f050012;
         public static final int LightGray=0x7f05000c;
+        public static final int LightGray2=0x7f05000d;
+        public static final int LightGreen=0x7f05000e;
+        public static final int LightRed=0x7f050010;
+        public static final int LightYellow=0x7f050011;
         public static final int TitleGreen=0x7f05000a;
         public static final int TitleYellow=0x7f05000b;
         public static final int common_action_bar_splitter=0x7f050009;
@@ -172,8 +178,8 @@ containing a value of this type.
         public static final int common_signin_btn_light_text_disabled=0x7f050006;
         public static final int common_signin_btn_light_text_focused=0x7f050007;
         public static final int common_signin_btn_light_text_pressed=0x7f050005;
-        public static final int common_signin_btn_text_dark=0x7f05000d;
-        public static final int common_signin_btn_text_light=0x7f05000e;
+        public static final int common_signin_btn_text_dark=0x7f050013;
+        public static final int common_signin_btn_text_light=0x7f050014;
     }
     public static final class dimen {
         /**  Default screen margins, per the Android Design guidelines. 
@@ -223,6 +229,7 @@ containing a value of this type.
         public static final int ic_plusone_tall_off_client=0x7f020022;
         public static final int ic_refresh=0x7f020023;
         public static final int ic_refresh_256=0x7f020024;
+        public static final int ic_search_83=0x7f020025;
     }
     public static final class id {
         public static final int AppVersion=0x7f060009;
@@ -239,30 +246,33 @@ containing a value of this type.
         public static final int TextNote=0x7f06001c;
         public static final int TextValore=0x7f060015;
         public static final int action_authDropbox=0x7f060031;
-        public static final int action_downloadDB=0x7f06002a;
-        public static final int action_downloadDBfull=0x7f06002b;
-        public static final int action_readfileDBfull=0x7f060030;
-        public static final int action_readfileDBlocal=0x7f06002f;
+        public static final int action_downloadDB=0x7f06002f;
+        public static final int action_erase_all_db=0x7f060030;
+        public static final int action_read_data_upload=0x7f060034;
+        public static final int action_readfileDBfull=0x7f06002e;
+        public static final int action_readfileDBlocal=0x7f06002d;
+        public static final int action_refresh=0x7f060035;
+        public static final int action_search=0x7f060033;
         public static final int action_settings=0x7f060032;
-        public static final int action_sync=0x7f06002e;
-        public static final int action_sync_db=0x7f06002d;
-        public static final int action_upload=0x7f06002c;
-        public static final int action_uploadDB=0x7f060029;
-        public static final int adaText=0x7f060023;
-        public static final int btn1=0x7f06001e;
-        public static final int btn2=0x7f06001f;
-        public static final int categoriaText=0x7f060026;
-        public static final int chifaText=0x7f060022;
-        public static final int cpersText=0x7f060024;
-        public static final int dataText=0x7f060020;
-        public static final int descrizioneText=0x7f060027;
+        public static final int action_sync_INS_temp=0x7f06002c;
+        public static final int action_sync_db=0x7f06002b;
+        public static final int action_uploadDB=0x7f06002a;
+        public static final int adaText=0x7f060024;
+        public static final int btnread1=0x7f06001e;
+        public static final int btnread2=0x7f06001f;
+        public static final int btnread3=0x7f060020;
+        public static final int categoriaText=0x7f060027;
+        public static final int chifaText=0x7f060023;
+        public static final int cpersText=0x7f060025;
+        public static final int dataText=0x7f060021;
+        public static final int descrizioneText=0x7f060028;
         public static final int hybrid=0x7f060004;
         public static final int imgbtnOK=0x7f060008;
         public static final int imgbtnReset=0x7f060006;
         public static final int linearLayout1=0x7f06001d;
         public static final int none=0x7f060000;
         public static final int normal=0x7f060001;
-        public static final int noteText=0x7f060028;
+        public static final int noteText=0x7f060029;
         public static final int satellite=0x7f060002;
         public static final int terrain=0x7f060003;
         public static final int textView1=0x7f06000b;
@@ -274,8 +284,8 @@ containing a value of this type.
         public static final int textView8=0x7f060019;
         public static final int textView9=0x7f06001b;
         public static final int textViewTitle=0x7f060007;
-        public static final int tipooperazioneText=0x7f060021;
-        public static final int valoreText=0x7f060025;
+        public static final int tipooperazioneText=0x7f060022;
+        public static final int valoreText=0x7f060026;
     }
     public static final class integer {
         public static final int google_play_services_version=0x7f080000;
@@ -288,16 +298,20 @@ containing a value of this type.
     }
     public static final class menu {
         public static final int main=0x7f0c0000;
-        public static final int read_txt=0x7f0c0001;
+        public static final int read_data_actions=0x7f0c0001;
+        public static final int read_txt=0x7f0c0002;
     }
     public static final class string {
-        public static final int action_authDropbox_login=0x7f070021;
-        public static final int action_authDropbox_logout=0x7f070022;
-        public static final int action_downloadDB=0x7f070025;
-        public static final int action_downloadDBfull=0x7f070026;
-        public static final int action_readfileDBfull=0x7f070024;
-        public static final int action_readfileDBlocal=0x7f070023;
-        public static final int action_settings=0x7f070020;
+        public static final int action_authDropbox_login=0x7f070022;
+        public static final int action_authDropbox_logout=0x7f070023;
+        public static final int action_compose=0x7f070039;
+        public static final int action_downloadDB=0x7f070026;
+        public static final int action_downloadDBfull=0x7f070027;
+        public static final int action_erase_all_db=0x7f070020;
+        public static final int action_readfileDBfull=0x7f070025;
+        public static final int action_readfileDBlocal=0x7f070024;
+        public static final int action_search=0x7f070038;
+        public static final int action_settings=0x7f070021;
         public static final int action_sync=0x7f07001e;
         public static final int action_sync_db=0x7f07001f;
         public static final int action_upload=0x7f07001c;
@@ -397,53 +411,55 @@ containing a value of this type.
         /**  Long form sign-in button text [CHAR LIMIT=30] 
          */
         public static final int common_signin_button_text_long=0x7f070013;
-        public static final int desc_imgData=0x7f07002c;
-        public static final int desc_refresh=0x7f07002d;
-        public static final int pref_description_social_recommendations=0x7f07003a;
+        public static final int desc_imgData=0x7f07002d;
+        public static final int desc_refresh=0x7f07002e;
+        public static final int pref_description_social_recommendations=0x7f07003d;
         /**  Example settings for Data & Sync 
          */
-        public static final int pref_header_data_sync=0x7f07003c;
+        public static final int pref_header_data_sync=0x7f07003f;
         /**  Strings related to Settings 
  Example General settings 
          */
-        public static final int pref_header_general=0x7f070038;
+        public static final int pref_header_general=0x7f07003b;
         /**  Example settings for Notifications 
          */
-        public static final int pref_header_notifications=0x7f07003f;
-        public static final int pref_ringtone_silent=0x7f070042;
-        public static final int pref_title_add_friends_to_messages=0x7f07003b;
-        public static final int pref_title_new_message_notifications=0x7f070040;
-        public static final int pref_title_ringtone=0x7f070041;
-        public static final int pref_title_social_recommendations=0x7f070039;
-        public static final int pref_title_sync_frequency=0x7f07003d;
-        public static final int pref_title_system_sync_settings=0x7f07003e;
-        public static final int pref_title_vibrate=0x7f070043;
-        public static final int strOK=0x7f07002b;
-        public static final int title_activity_ModifyData=0x7f07002a;
-        public static final int title_activity_MySettings=0x7f070028;
-        public static final int title_activity_SyncDB=0x7f070029;
-        public static final int title_activity_read_DB=0x7f070027;
-        public static final int title_activity_settings=0x7f070037;
-        public static final int titolo1=0x7f07001a;
-        public static final int titoloADa=0x7f070031;
-        public static final int titoloCategoria=0x7f070034;
-        public static final int titoloChi=0x7f070030;
-        public static final int titoloData=0x7f07002e;
-        public static final int titoloDescrizione=0x7f070035;
-        public static final int titoloNote=0x7f070036;
-        public static final int titoloPersonale=0x7f070032;
-        public static final int titoloTipoOper=0x7f07002f;
-        public static final int titoloValore=0x7f070033;
+        public static final int pref_header_notifications=0x7f070042;
+        public static final int pref_ringtone_silent=0x7f070045;
+        public static final int pref_title_add_friends_to_messages=0x7f07003e;
+        public static final int pref_title_new_message_notifications=0x7f070043;
+        public static final int pref_title_ringtone=0x7f070044;
+        public static final int pref_title_social_recommendations=0x7f07003c;
+        public static final int pref_title_sync_frequency=0x7f070040;
+        public static final int pref_title_system_sync_settings=0x7f070041;
+        public static final int pref_title_vibrate=0x7f070046;
+        public static final int strOK=0x7f07002c;
+        public static final int title_activity_InsertData=0x7f07001a;
+        public static final int title_activity_ModifyData=0x7f07002b;
+        public static final int title_activity_MySettings=0x7f070029;
+        public static final int title_activity_SyncDB=0x7f07002a;
+        public static final int title_activity_read_DB=0x7f070028;
+        public static final int title_activity_settings=0x7f07003a;
+        public static final int titoloADa=0x7f070032;
+        public static final int titoloCategoria=0x7f070035;
+        public static final int titoloChi=0x7f070031;
+        public static final int titoloData=0x7f07002f;
+        public static final int titoloDescrizione=0x7f070036;
+        public static final int titoloNote=0x7f070037;
+        public static final int titoloPersonale=0x7f070033;
+        public static final int titoloTipoOper=0x7f070030;
+        public static final int titoloValore=0x7f070034;
     }
     public static final class style {
         /** 
         Base application theme, dependent on API level. This theme is replaced
         by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
+
     
 
             Theme customizations available in newer API levels can go in
             res/values-vXX/styles.xml, while customizations related to
             backward-compatibility can go here.
+
         
 
         Base application theme for API 11+. This theme completely replaces
@@ -464,6 +480,7 @@ containing a value of this type.
         public static final int AppTheme=0x7f0b0001;
         public static final int CustTextLabel=0x7f0b0002;
         public static final int CustTextTitle=0x7f0b0003;
+        public static final int CustomThemeReadData=0x7f0b0004;
     }
     public static final class xml {
         public static final int fragmented_preferences=0x7f040000;
