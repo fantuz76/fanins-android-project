@@ -10,7 +10,7 @@
     <!-- Refresh -->
     <item
         android:id="@+id/action_read_data_upload"
-        android:icon="@drawable/ic_add"
+        android:icon="@drawable/ic_folder_web_upload"
         android:showAsAction="ifRoom"
         android:title="Upload"/>
 

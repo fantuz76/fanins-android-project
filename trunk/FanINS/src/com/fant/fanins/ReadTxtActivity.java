@@ -39,6 +39,7 @@ public class ReadTxtActivity extends ListActivity {
 	private int posScroll;
 
 	Context mycontext;
+	Bundle mySavedInstance;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +58,7 @@ public class ReadTxtActivity extends ListActivity {
 
 
 		mycontext = this;
+		mySavedInstance = savedInstanceState;
 
 
 		try {
@@ -84,6 +86,13 @@ public class ReadTxtActivity extends ListActivity {
 
 				Button button3 = (Button) findViewById(R.id.btnread3);
 				button3.setText("Ordina");
+				button3.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						ordinaDatabase();						
+					}
+				});
+
 
 
 				if (myGlobal.statoDBLocalFull == false) {
@@ -114,7 +123,12 @@ public class ReadTxtActivity extends ListActivity {
 
 				Button button3 = (Button) findViewById(R.id.btnread3);
 				button3.setVisibility(View.INVISIBLE);
-
+				button3.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						ordinaDatabase();						
+					}
+				});
 
 
 				if (myGlobal.statoDBLocal == false) {
@@ -129,49 +143,15 @@ public class ReadTxtActivity extends ListActivity {
 
 
 
-			DBINStoread.open();
-
-			//mycursor = DBINStoread.fetchDati();
 			querystr = "SELECT * FROM " + MyDatabase.DataINStable.TABELLA_INSDATA ;
 			if (readDBtype.equals("full")) {
 				querystr = querystr + " ORDER BY " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" DESC";
 			}
-			mycursor = DBINStoread.rawQuery(querystr,  null );
 
-			if (mycursor.getCount() == 0) {
-				assert true;	// nop
-			} else {
-				super.onCreate(savedInstanceState);
-
-				dataAdapter = new SimpleCursorAdapter(
-						this, R.layout.list_item, 
-						mycursor, 
-						new String[] 
-								{ MyDatabase.DataINStable.DATA_OPERAZIONE_KEY, 
-								MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY, 
-								MyDatabase.DataINStable.CHI_FA_KEY, 
-								MyDatabase.DataINStable.A_DA_KEY, 
-								MyDatabase.DataINStable.C_PERS_KEY, 
-								MyDatabase.DataINStable.VALORE_KEY, 
-								MyDatabase.DataINStable.CATEGORIA_KEY,  
-								MyDatabase.DataINStable.DESCRIZIONE_KEY, 
-								MyDatabase.DataINStable.NOTE_KEY}, 
-								new int[]
-										{ R.id.dataText, 
-								R.id.tipooperazioneText, 
-								R.id.chifaText, 
-								R.id.adaText, 
-								R.id.cpersText, 
-								R.id.valoreText, 
-								R.id.categoriaText, 
-								R.id.descrizioneText, 
-								R.id.noteText},
-								0);
-
-				setListAdapter(dataAdapter);
-
-			}
-			DBINStoread.close();
+			refreshAllDatabase(querystr);
+			
+			
+			
 
 			myListActivity = getListView();
 
@@ -272,6 +252,7 @@ public class ReadTxtActivity extends ListActivity {
 			showToast("Error Exception: " + e.getMessage());
 		}
 
+		
 
 
 	}
@@ -312,6 +293,10 @@ public class ReadTxtActivity extends ListActivity {
     		uploadDB.execute();
 			return true;
 
+		case R.id.action_refresh:
+			refreshAllDatabase(querystr);
+			return true;
+			
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -417,4 +402,70 @@ public class ReadTxtActivity extends ListActivity {
 		}
 	}
 
+	
+	public void refreshAllDatabase(String _query) {
+		DBINStoread.open();
+
+		//mycursor = DBINStoread.fetchDati();
+		mycursor = DBINStoread.rawQuery(_query,  null );
+
+		if (mycursor.getCount() == 0) {
+			assert true;	// nop
+		} else {
+			super.onCreate(mySavedInstance);
+
+			dataAdapter = new SimpleCursorAdapter(
+					this, R.layout.list_item, 
+					mycursor, 
+					new String[] 
+							{ MyDatabase.DataINStable.DATA_OPERAZIONE_KEY, 
+							MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY, 
+							MyDatabase.DataINStable.CHI_FA_KEY, 
+							MyDatabase.DataINStable.A_DA_KEY, 
+							MyDatabase.DataINStable.C_PERS_KEY, 
+							MyDatabase.DataINStable.VALORE_KEY, 
+							MyDatabase.DataINStable.CATEGORIA_KEY,  
+							MyDatabase.DataINStable.DESCRIZIONE_KEY, 
+							MyDatabase.DataINStable.NOTE_KEY}, 
+							new int[]
+									{ R.id.dataText, 
+							R.id.tipooperazioneText, 
+							R.id.chifaText, 
+							R.id.adaText, 
+							R.id.cpersText, 
+							R.id.valoreText, 
+							R.id.categoriaText, 
+							R.id.descrizioneText, 
+							R.id.noteText},
+							0);
+
+			setListAdapter(dataAdapter);
+
+		}
+		DBINStoread.close();
+	}
+	
+	
+	private void ordinaDatabase(){
+		
+		if (querystr.contains(MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" DESC")) {
+			querystr = querystr.replace(MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" DESC", MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" ASC");
+			showToast("Ordine :" + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" ASC");
+		} else if (querystr.contains(MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" ASC")) {
+			querystr = querystr.replace(MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" ASC", MyDatabase.DataINStable.ID +" DESC");
+			showToast("Ordine :" + MyDatabase.DataINStable.ID +" DESC");
+		} else if (querystr.contains(MyDatabase.DataINStable.ID +" DESC")) {
+			querystr = querystr.replace(MyDatabase.DataINStable.ID +" DESC", MyDatabase.DataINStable.ID +" ASC");
+			showToast("Ordine :" + MyDatabase.DataINStable.ID +" ASC");
+		} else if (querystr.contains(MyDatabase.DataINStable.ID +" ASC")) {
+			querystr = querystr.replace(MyDatabase.DataINStable.ID +" ASC", MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" DESC");
+			showToast("Ordine :" + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" DESC");
+
+		}
+		refreshAllDatabase(querystr);
+	}
+	
+	
 }
+
+

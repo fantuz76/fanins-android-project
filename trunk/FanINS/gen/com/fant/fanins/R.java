@@ -220,16 +220,20 @@ containing a value of this type.
         public static final int ic_add_big=0x7f020019;
         public static final int ic_calendar=0x7f02001a;
         public static final int ic_calendar_big=0x7f02001b;
-        public static final int ic_launcher=0x7f02001c;
-        public static final int ic_money=0x7f02001d;
-        public static final int ic_money_big=0x7f02001e;
-        public static final int ic_plusone_medium_off_client=0x7f02001f;
-        public static final int ic_plusone_small_off_client=0x7f020020;
-        public static final int ic_plusone_standard_off_client=0x7f020021;
-        public static final int ic_plusone_tall_off_client=0x7f020022;
-        public static final int ic_refresh=0x7f020023;
-        public static final int ic_refresh_256=0x7f020024;
-        public static final int ic_search_83=0x7f020025;
+        public static final int ic_cloud_sync=0x7f02001c;
+        public static final int ic_folder_bookmark=0x7f02001d;
+        public static final int ic_folder_library=0x7f02001e;
+        public static final int ic_folder_web_upload=0x7f02001f;
+        public static final int ic_launcher=0x7f020020;
+        public static final int ic_money=0x7f020021;
+        public static final int ic_money_big=0x7f020022;
+        public static final int ic_plusone_medium_off_client=0x7f020023;
+        public static final int ic_plusone_small_off_client=0x7f020024;
+        public static final int ic_plusone_standard_off_client=0x7f020025;
+        public static final int ic_plusone_tall_off_client=0x7f020026;
+        public static final int ic_refresh=0x7f020027;
+        public static final int ic_refresh_144=0x7f020028;
+        public static final int ic_search_83=0x7f020029;
     }
     public static final class id {
         public static final int AppVersion=0x7f060009;
@@ -245,18 +249,17 @@ containing a value of this type.
         public static final int TextDescrizione=0x7f06001a;
         public static final int TextNote=0x7f06001c;
         public static final int TextValore=0x7f060015;
-        public static final int action_authDropbox=0x7f060031;
-        public static final int action_downloadDB=0x7f06002f;
-        public static final int action_erase_all_db=0x7f060030;
-        public static final int action_read_data_upload=0x7f060034;
-        public static final int action_readfileDBfull=0x7f06002e;
-        public static final int action_readfileDBlocal=0x7f06002d;
-        public static final int action_refresh=0x7f060035;
-        public static final int action_search=0x7f060033;
-        public static final int action_settings=0x7f060032;
-        public static final int action_sync_INS_temp=0x7f06002c;
-        public static final int action_sync_db=0x7f06002b;
-        public static final int action_uploadDB=0x7f06002a;
+        public static final int action_authDropbox=0x7f060030;
+        public static final int action_read_data_upload=0x7f060033;
+        public static final int action_readfileDBfull=0x7f06002b;
+        public static final int action_readfileDBlocal=0x7f06002a;
+        public static final int action_refresh=0x7f060034;
+        public static final int action_reportlaunch=0x7f06002d;
+        public static final int action_search=0x7f060032;
+        public static final int action_settings=0x7f060031;
+        public static final int action_sync_INS_temp=0x7f06002f;
+        public static final int action_sync_db=0x7f06002c;
+        public static final int action_uploadDB=0x7f06002e;
         public static final int adaText=0x7f060024;
         public static final int btnread1=0x7f06001e;
         public static final int btnread2=0x7f06001f;
@@ -293,8 +296,9 @@ containing a value of this type.
     public static final class layout {
         public static final int activity_main=0x7f030000;
         public static final int activity_read_txt=0x7f030001;
-        public static final int activity_syncdb=0x7f030002;
-        public static final int list_item=0x7f030003;
+        public static final int activity_report=0x7f030002;
+        public static final int activity_syncdb=0x7f030003;
+        public static final int list_item=0x7f030004;
     }
     public static final class menu {
         public static final int main=0x7f0c0000;
@@ -302,15 +306,16 @@ containing a value of this type.
         public static final int read_txt=0x7f0c0002;
     }
     public static final class string {
-        public static final int action_authDropbox_login=0x7f070022;
-        public static final int action_authDropbox_logout=0x7f070023;
-        public static final int action_compose=0x7f070039;
-        public static final int action_downloadDB=0x7f070026;
-        public static final int action_downloadDBfull=0x7f070027;
+        public static final int action_authDropbox_login=0x7f070023;
+        public static final int action_authDropbox_logout=0x7f070024;
+        public static final int action_compose=0x7f07003b;
+        public static final int action_downloadDB=0x7f070027;
+        public static final int action_downloadDBfull=0x7f070028;
         public static final int action_erase_all_db=0x7f070020;
-        public static final int action_readfileDBfull=0x7f070025;
-        public static final int action_readfileDBlocal=0x7f070024;
-        public static final int action_search=0x7f070038;
+        public static final int action_readfileDBfull=0x7f070026;
+        public static final int action_readfileDBlocal=0x7f070025;
+        public static final int action_reportlaunch=0x7f070022;
+        public static final int action_search=0x7f07003a;
         public static final int action_settings=0x7f070021;
         public static final int action_sync=0x7f07001e;
         public static final int action_sync_db=0x7f07001f;
@@ -411,43 +416,44 @@ containing a value of this type.
         /**  Long form sign-in button text [CHAR LIMIT=30] 
          */
         public static final int common_signin_button_text_long=0x7f070013;
-        public static final int desc_imgData=0x7f07002d;
-        public static final int desc_refresh=0x7f07002e;
-        public static final int pref_description_social_recommendations=0x7f07003d;
+        public static final int desc_imgData=0x7f07002f;
+        public static final int desc_refresh=0x7f070030;
+        public static final int pref_description_social_recommendations=0x7f07003f;
         /**  Example settings for Data & Sync 
          */
-        public static final int pref_header_data_sync=0x7f07003f;
+        public static final int pref_header_data_sync=0x7f070041;
         /**  Strings related to Settings 
  Example General settings 
          */
-        public static final int pref_header_general=0x7f07003b;
+        public static final int pref_header_general=0x7f07003d;
         /**  Example settings for Notifications 
          */
-        public static final int pref_header_notifications=0x7f070042;
-        public static final int pref_ringtone_silent=0x7f070045;
-        public static final int pref_title_add_friends_to_messages=0x7f07003e;
-        public static final int pref_title_new_message_notifications=0x7f070043;
-        public static final int pref_title_ringtone=0x7f070044;
-        public static final int pref_title_social_recommendations=0x7f07003c;
-        public static final int pref_title_sync_frequency=0x7f070040;
-        public static final int pref_title_system_sync_settings=0x7f070041;
-        public static final int pref_title_vibrate=0x7f070046;
-        public static final int strOK=0x7f07002c;
+        public static final int pref_header_notifications=0x7f070044;
+        public static final int pref_ringtone_silent=0x7f070047;
+        public static final int pref_title_add_friends_to_messages=0x7f070040;
+        public static final int pref_title_new_message_notifications=0x7f070045;
+        public static final int pref_title_ringtone=0x7f070046;
+        public static final int pref_title_social_recommendations=0x7f07003e;
+        public static final int pref_title_sync_frequency=0x7f070042;
+        public static final int pref_title_system_sync_settings=0x7f070043;
+        public static final int pref_title_vibrate=0x7f070048;
+        public static final int strOK=0x7f07002e;
         public static final int title_activity_InsertData=0x7f07001a;
-        public static final int title_activity_ModifyData=0x7f07002b;
-        public static final int title_activity_MySettings=0x7f070029;
-        public static final int title_activity_SyncDB=0x7f07002a;
-        public static final int title_activity_read_DB=0x7f070028;
-        public static final int title_activity_settings=0x7f07003a;
-        public static final int titoloADa=0x7f070032;
-        public static final int titoloCategoria=0x7f070035;
-        public static final int titoloChi=0x7f070031;
-        public static final int titoloData=0x7f07002f;
-        public static final int titoloDescrizione=0x7f070036;
-        public static final int titoloNote=0x7f070037;
-        public static final int titoloPersonale=0x7f070033;
-        public static final int titoloTipoOper=0x7f070030;
-        public static final int titoloValore=0x7f070034;
+        public static final int title_activity_ModifyData=0x7f07002d;
+        public static final int title_activity_MySettings=0x7f07002b;
+        public static final int title_activity_SyncDB=0x7f07002c;
+        public static final int title_activity_read_DB=0x7f070029;
+        public static final int title_activity_report=0x7f07002a;
+        public static final int title_activity_settings=0x7f07003c;
+        public static final int titoloADa=0x7f070034;
+        public static final int titoloCategoria=0x7f070037;
+        public static final int titoloChi=0x7f070033;
+        public static final int titoloData=0x7f070031;
+        public static final int titoloDescrizione=0x7f070038;
+        public static final int titoloNote=0x7f070039;
+        public static final int titoloPersonale=0x7f070035;
+        public static final int titoloTipoOper=0x7f070032;
+        public static final int titoloValore=0x7f070036;
     }
     public static final class style {
         /** 
@@ -485,11 +491,9 @@ containing a value of this type.
     public static final class xml {
         public static final int fragmented_preferences=0x7f040000;
         public static final int pref_data_sync=0x7f040001;
-        public static final int pref_general=0x7f040002;
-        public static final int pref_headers=0x7f040003;
-        public static final int pref_notification=0x7f040004;
-        public static final int preference_fanins=0x7f040005;
-        public static final int preference_headers=0x7f040006;
+        public static final int pref_notification=0x7f040002;
+        public static final int preference_fanins=0x7f040003;
+        public static final int preference_headers=0x7f040004;
     }
     public static final class styleable {
         /** Attributes that can be used with a AdsAttrs.

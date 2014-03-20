@@ -1,7 +1,6 @@
 package com.fant.fanins;
 
 
-import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -60,7 +59,6 @@ import com.google.api.client.googleapis.media.MediaHttpUploader;
 import com.google.api.client.http.FileContent;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
-import com.google.api.services.drive.DriveScopes;
 import com.google.gdata.client.spreadsheet.SpreadsheetService;
 import com.google.gdata.data.spreadsheet.CellEntry;
 import com.google.gdata.data.spreadsheet.CellFeed;
@@ -122,7 +120,7 @@ public class MainActivity extends FragmentActivity {
 	
 	com.google.api.services.drive.model.File fileOnGoogleDrive = null;
 	
-	private MyDatabase DBINSlocal;
+	
 	  	
     private static Drive service;
 	private GoogleAccountCredential credential;	  
@@ -174,7 +172,7 @@ public class MainActivity extends FragmentActivity {
         if (!fileAccessOK) 
         	showToast("Errore creazione file: " + fileNameFull);
         
-        if (!prepDBfilesisOK(false,false))
+        if (!myGlobal.prepDBfilesisOK(this,false,false))
         	showToast("Errore nel check file Database");
 
 
@@ -194,19 +192,19 @@ public class MainActivity extends FragmentActivity {
 
         if (myGlobal.statoDBLocal) {
         	// Se Database tutto a posto inizializzo array con valori 
-        	DBINSlocal.open();
+        	myGlobal.DBINSlocal.open();
         	List<String> mylistr; 
-        	mylistr = DBINSlocal.fetchValori(MyDatabase.DataINStable.TABELLA_TIPOOPERAZIONE);
+        	mylistr = myGlobal.DBINSlocal.fetchValori(MyDatabase.DataINStable.TABELLA_TIPOOPERAZIONE);
         	myGlobal.arrTipoOperazione = mylistr.toArray(new String[0]);
-        	mylistr = DBINSlocal.fetchValori(MyDatabase.DataINStable.TABELLA_CHIFA);
+        	mylistr = myGlobal.DBINSlocal.fetchValori(MyDatabase.DataINStable.TABELLA_CHIFA);
         	myGlobal.arrChiFa = mylistr.toArray(new String[0]);
-        	mylistr = DBINSlocal.fetchValori(MyDatabase.DataINStable.TABELLA_CPERSONALI);
+        	mylistr = myGlobal.DBINSlocal.fetchValori(MyDatabase.DataINStable.TABELLA_CPERSONALI);
         	myGlobal.arrCPersonale = mylistr.toArray(new String[0]);
-        	mylistr = DBINSlocal.fetchValori(MyDatabase.DataINStable.TABELLA_CATEGORIE);
+        	mylistr = myGlobal.DBINSlocal.fetchValori(MyDatabase.DataINStable.TABELLA_CATEGORIE);
         	myGlobal.arrCategoria = mylistr.toArray(new String[0]);
-        	mylistr = DBINSlocal.fetchValori(MyDatabase.DataINStable.TABELLA_ADA);
+        	mylistr = myGlobal.DBINSlocal.fetchValori(MyDatabase.DataINStable.TABELLA_ADA);
         	myGlobal.arrADa = mylistr.toArray(new String[0]);
-        	DBINSlocal.close();
+        	myGlobal.DBINSlocal.close();
         } else {
         	// in mancanza del DB metto tutti List vuoti
         	List<String> mylistr =  new ArrayList<String>();
@@ -623,10 +621,6 @@ public class MainActivity extends FragmentActivity {
     		//newFile.delete();
     		return true;
 
-    	case R.id.action_downloadDB:
-            if (!prepDBfilesisOK(true,true))
-            	showToast("Errore nel download database");
-    		return true;
 	
     	/*	
     	case R.id.action_downloadDB:
@@ -704,49 +698,6 @@ public class MainActivity extends FragmentActivity {
 
 
 
-    	case R.id.action_erase_all_db:
-    		//Put up the Yes/No message box
-    		AlertDialog.Builder buildererase = new AlertDialog.Builder(this);
-    		buildererase    	    	
-    		.setTitle(R.string.action_sync)
-    		.setMessage("Sicuro di cancellare i file Database?")
-    		.setIcon(android.R.drawable.ic_dialog_alert)
-    		.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-    			public void onClick(DialogInterface dialog, int which) {    	    	    	    	    	    	
-
-    				try {
-    					java.io.File locFileDB = new java.io.File(myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_DB_FILENAME);
-    					if(!locFileDB.exists()) {
-    						showToast("File inesistente: " + locFileDB.getName());
-    						myGlobal.statoDBLocal = false;
-    					} else if (locFileDB.delete()) {
-    						showToast("Cancellato: " + locFileDB.getName());
-    						myGlobal.statoDBLocal = false;
-    					}
-    				} catch (Exception e) {
-    					showToast("Errore" + e.getMessage());
-    				}
-
-    				try {
-    					java.io.File locFileFullDB = new java.io.File(myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_FULL_DB_FILE);
-    					if(!locFileFullDB.exists()) {
-    						showToast("File inesistente: " + locFileFullDB.getName());
-    						myGlobal.statoDBLocal = false;
-    					} else if (locFileFullDB.delete()) {
-    						showToast("Cancellato: " + locFileFullDB.getName());
-    						myGlobal.statoDBLocalFull = false;
-    					}
-    				} catch (Exception e) {
-    					showToast("Errore" + e.getMessage());
-    				}
-
-    			}
-    		})
-    		.setNegativeButton("No", null)						//Do nothing on no
-    		.show();    		
-
-    		return true;
-
     		
     	case R.id.action_authDropbox:        		
     		if (mDropboxLoggedIn) {
@@ -759,8 +710,12 @@ public class MainActivity extends FragmentActivity {
     				myGlobal.mApiDropbox.getSession().startOAuth2Authentication(MainActivity.this);
     			}
     		}
-
-
+    		return true;
+    		
+    		
+    	case R.id.action_reportlaunch:
+    		intent = new Intent(this, ReportActivity.class);
+    		startActivity(intent);
     		return true;
 
     	case R.id.action_settings:
@@ -820,10 +775,7 @@ public class MainActivity extends FragmentActivity {
     
  
     public boolean checkCategoria()  {
-    	//List<String> mylistr = Arrays.asList(arrCategoria);
-    	DBINSlocal.open();
-    	List<String> mylistr = DBINSlocal.fetchValori(MyDatabase.DataINStable.TABELLA_CATEGORIE);
-    	DBINSlocal.close();
+    	List<String> mylistr = Arrays.asList(myGlobal.arrCategoria);    	
     	if (mylistr.contains(valCategoria)) 
     		return(true);
     	else
@@ -831,11 +783,7 @@ public class MainActivity extends FragmentActivity {
     }
     
     public boolean checkADa()  {
-    	//List<String> mylistr = Arrays.asList(arrADa);
-    	DBINSlocal.open();
-    	List<String> mylistr = DBINSlocal.fetchValori(MyDatabase.DataINStable.TABELLA_ADA);
-    	DBINSlocal.close();
-
+    	List<String> mylistr = Arrays.asList(myGlobal.arrADa);    
     	// non ammissibile
     	if  ( (valTipoOper.equalsIgnoreCase("Spostamento")) && (valADa.equals("")) ) {
     		return false;
@@ -851,94 +799,7 @@ public class MainActivity extends FragmentActivity {
     }
 
     
-    // *************************************************************************
-    // Preparo file database, se non ci sono li crea 
-    // *************************************************************************    
-    public boolean prepDBfilesisOK(boolean _forceDownladlocalEmpty, boolean _forceDownladlocalFull ){
-    	MyDatabase DBINStmp;
-    	final File _local = new File(myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_DB_FILENAME);
-    	final File _full = new File(myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_FULL_DB_FILE);
-    	
-    	try  {
-    		// controllo presenza dei file Database locali
-    		if(!_local.exists() || _forceDownladlocalEmpty) {
-    			// file non esiste devo scaricarlo?
-    			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    			builder
-    			.setTitle("File non trovato: " + myGlobal.LOCAL_DB_FILENAME)
-    			.setMessage("Scaricarlo da DropBox?")
-    			.setIcon(android.R.drawable.ic_dialog_alert)
-    			.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-    				public void onClick(DialogInterface dialog, int which) {			      	
-    		    		DownloadFromDropbox download2 = new DownloadFromDropbox(MainActivity.this, myGlobal.mApiDropbox, myGlobal.DROPBOX_INS_DIR, myGlobal.REMOTE_DB_FILENAME_EMPTY,
-    		    				myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator + myGlobal.LOCAL_DB_FILENAME);
-    		    		download2.execute();
-    				}
-    			})
-    			.setNegativeButton("No", new DialogInterface.OnClickListener() {
-    				public void onClick(DialogInterface dialog, int which) {			      	    		    		
-    		    		showToast("File inesistente e non scaricato possibili errori nel programma!");
-    		    		if (!_local.exists())
-    		    			myGlobal.statoDBLocal = false;
-    				}
-    			})
-    			.show();    			
-    			
-    		} else {
-    		
-	    		DBINSlocal = new MyDatabase(
-	    				this, 
-	    				myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_DB_FILENAME);
-	
-	    		DBINSlocal.open();
-	    		DBINSlocal.close();
-	    		myGlobal.statoDBLocal = true;
-    		}
-
-    		
-    		 
-    		if(!_full.exists() || _forceDownladlocalFull) {
-    			// file non esiste devo scaricarlo?
-    			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    			builder
-    			.setTitle("File non trovato: " + myGlobal.LOCAL_FULL_DB_FILE)
-    			.setMessage("Scaricarlo da DropBox?")
-    			.setIcon(android.R.drawable.ic_dialog_alert)
-    			.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-    				public void onClick(DialogInterface dialog, int which) {			      	
-    		    		DownloadFromDropbox download2 = new DownloadFromDropbox(MainActivity.this, myGlobal.mApiDropbox, myGlobal.DROPBOX_INS_DIR, myGlobal.REMOTE_DB_FILENAME,
-    		    				myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator + myGlobal.LOCAL_FULL_DB_FILE);
-    		    		download2.execute();
-    				}
-    			})
-    			.setNegativeButton("No", new DialogInterface.OnClickListener() {
-    				public void onClick(DialogInterface dialog, int which) {			      	    		    		
-    		    		showToast("File inesistente e non scaricato possibili errori nel programma!");
-    		    		if (!_full.exists())
-    		    			myGlobal.statoDBLocalFull = false;
-    				}
-    			})
-    			.show();    			
-    			
-    		} else {
-        		DBINStmp = new MyDatabase(
-        				this, 
-        				myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_FULL_DB_FILE);
-
-        		DBINStmp.open();
-        		DBINStmp.close();
-        		myGlobal.statoDBLocalFull = true;
-    		}
-    		
-
-    		return true;
-    	} catch (Exception e) {
-    		e.printStackTrace();
-    		showToast("Error Exception: " + e.getMessage());
-    		return false;
-    	}
-
-    }
+ 
     
     // *************************************************************************
     // Preparo file di testo, controllo consistenza 
@@ -1047,9 +908,9 @@ public class MainActivity extends FragmentActivity {
     					if (myGlobal.statoDBLocal == false) {
     						showToast("Errore presenza file DB locale! Impossibile procedere.");
     					} else {
-	    	        		DBINSlocal.open();
-	    	        		DBINSlocal.insertRecordDataIns(valData, valTipoOper, valChiFa, valADa, valPersonale, valValore, valCategoria, valDescrizione, valNote, "");
-	    	        		DBINSlocal.close();
+	    	        		myGlobal.DBINSlocal.open();
+	    	        		myGlobal.DBINSlocal.insertRecordDataIns(valData, valTipoOper, valChiFa, valADa, valPersonale, valValore, valCategoria, valDescrizione, valNote, "");
+	    	        		myGlobal.DBINSlocal.close();
     	        		
 	    	        		textTitle.setTextColor(getResources().getColor(R.color.TitleGreen));
 	    	        		showToast("Dati Salvati");

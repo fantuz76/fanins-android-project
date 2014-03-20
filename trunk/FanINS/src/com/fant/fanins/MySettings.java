@@ -3,23 +3,32 @@ package com.fant.fanins;
 
 import java.util.List;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.Toast;
 
 
 public class MySettings extends PreferenceActivity {
 
+	static Context myContext;
 public static String versionName = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        
+        myContext = this;
 
   		try {
 			versionName = this.getPackageManager()
@@ -30,10 +39,12 @@ public static String versionName = "";
 			versionName = "Errore versione non rilevata";
 		}
 		
+  		
+  		
         // Add a button to the header list.
         if (hasHeaders()) {
             Button button = new Button(this);
-            button.setText("Some action");
+            button.setText("Pulsante");
             setListFooter(button);
         }
     }
@@ -47,7 +58,77 @@ public static String versionName = "";
         loadHeadersFromResource(R.xml.preference_headers, target);
 		        
     }
+    
+    
+    public static void CancellaDatabase() {
 
+		//Put up the Yes/No message box
+		AlertDialog.Builder buildererase = new AlertDialog.Builder(myContext);
+		buildererase    	    	
+		.setTitle(R.string.action_sync)
+		.setMessage("Sicuro di cancellare i file Database?")
+		.setIcon(android.R.drawable.ic_dialog_alert)
+		.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {    	    	    	    	    	    	
+
+				try {
+					java.io.File locFileDB = new java.io.File(myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_DB_FILENAME);
+					if(!locFileDB.exists()) {
+						
+						showToast("File inesistente: " + locFileDB.getName());
+						myGlobal.statoDBLocal = false;
+					} else if (locFileDB.delete()) {
+						showToast("Cancellato: " + locFileDB.getName());
+						myGlobal.statoDBLocal = false;
+					}
+				} catch (Exception e) {
+					showToast("Errore" + e.getMessage());
+				}
+
+				try {
+					java.io.File locFileFullDB = new java.io.File(myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_FULL_DB_FILE);
+					if(!locFileFullDB.exists()) {
+						showToast("File inesistente: " + locFileFullDB.getName());
+						myGlobal.statoDBLocal = false;
+					} else if (locFileFullDB.delete()) {
+						showToast("Cancellato: " + locFileFullDB.getName());
+						myGlobal.statoDBLocalFull = false;
+					}
+				} catch (Exception e) {
+					showToast("Errore" + e.getMessage());
+				}
+
+			}
+		})
+		.setNegativeButton("No", null)						//Do nothing on no
+		.show();   
+    }
+
+
+    
+    public static class DeleteAllDatabase extends PreferenceFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            CancellaDatabase();
+        }
+    }    
+
+    public static class DownloadAllDatabase extends PreferenceFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+
+            if (!myGlobal.prepDBfilesisOK(myContext,true,true))
+            	showToast("Errore nel download database");
+
+            
+             	         
+        }
+    }    
+
+    
+    
     /**
      * This fragment shows the preferences for the first header.
      */
@@ -106,4 +187,28 @@ public static String versionName = "";
             
         }
     }
+
+    public static Handler UIHandler;
+
+    static 
+    {
+        UIHandler = new Handler(Looper.getMainLooper());
+    }
+    public static void runOnUI(Runnable runnable) {
+        UIHandler.post(runnable);
+    }
+
+    // *************************************************************************
+    // Mostra messaggio toast 
+    // *************************************************************************
+    public static void showToast(final String toast) {
+    	MySettings.runOnUI(new Runnable() {
+          @Override
+          public void run() {
+            Toast.makeText(myContext , toast, Toast.LENGTH_LONG).show();
+          }
+        });
+      }
+    
+    
 }
