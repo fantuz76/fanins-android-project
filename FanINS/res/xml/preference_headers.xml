@@ -1,27 +1,42 @@
-<preference-headers
-        xmlns:android="http://schemas.android.com/apk/res/android">
+<preference-headers xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <header android:fragment="com.fant.fanins.MySettings$Prefs2Fragment"
-            android:icon="@drawable/ic_money"
-            android:title="Versione app"
-            android:summary="Info about">
-        <!-- Arbitrary key/value pairs can be included with a header as
-             arguments to its fragment. -->
-        <extra android:name="someKey" android:value="someHeaderValue" />
-    </header>    
-    
-    <header android:fragment="com.fant.fanins.MySettings$Prefs1Fragment"
-            android:icon="@drawable/ic_money" 
-            android:key="chiaveFant"
-            android:title="Prefs 1"
-            android:summary="An example of some preferences." />
+    <header
+        android:fragment="com.fant.fanins.MySettings$DeleteAllDatabase"
+        android:icon="@drawable/ic_money"
+        android:summary="Cancella i file del database locale"
+        android:title="Cancella File Database" />
+    <header
+        android:fragment="com.fant.fanins.MySettings$DownloadAllDatabase"
+        android:icon="@drawable/ic_money"
+        android:summary="Download i file del database da Dropbox e sovrascrive quelli in locale"
+        android:title="Download File Database" />
+    <header
+        android:fragment="com.fant.fanins.MySettings$Prefs1Fragment"
+        android:icon="@drawable/ic_money"
+        android:key="Database"
+        android:summary="An example of some preferences."
+        android:title="Gestione dei file di Database" >
 
-
-    <header android:icon="@drawable/ic_money"
-            android:title="Intent"
-            android:summary="Launches an Intent.">
-        <intent android:action="android.intent.action.VIEW"
-                android:data="http://www.android.com" />
+        <!--
+             Arbitrary key/value pairs can be included with a header as
+             arguments to its fragment.
+        -->
+        <extra
+            android:name="someKey"
+            android:value="someHeaderValue" />
+    </header>
+    <header
+        android:icon="@drawable/ic_money"
+        android:summary="Launches an Intent."
+        android:title="Intent" >
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="http://www.android.com" />
+    </header>
+    <header
+        android:fragment="com.fant.fanins.MySettings$Prefs2Fragment"
+        android:summary="Info about"
+        android:title="Versione app" >
     </header>
 
 </preference-headers>
