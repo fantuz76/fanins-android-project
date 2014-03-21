@@ -255,6 +255,7 @@ containing a value of this type.
         public static final int TextNote=0x7f06001c;
         public static final int TextValore=0x7f060015;
         public static final int action_authDropbox=0x7f060034;
+        public static final int action_graph=0x7f06003a;
         public static final int action_read_data_upload=0x7f060037;
         public static final int action_readfileDBfull=0x7f06002f;
         public static final int action_readfileDBlocal=0x7f06002e;
@@ -262,13 +263,14 @@ containing a value of this type.
         public static final int action_reportlaunch=0x7f060031;
         public static final int action_search=0x7f060036;
         public static final int action_settings=0x7f060035;
+        public static final int action_sort_column=0x7f060039;
         public static final int action_sync_INS_temp=0x7f060033;
         public static final int action_sync_db=0x7f060030;
         public static final int action_uploadDB=0x7f060032;
         public static final int adaText=0x7f060028;
-        public static final int btnread1=0x7f060022;
-        public static final int btnread2=0x7f060023;
-        public static final int btnread3=0x7f060024;
+        public static final int btnread1=0x7f060023;
+        public static final int btnread2=0x7f060024;
+        public static final int btnread3=0x7f060022;
         public static final int categoriaText=0x7f06002b;
         public static final int chifaText=0x7f060027;
         public static final int cpersText=0x7f060029;
@@ -309,6 +311,7 @@ containing a value of this type.
         public static final int main=0x7f0c0000;
         public static final int read_data_actions=0x7f0c0001;
         public static final int read_txt=0x7f0c0002;
+        public static final int report_actions=0x7f0c0003;
     }
     public static final class string {
         public static final int action_authDropbox_login=0x7f070023;

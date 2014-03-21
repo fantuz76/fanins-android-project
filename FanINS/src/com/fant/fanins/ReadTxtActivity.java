@@ -2,6 +2,7 @@ package com.fant.fanins;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -14,6 +15,7 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.widget.SimpleCursorAdapter;
@@ -44,8 +46,10 @@ public class ReadTxtActivity extends ListActivity {
 	private static SimpleCursorAdapter dataAdapter;
 	private int posizioneDaEditare;
 	private Cursor mycursor = null;
-	private String querystr = "";
-	private int posScroll;
+	
+	private static String querystr;
+	private static int posScroll;
+	private static String sqlOrderTpye;
 
 	Context mycontext;
 	Bundle mySavedInstance;
@@ -54,8 +58,9 @@ public class ReadTxtActivity extends ListActivity {
 	private int month;
 	private int day;
 	EditText editTextDateInizio, editTextDateFine, editTextClicked;
-	private String sqlOrderTpye = " ORDER BY " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" DESC ";;
-	
+
+	static final String ORDER_DEFAULT =" ORDER BY " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" DESC "; 
+		
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -95,7 +100,7 @@ public class ReadTxtActivity extends ListActivity {
 
 
 				Button button2 = (Button) findViewById(R.id.btnread2);
-				button2.setVisibility(View.VISIBLE);
+				button2.setVisibility(View.INVISIBLE);
 				button2.setText("Salta");
 				button2.setOnClickListener(new View.OnClickListener() {
 					@Override
@@ -134,7 +139,7 @@ public class ReadTxtActivity extends ListActivity {
 
 
 				Button button2 = (Button) findViewById(R.id.btnread2);
-				button2.setVisibility(View.VISIBLE);
+				button2.setVisibility(View.INVISIBLE);
 				button2.setText("Salta");
 				button2.setOnClickListener(new View.OnClickListener() {
 					@Override
@@ -162,12 +167,18 @@ public class ReadTxtActivity extends ListActivity {
 			}
 
 
-			
+
 			initializeActivity();
-	        
-
-
-
+			
+			if (!myGlobal.ReadTxtActivityLoaded) 
+			{
+				// Cose da eseguire una volta sola all'avvio dell'activity
+				myGlobal.ReadTxtActivityLoaded = true;
+				sqlOrderTpye = ORDER_DEFAULT;
+				refreshQuery();				
+			}
+			
+			
 			refreshAllDatabase();
 			
 			
@@ -272,10 +283,13 @@ public class ReadTxtActivity extends ListActivity {
 			showToast("Error Exception: " + e.getMessage());
 		}
 
-		
-
-
 	}
+	
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+	  super.onConfigurationChanged(newConfig);
+	  setContentView(R.layout.activity_read_txt);
+	} 
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -312,8 +326,14 @@ public class ReadTxtActivity extends ListActivity {
 	  		UploadToDropbox uploadDB = new UploadToDropbox(this, myGlobal.mApiDropbox, myGlobal.DROPBOX_INS_DIR, newFileDB2, true, true);
     		uploadDB.execute();
 			return true;
+			
+			
+		case R.id.action_sort_column:
+			SortOnColumnDB();
+			return true;
 
 		case R.id.action_refresh:
+			refreshQuery();
 			refreshAllDatabase();
 			return true;
 			
@@ -370,6 +390,82 @@ public class ReadTxtActivity extends ListActivity {
 		alert.show();
 	}
 
+	
+	
+	
+	
+
+
+
+	public void SortOnColumnDB() {
+
+		AlertDialog dialog; 
+
+		ArrayList<String> columnList = new ArrayList<String>();
+		for (int i=0; i<mycursor.getColumnCount();i++){
+			columnList.add(mycursor.getColumnName(i));
+		}
+
+
+		// arraylist to keep the selected items
+		final ArrayList seletedItems=new ArrayList();
+
+		final CharSequence[]  items = columnList.toArray(new CharSequence[columnList.size()]);
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(mycontext);
+		builder.setTitle("Scegli colonne da ordinare");
+		builder.setMultiChoiceItems(items, null,
+				new DialogInterface.OnMultiChoiceClickListener() {
+			// indexSelected contains the index of item (of which checkbox checked)
+			@Override
+			public void onClick(DialogInterface dialog, int indexSelected,
+					boolean isChecked) {
+				if (isChecked) {
+					// If the user checked the item, add it to the selected items
+					// write your code when user checked the checkbox 
+					seletedItems.add(indexSelected);
+				} else if (seletedItems.contains(indexSelected)) {
+					// Else, if the item is already in the array, remove it 
+					// write your code when user Uchecked the checkbox 
+					seletedItems.remove(Integer.valueOf(indexSelected));
+				}
+			}
+		})
+		// Set the action buttons
+		.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int id) {
+				//  Your code when user clicked on OK
+				//  You can write the code  to save the selected item here
+				
+				if (seletedItems.isEmpty()) {
+					sqlOrderTpye = ORDER_DEFAULT;
+				} else {
+					sqlOrderTpye = " ORDER BY "; 
+					for (int i=0; i<seletedItems.size(); i++){
+						// aggiungo virgola all'inizio tranne al primo
+						if (i > 0) sqlOrderTpye += ", ";
+						sqlOrderTpye += items[Integer.valueOf(seletedItems.get(i).toString())].toString() ;
+					}				
+				}
+				
+				
+				refreshQuery();
+				refreshAllDatabase();
+				
+			}
+		})
+		.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int id) {
+				//  Your code when user clicked on Cancel
+
+			}
+		});
+
+		dialog = builder.create();//AlertDialog dialog; create like this outside onClick
+		dialog.show();
+	}
 
 
 	// *************************************************************************
@@ -422,14 +518,16 @@ public class ReadTxtActivity extends ListActivity {
 		}
 	}
 
-	
-	public void refreshAllDatabase() {
-
+	public void refreshQuery() {
 		querystr = "SELECT * FROM " + MyDatabase.DataINStable.TABELLA_INSDATA + " WHERE "
 				+ " (" + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + ">='" + editTextDateInizio.getText().toString() + "' AND " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + "<='"+ editTextDateFine.getText().toString() + "') "	;
 		if (readDBtype.equals("full")) {
 			querystr = querystr + sqlOrderTpye;
-		}
+		}		
+	}
+	
+	public void refreshAllDatabase() {
+
 		
 		DBINStoread.open();
 
@@ -477,18 +575,21 @@ public class ReadTxtActivity extends ListActivity {
 		
 		if (sqlOrderTpye.contains(MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" DESC")) {
 			sqlOrderTpye = sqlOrderTpye.replace(MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" DESC", MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" ASC");
-			showToast("Ordine :" + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" ASC");
+			showToast("Ordine :" + sqlOrderTpye.replace(" ORDER BY ", ""));
 		} else if (sqlOrderTpye.contains(MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" ASC")) {
 			sqlOrderTpye = sqlOrderTpye.replace(MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" ASC", MyDatabase.DataINStable.ID +" DESC");
-			showToast("Ordine :" + MyDatabase.DataINStable.ID +" DESC");
+			showToast("Ordine :" + sqlOrderTpye.replace(" ORDER BY ", ""));
 		} else if (sqlOrderTpye.contains(MyDatabase.DataINStable.ID +" DESC")) {
 			sqlOrderTpye = sqlOrderTpye.replace(MyDatabase.DataINStable.ID +" DESC", MyDatabase.DataINStable.ID +" ASC");
-			showToast("Ordine :" + MyDatabase.DataINStable.ID +" ASC");
+			showToast("Ordine :" + sqlOrderTpye.replace(" ORDER BY ", ""));
 		} else if (sqlOrderTpye.contains(MyDatabase.DataINStable.ID +" ASC")) {
 			sqlOrderTpye = sqlOrderTpye.replace(MyDatabase.DataINStable.ID +" ASC", MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" DESC");
-			showToast("Ordine :" + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" DESC");
-
+			showToast("Ordine :" + sqlOrderTpye.replace(" ORDER BY ", ""));
+		} else {
+			sqlOrderTpye = ORDER_DEFAULT;
+			showToast("Ordine Default : " + sqlOrderTpye.replace(" ORDER BY ", ""));
 		}
+		refreshQuery();
 		refreshAllDatabase();
 	}
 	
@@ -570,6 +671,7 @@ public class ReadTxtActivity extends ListActivity {
 	    	String format = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALY).format(cal.getTime());
 	    	
 	    	editTextClicked.setText(format);
+	    	refreshQuery();
 	    	refreshAllDatabase();
 	    }
 	};

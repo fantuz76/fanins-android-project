@@ -63,6 +63,13 @@
                 android:inputType="date"
                 android:textStyle="bold" >
             </EditText>
+            
+            <Button
+                android:id="@+id/btnread3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="btn3" />
+            
         </LinearLayout>
 
         <LinearLayout
@@ -81,11 +88,7 @@
                 android:layout_height="wrap_content"
                 android:text="btn2" />
 
-            <Button
-                android:id="@+id/btnread3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="btn3" />
+
         </LinearLayout>
 
         <ListView

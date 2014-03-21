@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import android.app.AlertDialog;
+import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Environment;
@@ -23,7 +24,7 @@ import com.dropbox.client2.android.AndroidAuthSession;
 import com.google.common.io.Files;
 
 
-public class myGlobal
+public class myGlobal extends Application
 {
 
 	public static final String TAG = "FANTUZ_Activity";
@@ -38,7 +39,8 @@ public class myGlobal
 	public static boolean statoDBLocalFull;
 	public static DropboxAPI<AndroidAuthSession> mApiDropbox;
 
-
+	public static boolean MainActivityLoaded;
+	public static boolean ReadTxtActivityLoaded;
 
 
 
@@ -52,6 +54,11 @@ public class myGlobal
 
 	Context mContext;
 
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		// Cose da fare una volta sola all'avvio dell'applicazione
+	}
 
 	// constructor
 	public myGlobal(Context context){
@@ -196,95 +203,95 @@ public class myGlobal
 		return _formattedDate;
 	}
 
-	
-	   // *************************************************************************
-    // Preparo file database, se non ci sono li crea 
-    // *************************************************************************    
-    public static  boolean prepDBfilesisOK(final Context ctx, boolean _forceDownladlocalEmpty, boolean _forceDownladlocalFull ){
-    	MyDatabase DBINStmp;
-    	
-    	
-    	final File _local = new File(myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_DB_FILENAME);
-    	final File _full = new File(myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_FULL_DB_FILE);
-    	
-    	try  {
-    		// controllo presenza dei file Database locali
-    		if(!_local.exists() || _forceDownladlocalEmpty) {
-    			// file non esiste devo scaricarlo?
-    			AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
-    			builder
-    			.setTitle("File non trovato: " + myGlobal.LOCAL_DB_FILENAME)
-    			.setMessage("Scaricarlo da DropBox?")
-    			.setIcon(android.R.drawable.ic_dialog_alert)
-    			.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-    				public void onClick(DialogInterface dialog, int which) {			      	
-    		    		DownloadFromDropbox download2 = new DownloadFromDropbox(ctx, myGlobal.mApiDropbox, myGlobal.DROPBOX_INS_DIR, myGlobal.REMOTE_DB_FILENAME_EMPTY,
-    		    				myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator + myGlobal.LOCAL_DB_FILENAME);
-    		    		download2.execute();
-    				}
-    			})
-    			.setNegativeButton("No", new DialogInterface.OnClickListener() {
-    				public void onClick(DialogInterface dialog, int which) {		
-    					Toast.makeText(ctx, "File inesistente e non scaricato possibili errori nel programma!", Toast.LENGTH_LONG).show();    		    		
-    		    		if (!_local.exists())
-    		    			myGlobal.statoDBLocal = false;
-    				}
-    			})
-    			.show();    			
-    			
-    		} else {
-    		
-	    		DBINSlocal = new MyDatabase(
-	    				ctx, 
-	    				myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_DB_FILENAME);
-	
-	    		DBINSlocal.open();
-	    		DBINSlocal.close();
-	    		myGlobal.statoDBLocal = true;
-    		}
 
-    		
-    		 
-    		if(!_full.exists() || _forceDownladlocalFull) {
-    			// file non esiste devo scaricarlo?
-    			AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
-    			builder
-    			.setTitle("File non trovato: " + myGlobal.LOCAL_FULL_DB_FILE)
-    			.setMessage("Scaricarlo da DropBox?")
-    			.setIcon(android.R.drawable.ic_dialog_alert)
-    			.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-    				public void onClick(DialogInterface dialog, int which) {			      	
-    		    		DownloadFromDropbox download2 = new DownloadFromDropbox(ctx, myGlobal.mApiDropbox, myGlobal.DROPBOX_INS_DIR, myGlobal.REMOTE_DB_FILENAME,
-    		    				myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator + myGlobal.LOCAL_FULL_DB_FILE);
-    		    		download2.execute();
-    				}
-    			})
-    			.setNegativeButton("No", new DialogInterface.OnClickListener() {
-    				public void onClick(DialogInterface dialog, int which) {		
-    					Toast.makeText(ctx, "File inesistente e non scaricato possibili errori nel programma!", Toast.LENGTH_LONG).show();
-    		    		if (!_full.exists())
-    		    			myGlobal.statoDBLocalFull = false;
-    				}
-    			})
-    			.show();    			
-    			
-    		} else {
-        		DBINStmp = new MyDatabase(
-        				ctx, 
-        				myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_FULL_DB_FILE);
+	// *************************************************************************
+	// Preparo file database, se non ci sono li crea 
+	// *************************************************************************    
+	public static  boolean prepDBfilesisOK(final Context ctx, boolean _forceDownladlocalEmpty, boolean _forceDownladlocalFull ){
+		MyDatabase DBINStmp;
 
-        		DBINStmp.open();
-        		DBINStmp.close();
-        		myGlobal.statoDBLocalFull = true;
-    		}
-    		
 
-    		return true;
-    	} catch (Exception e) {
-    		e.printStackTrace();
-    		Toast.makeText(ctx, "Error Exception: " + e.getMessage(), Toast.LENGTH_LONG).show();
-    		return false;
-    	}
+		final File _local = new File(myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_DB_FILENAME);
+		final File _full = new File(myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_FULL_DB_FILE);
 
-    }
+		try  {
+			// controllo presenza dei file Database locali
+			if(!_local.exists() || _forceDownladlocalEmpty) {
+				// file non esiste devo scaricarlo?
+				AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+				builder
+				.setTitle("File non trovato: " + myGlobal.LOCAL_DB_FILENAME)
+				.setMessage("Scaricarlo da DropBox?")
+				.setIcon(android.R.drawable.ic_dialog_alert)
+				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {			      	
+						DownloadFromDropbox download2 = new DownloadFromDropbox(ctx, myGlobal.mApiDropbox, myGlobal.DROPBOX_INS_DIR, myGlobal.REMOTE_DB_FILENAME_EMPTY,
+								myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator + myGlobal.LOCAL_DB_FILENAME);
+						download2.execute();
+					}
+				})
+				.setNegativeButton("No", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {		
+						Toast.makeText(ctx, "File inesistente e non scaricato possibili errori nel programma!", Toast.LENGTH_LONG).show();    		    		
+						if (!_local.exists())
+							myGlobal.statoDBLocal = false;
+					}
+				})
+				.show();    			
+
+			} else {
+
+				DBINSlocal = new MyDatabase(
+						ctx, 
+						myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_DB_FILENAME);
+
+				DBINSlocal.open();
+				DBINSlocal.close();
+				myGlobal.statoDBLocal = true;
+			}
+
+
+
+			if(!_full.exists() || _forceDownladlocalFull) {
+				// file non esiste devo scaricarlo?
+				AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+				builder
+				.setTitle("File non trovato: " + myGlobal.LOCAL_FULL_DB_FILE)
+				.setMessage("Scaricarlo da DropBox?")
+				.setIcon(android.R.drawable.ic_dialog_alert)
+				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {			      	
+						DownloadFromDropbox download2 = new DownloadFromDropbox(ctx, myGlobal.mApiDropbox, myGlobal.DROPBOX_INS_DIR, myGlobal.REMOTE_DB_FILENAME,
+								myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator + myGlobal.LOCAL_FULL_DB_FILE);
+						download2.execute();
+					}
+				})
+				.setNegativeButton("No", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {		
+						Toast.makeText(ctx, "File inesistente e non scaricato possibili errori nel programma!", Toast.LENGTH_LONG).show();
+						if (!_full.exists())
+							myGlobal.statoDBLocalFull = false;
+					}
+				})
+				.show();    			
+
+			} else {
+				DBINStmp = new MyDatabase(
+						ctx, 
+						myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_FULL_DB_FILE);
+
+				DBINStmp.open();
+				DBINStmp.close();
+				myGlobal.statoDBLocalFull = true;
+			}
+
+
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			Toast.makeText(ctx, "Error Exception: " + e.getMessage(), Toast.LENGTH_LONG).show();
+			return false;
+		}
+
+	}
 }
