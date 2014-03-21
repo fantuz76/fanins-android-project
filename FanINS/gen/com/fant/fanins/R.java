@@ -233,10 +233,15 @@ containing a value of this type.
         public static final int ic_plusone_tall_off_client=0x7f020026;
         public static final int ic_refresh=0x7f020027;
         public static final int ic_refresh_144=0x7f020028;
-        public static final int ic_search_83=0x7f020029;
+        public static final int ic_refresh_256=0x7f020029;
+        public static final int ic_search_83=0x7f02002a;
     }
     public static final class id {
         public static final int AppVersion=0x7f060009;
+        public static final int DataFine=0x7f060021;
+        public static final int DataFineLabel=0x7f060020;
+        public static final int DataInizio=0x7f06001f;
+        public static final int DataInizioLabel=0x7f06001e;
         public static final int LinearLayout=0x7f060005;
         public static final int SpinnerADa=0x7f060011;
         public static final int SpinnerCategoria=0x7f060018;
@@ -249,33 +254,33 @@ containing a value of this type.
         public static final int TextDescrizione=0x7f06001a;
         public static final int TextNote=0x7f06001c;
         public static final int TextValore=0x7f060015;
-        public static final int action_authDropbox=0x7f060030;
-        public static final int action_read_data_upload=0x7f060033;
-        public static final int action_readfileDBfull=0x7f06002b;
-        public static final int action_readfileDBlocal=0x7f06002a;
-        public static final int action_refresh=0x7f060034;
-        public static final int action_reportlaunch=0x7f06002d;
-        public static final int action_search=0x7f060032;
-        public static final int action_settings=0x7f060031;
-        public static final int action_sync_INS_temp=0x7f06002f;
-        public static final int action_sync_db=0x7f06002c;
-        public static final int action_uploadDB=0x7f06002e;
-        public static final int adaText=0x7f060024;
-        public static final int btnread1=0x7f06001e;
-        public static final int btnread2=0x7f06001f;
-        public static final int btnread3=0x7f060020;
-        public static final int categoriaText=0x7f060027;
-        public static final int chifaText=0x7f060023;
-        public static final int cpersText=0x7f060025;
-        public static final int dataText=0x7f060021;
-        public static final int descrizioneText=0x7f060028;
+        public static final int action_authDropbox=0x7f060034;
+        public static final int action_read_data_upload=0x7f060037;
+        public static final int action_readfileDBfull=0x7f06002f;
+        public static final int action_readfileDBlocal=0x7f06002e;
+        public static final int action_refresh=0x7f060038;
+        public static final int action_reportlaunch=0x7f060031;
+        public static final int action_search=0x7f060036;
+        public static final int action_settings=0x7f060035;
+        public static final int action_sync_INS_temp=0x7f060033;
+        public static final int action_sync_db=0x7f060030;
+        public static final int action_uploadDB=0x7f060032;
+        public static final int adaText=0x7f060028;
+        public static final int btnread1=0x7f060022;
+        public static final int btnread2=0x7f060023;
+        public static final int btnread3=0x7f060024;
+        public static final int categoriaText=0x7f06002b;
+        public static final int chifaText=0x7f060027;
+        public static final int cpersText=0x7f060029;
+        public static final int dataText=0x7f060025;
+        public static final int descrizioneText=0x7f06002c;
         public static final int hybrid=0x7f060004;
         public static final int imgbtnOK=0x7f060008;
         public static final int imgbtnReset=0x7f060006;
         public static final int linearLayout1=0x7f06001d;
         public static final int none=0x7f060000;
         public static final int normal=0x7f060001;
-        public static final int noteText=0x7f060029;
+        public static final int noteText=0x7f06002d;
         public static final int satellite=0x7f060002;
         public static final int terrain=0x7f060003;
         public static final int textView1=0x7f06000b;
@@ -287,8 +292,8 @@ containing a value of this type.
         public static final int textView8=0x7f060019;
         public static final int textView9=0x7f06001b;
         public static final int textViewTitle=0x7f060007;
-        public static final int tipooperazioneText=0x7f060022;
-        public static final int valoreText=0x7f060026;
+        public static final int tipooperazioneText=0x7f060026;
+        public static final int valoreText=0x7f06002a;
     }
     public static final class integer {
         public static final int google_play_services_version=0x7f080000;
@@ -308,14 +313,14 @@ containing a value of this type.
     public static final class string {
         public static final int action_authDropbox_login=0x7f070023;
         public static final int action_authDropbox_logout=0x7f070024;
-        public static final int action_compose=0x7f07003b;
+        public static final int action_compose=0x7f07003c;
         public static final int action_downloadDB=0x7f070027;
         public static final int action_downloadDBfull=0x7f070028;
         public static final int action_erase_all_db=0x7f070020;
         public static final int action_readfileDBfull=0x7f070026;
         public static final int action_readfileDBlocal=0x7f070025;
         public static final int action_reportlaunch=0x7f070022;
-        public static final int action_search=0x7f07003a;
+        public static final int action_search=0x7f07003b;
         public static final int action_settings=0x7f070021;
         public static final int action_sync=0x7f07001e;
         public static final int action_sync_db=0x7f07001f;
@@ -418,25 +423,25 @@ containing a value of this type.
         public static final int common_signin_button_text_long=0x7f070013;
         public static final int desc_imgData=0x7f07002f;
         public static final int desc_refresh=0x7f070030;
-        public static final int pref_description_social_recommendations=0x7f07003f;
+        public static final int pref_description_social_recommendations=0x7f070040;
         /**  Example settings for Data & Sync 
          */
-        public static final int pref_header_data_sync=0x7f070041;
+        public static final int pref_header_data_sync=0x7f070042;
         /**  Strings related to Settings 
  Example General settings 
          */
-        public static final int pref_header_general=0x7f07003d;
+        public static final int pref_header_general=0x7f07003e;
         /**  Example settings for Notifications 
          */
-        public static final int pref_header_notifications=0x7f070044;
-        public static final int pref_ringtone_silent=0x7f070047;
-        public static final int pref_title_add_friends_to_messages=0x7f070040;
-        public static final int pref_title_new_message_notifications=0x7f070045;
-        public static final int pref_title_ringtone=0x7f070046;
-        public static final int pref_title_social_recommendations=0x7f07003e;
-        public static final int pref_title_sync_frequency=0x7f070042;
-        public static final int pref_title_system_sync_settings=0x7f070043;
-        public static final int pref_title_vibrate=0x7f070048;
+        public static final int pref_header_notifications=0x7f070045;
+        public static final int pref_ringtone_silent=0x7f070048;
+        public static final int pref_title_add_friends_to_messages=0x7f070041;
+        public static final int pref_title_new_message_notifications=0x7f070046;
+        public static final int pref_title_ringtone=0x7f070047;
+        public static final int pref_title_social_recommendations=0x7f07003f;
+        public static final int pref_title_sync_frequency=0x7f070043;
+        public static final int pref_title_system_sync_settings=0x7f070044;
+        public static final int pref_title_vibrate=0x7f070049;
         public static final int strOK=0x7f07002e;
         public static final int title_activity_InsertData=0x7f07001a;
         public static final int title_activity_ModifyData=0x7f07002d;
@@ -444,16 +449,17 @@ containing a value of this type.
         public static final int title_activity_SyncDB=0x7f07002c;
         public static final int title_activity_read_DB=0x7f070029;
         public static final int title_activity_report=0x7f07002a;
-        public static final int title_activity_settings=0x7f07003c;
-        public static final int titoloADa=0x7f070034;
-        public static final int titoloCategoria=0x7f070037;
-        public static final int titoloChi=0x7f070033;
+        public static final int title_activity_settings=0x7f07003d;
+        public static final int titoloADa=0x7f070035;
+        public static final int titoloCategoria=0x7f070038;
+        public static final int titoloChi=0x7f070034;
         public static final int titoloData=0x7f070031;
-        public static final int titoloDescrizione=0x7f070038;
-        public static final int titoloNote=0x7f070039;
-        public static final int titoloPersonale=0x7f070035;
-        public static final int titoloTipoOper=0x7f070032;
-        public static final int titoloValore=0x7f070036;
+        public static final int titoloDataIntervallo=0x7f070032;
+        public static final int titoloDescrizione=0x7f070039;
+        public static final int titoloNote=0x7f07003a;
+        public static final int titoloPersonale=0x7f070036;
+        public static final int titoloTipoOper=0x7f070033;
+        public static final int titoloValore=0x7f070037;
     }
     public static final class style {
         /** 

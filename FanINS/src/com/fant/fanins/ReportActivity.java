@@ -29,6 +29,7 @@ public class ReportActivity extends ListActivity {
 	private Cursor mycursor = null;
 	private String querystr = "";
 	
+	private ListAdapter myadapter;
 
 	Context mycontext;
 	Bundle mySavedInstance;
@@ -67,8 +68,8 @@ public class ReportActivity extends ListActivity {
 		
 
 		ArrayList<String> columnArray1 = new ArrayList<String>();		
-		String DataInizio ="2007-01-11";
-		String DataFine ="2015-02-01";
+		String DataInizio = "2007-01-11";
+		String DataFine = "2015-02-01";
 		String queryTipoOperazione = "Spesa";
 		String queryCPers = "C";
 
@@ -208,12 +209,12 @@ public class ReportActivity extends ListActivity {
 		
 		
 		
-		ListAdapter adapter = new ArrayAdapter<String>(
+		myadapter = new ArrayAdapter<String>(
 				this,
 				android.R.layout.simple_list_item_1,
 				columnArray1
 				);
-		setListAdapter(adapter);
+		setListAdapter(myadapter);
 */
 
 
@@ -259,9 +260,11 @@ public class ReportActivity extends ListActivity {
 	}
 
 
+	
+	
+	
 
 	private void calcoloTotale () {
-
 		
 		DBINStoread = new MyDatabase(
 				getApplicationContext(), 
@@ -269,8 +272,8 @@ public class ReportActivity extends ListActivity {
 		
 
 		ArrayList<String> columnArray1 = new ArrayList<String>();		
-		String DataInizio ="2007-01-11";
-		String DataFine ="2015-02-01";
+		String DataInizio = "2007-01-11";
+		String DataFine = "2015-02-01";
 		String queryTipoOperazione = "Spesa";
 		String queryCPers = "C";
 		String queryChiFa = "IWBank";
@@ -763,12 +766,12 @@ public class ReportActivity extends ListActivity {
 		
 		
 		
-		ListAdapter adapter = new ArrayAdapter<String>(
+		myadapter = new ArrayAdapter<String>(
 				this,
 				android.R.layout.simple_list_item_1,
 				columnArray1
 				);
-		setListAdapter(adapter);		
+		setListAdapter(myadapter);		
 		
 		String tmpchifa;
 
@@ -852,7 +855,7 @@ public class ReportActivity extends ListActivity {
 		// JB ha pagato a SF	PersSFJB
 		// Tot da JB a SF	
 		
-		float SFdovrebbeJB2 = (SpostdaSimoneAJulie + PersJBSF) - (SpostdaJulieASimone + PersSFJB);
+		float SFdovrebbeJB2 = (SpostdaJulieASimone + PersSFJB) - (SpostdaSimoneAJulie + PersJBSF);
 		
 		float SFdeve = SFdovrebbeJB1+ SFdovrebbeJB2;
 		float SFversaIW = SFdeve * 2;
@@ -860,7 +863,55 @@ public class ReportActivity extends ListActivity {
 		showToast("SF deve versare su IW:" + SFversaIW);
 			
 		
+		columnArray1.clear();
+		columnArray1.add("---- SF DEVE= " + String.valueOf(SFdeve));
+		columnArray1.add("---- SF DEVE versare= " + String.valueOf(SFversaIW));
+		columnArray1.add("---- SF dovrebbe a JB1= " + String.valueOf(SFdovrebbeJB1));
+		columnArray1.add("---- SF dovrebbe a JB2= " + String.valueOf(SFdovrebbeJB2));
+		columnArray1.add("");
+		columnArray1.add("---- Tot messi da JB= " + String.valueOf((ComuniJB + SpostdaJulieAIW - SpostdaIWaJB)));
+		columnArray1.add("---- Tot messi da SF= " + String.valueOf((ComuniSF + SpostdaSimoneAIW - SpostdaIWaSF)));
+		columnArray1.add("");
+		columnArray1.add("---- Tot da SF a JB= " + String.valueOf((SpostdaSimoneAJulie + PersJBSF)));
+		columnArray1.add("---- Tot da JB a SF= " + String.valueOf((SpostdaJulieASimone + PersSFJB)));
+		columnArray1.add("");
+		columnArray1.add("");
+		columnArray1.add("---- Comuni");
+		columnArray1.add(String.valueOf(ComuniIW));
+		columnArray1.add(String.valueOf(ComuniJB));
+		columnArray1.add(String.valueOf(ComuniSF));
 		
+		columnArray1.add("---- Pers JB");
+		columnArray1.add(String.valueOf(PersJBIW));
+		columnArray1.add(String.valueOf(PersJBJB));
+		columnArray1.add(String.valueOf(PersJBSF));		
+		
+		columnArray1.add("---- Pers SF");
+		columnArray1.add(String.valueOf(PersSFIW));
+		columnArray1.add(String.valueOf(PersSFJB));
+		columnArray1.add(String.valueOf(PersSFSF));			
+
+		columnArray1.add("---- Spost da IW");
+		columnArray1.add(String.valueOf(SpostdaIWaIW));
+		columnArray1.add(String.valueOf(SpostdaIWaJB));
+		columnArray1.add(String.valueOf(SpostdaIWaSF));		
+		
+		columnArray1.add("---- Spost da JB");
+		columnArray1.add(String.valueOf(SpostdaJulieAIW));
+		columnArray1.add(String.valueOf(SpostdaJulieAJulie));
+		columnArray1.add(String.valueOf(SpostdaJulieASimone));		
+
+		columnArray1.add("---- Spost da SF");
+		columnArray1.add(String.valueOf(SpostdaSimoneAIW));
+		columnArray1.add(String.valueOf(SpostdaSimoneAJulie));
+		columnArray1.add(String.valueOf(SpostdaSimoneASimone));		
+
+		myadapter = new ArrayAdapter<String>(
+				this,
+				android.R.layout.simple_list_item_1,
+				columnArray1
+				);
+		setListAdapter(myadapter);
 		
 	}
 	

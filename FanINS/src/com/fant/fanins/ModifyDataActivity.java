@@ -132,7 +132,9 @@ public class ModifyDataActivity extends FragmentActivity {
         adapterADa =  new ArrayAdapter<CharSequence>   (this, android.R.layout.simple_spinner_item, myGlobal.arrADa );				
         adapterADa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinADa.setAdapter(adapterADa);
-        spinADa.setOnItemSelectedListener(new SelectSpinAutocomplete());
+        spinner.setOnTouchListener(spinnerOnTouch);
+        // Imposto Listener solo se clicco sullo Spinner per non resettare valore in ingresso
+        // spinADa.setOnItemSelectedListener(new SelectSpinAutocomplete());
 
         textADa = (AutoCompleteTextView) findViewById(R.id.TextAutocompleteADa);        	
         adapterADaTxt = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_list_item_1, myGlobal.arrADa);
@@ -257,34 +259,35 @@ public class ModifyDataActivity extends FragmentActivity {
     }
     
     
-    
 
+
+    
  
     public boolean checkCategoria()  {
-    	List<String> lsCat = Arrays.asList(myGlobal.arrCategoria);    	
-    	if (lsCat.contains(valCategoria)) 
+    	List<String> mylistr = Arrays.asList(myGlobal.arrCategoria);    	
+    	if (mylistr.contains(valCategoria)) 
     		return(true);
     	else
     		return(false);    	
     }
-
-
+    
     public boolean checkADa()  {
-    	List<String> lsCat = Arrays.asList(myGlobal.arrADa);
-
+    	List<String> mylistr = Arrays.asList(myGlobal.arrADa);    
     	// non ammissibile
-    	if (valTipoOper=="Spostamento" && (valADa == "")) {
+    	if  ( (valTipoOper.equalsIgnoreCase("Spostamento")) && (valADa.equals("")) ) {
     		return false;
     	}
     	
     	// tutti valori ammessi, anche cose nuove
-    	if (lsCat.contains(valADa))  {
+    	if (mylistr.contains(valADa))  {
     		return(true);
     	} else {
     		return(true);
     	}
 
     }
+
+    
  
     
     // *************************************************************************
@@ -620,8 +623,8 @@ public class ModifyDataActivity extends FragmentActivity {
 
 		// A/Da
 		textADa.setText(bun.getString(MyDatabase.DataINStable.A_DA_KEY));
-		myeditText = (EditText) findViewById(R.id.TextAutocompleteADa);
-		myeditText.setText(bun.getString(MyDatabase.DataINStable.A_DA_KEY));
+		//myeditText = (EditText) findViewById(R.id.TextAutocompleteADa);
+		//myeditText.setText(bun.getString(MyDatabase.DataINStable.A_DA_KEY));
 		
 		
 		//spinADa.setOnItemSelectedListener(new SelectSpinAutocomplete());
