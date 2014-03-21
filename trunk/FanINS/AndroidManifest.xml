@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!-- android:versionCode = intero  che si incrementa di uno ogni volta che si vuole differenziare
-	 android:versionName = stringa che identifica la versione così come presentata all'utente ex 2.3.4
+<!--
+     android:versionCode = intero  che si incrementa di uno ogni volta che si vuole differenziare
+	 android:versionName = stringa che identifica la versione così come presentata all'utente ex 2.3.4
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.fant.fanins"        
-    android:versionCode="5"
-    android:versionName="1.6.2" >
+    package="com.fant.fanins"
+    android:configChanges="keyboardHidden|orientation|screenSize"
+    android:versionCode="6"
+    android:versionName="1.7.0" >
 
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -31,7 +33,7 @@
         In realtà è probabilmente dovuto all'upgrade di google play alla versione 13. 
         http://stackoverflow.com/questions/19724113/google-play-services-update
         http://stackoverflow.com/questions/19723811/after-google-play-service-update-to-version-13-i-got-an-error
-        http://stackoverflow.com/questions/19724547/google-services-added-force-close-application-with-log-cat-error 
+        http://stackoverflow.com/questions/19724547/google-services-added-force-close-application-with-log-cat-error 
         -->
         <meta-data
             android:name="com.google.android.gms.version"
@@ -39,31 +41,33 @@
 
         <activity
             android:name="com.fant.fanins.MainActivity"
-            android:label="@string/app_name" 
-            android:theme="@style/android:Theme.Holo">
-            <intent-filter>			                
+            android:label="@string/app_name"
+            android:theme="@style/android:Theme.Holo" >
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-		<activity
-	        android:name="com.dropbox.client2.android.AuthActivity"
-	        android:configChanges="orientation|keyboard"
-	        android:launchMode="singleTask" >
-	        <intent-filter>
-				<!-- Change this to be db- followed by your app key -->
-				<data android:scheme="db-7dlkc5hdc0cvk82" />
-					
-	            <action android:name="android.intent.action.VIEW" />
-	
-	            <category android:name="android.intent.category.BROWSABLE" />
-	            <category android:name="android.intent.category.DEFAULT" />
-	        </intent-filter>
-    	</activity>        
+        <activity
+            android:name="com.dropbox.client2.android.AuthActivity"
+            android:configChanges="orientation|keyboard"
+            android:launchMode="singleTask" >
+            <intent-filter>
+
+                <!-- Change this to be db- followed by your app key -->
+                <data android:scheme="db-7dlkc5hdc0cvk82" />
+
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity
             android:name="com.fant.fanins.ReadTxtActivity"
             android:label="@string/title_activity_read_DB"
-            android:theme="@style/android:Theme.Holo">
+            android:theme="@style/android:Theme.Holo" >
         </activity>
         <activity
             android:name="com.fant.fanins.MySettings"
@@ -79,17 +83,14 @@
             android:label="@string/title_activity_ModifyData"
             android:theme="@style/android:Theme.Holo" >
         </activity>
-         <activity
+        <activity
             android:name="com.fant.fanins.ReportActivity"
             android:label="@string/title_activity_report"
-            android:theme="@style/android:Theme.Holo">
-        </activity>               
-         <activity
-            android:name="com.fant.fanins.ReportGraphActivity"
-            android:label="@string/title_activity_report"
-            android:theme="@style/android:Theme.Holo">
-        </activity>               
-         
-</application>
+            android:theme="@style/android:Theme.Holo" >
+        </activity>
+        <activity
+            android:name="org.achartengine.GraphicalActivity"
+            android:theme="@style/android:Theme.Holo" />
+    </application>
 
 </manifest>

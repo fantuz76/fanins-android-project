@@ -155,28 +155,32 @@ public class MainActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // We create a new AuthSession so that we can use the Dropbox API.
-        AndroidAuthSession session = buildSession();
-        myGlobal.mApiDropbox = new DropboxAPI<AndroidAuthSession>(session);
         
-        checkDropboxAppKeySetup();
-                
+        if (!myGlobal.MainActivityLoaded) {
+        	// cose da fare una volta sola all'avvio dell'applicazione
+        	myGlobal.MainActivityLoaded = true;
+        	
+
+            // We create a new AuthSession so that we can use the Dropbox API.
+            AndroidAuthSession session = buildSession();
+            myGlobal.mApiDropbox = new DropboxAPI<AndroidAuthSession>(session);
+            
+            checkDropboxAppKeySetup();
+                    
+   
+    		// prepara file
+            fileAccessOK = prepFileisOK();
+            if (!fileAccessOK) 
+            	showToast("Errore creazione file: " + fileNameFull);
+            
+            if (!myGlobal.prepDBfilesisOK(this,false,false))
+            	showToast("Errore nel check file Database");
+
+        }
+
 
         // Display the proper UI state if logged in or not
         setDropboxLoggedIn(myGlobal.mApiDropbox.getSession().isLinked());
-
-        
-        
-		// prepara file
-        fileAccessOK = prepFileisOK();
-        if (!fileAccessOK) 
-        	showToast("Errore creazione file: " + fileNameFull);
-        
-        if (!myGlobal.prepDBfilesisOK(this,false,false))
-        	showToast("Errore nel check file Database");
-
-
-
 
         
 
@@ -676,6 +680,7 @@ public class MainActivity extends FragmentActivity {
     		if (myGlobal.statoDBLocal == false) {
     			showToast("Errore presenza file DB locale! Impossibile procedere.");
     		} else {
+    			myGlobal.ReadTxtActivityLoaded = false;
     			intent = new Intent(this, ReadTxtActivity.class);
     			// passo delle informazioni all'Activity
     			intent.putExtra("readDBtype","local");
@@ -689,6 +694,7 @@ public class MainActivity extends FragmentActivity {
     		if (myGlobal.statoDBLocalFull == false) {
     			showToast("Errore presenza file DB locale! Impossibile procedere.");
     		} else {
+    			myGlobal.ReadTxtActivityLoaded = false;
     			intent = new Intent(this, ReadTxtActivity.class);
     			// passo delle informazioni all'Activity
     			intent.putExtra("readDBtype","full");
@@ -715,7 +721,7 @@ public class MainActivity extends FragmentActivity {
     		
     	case R.id.action_reportlaunch:
     		intent = new Intent(this, ReportActivity.class);    		
-    		startActivity(intent);
+    		startActivity(intent);    		
     		return true;
 
     	case R.id.action_settings:
