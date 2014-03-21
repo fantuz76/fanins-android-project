@@ -38,7 +38,9 @@ public static String versionName = "";
 			e.printStackTrace();
 			versionName = "Errore versione non rilevata";
 		}
-		
+
+  		
+  		
   		
   		
         // Add a button to the header list.

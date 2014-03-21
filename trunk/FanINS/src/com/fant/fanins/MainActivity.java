@@ -714,7 +714,7 @@ public class MainActivity extends FragmentActivity {
     		
     		
     	case R.id.action_reportlaunch:
-    		intent = new Intent(this, ReportActivity.class);
+    		intent = new Intent(this, ReportActivity.class);    		
     		startActivity(intent);
     		return true;
 

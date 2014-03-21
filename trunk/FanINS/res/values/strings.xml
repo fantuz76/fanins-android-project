@@ -26,6 +26,7 @@
     <string name="desc_imgData">Data_image</string>
     <string name="desc_refresh">refresh_image</string>
     <string name="titoloData">Data:</string>
+    <string name="titoloDataIntervallo">Date:</string>
     <string name="titoloTipoOper">Tipo:</string>
     <string name="titoloChi">Chi fa:</string>
     <string name="titoloADa">A/Da:</string>

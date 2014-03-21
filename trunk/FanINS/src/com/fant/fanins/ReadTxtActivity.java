@@ -1,8 +1,15 @@
 package com.fant.fanins;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.app.DatePickerDialog.OnDateSetListener;
+import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -13,11 +20,13 @@ import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -40,7 +49,13 @@ public class ReadTxtActivity extends ListActivity {
 
 	Context mycontext;
 	Bundle mySavedInstance;
-
+	
+	private int year;
+	private int month;
+	private int day;
+	EditText editTextDateInizio, editTextDateFine, editTextClicked;
+	private String sqlOrderTpye = " ORDER BY " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" DESC ";;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -60,7 +75,7 @@ public class ReadTxtActivity extends ListActivity {
 		mycontext = this;
 		mySavedInstance = savedInstanceState;
 
-
+		
 		try {
 			// recupero info extra e decido qual DB usare
 			Bundle bun = getIntent().getExtras();
@@ -68,11 +83,19 @@ public class ReadTxtActivity extends ListActivity {
 
 
 			if (readDBtype.equals("full")) {
-				Button button1 = (Button) findViewById(R.id.btnread1);
-				button1.setVisibility(View.INVISIBLE);
+				Button button1 = (Button) findViewById(R.id.btnread1);				
+				button1.setVisibility(View.VISIBLE);
+				button1.setText("Ordina");
+				button1.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						ordinaDatabase();						
+					}
+				});
 
 
 				Button button2 = (Button) findViewById(R.id.btnread2);
+				button2.setVisibility(View.VISIBLE);
 				button2.setText("Salta");
 				button2.setOnClickListener(new View.OnClickListener() {
 					@Override
@@ -85,13 +108,7 @@ public class ReadTxtActivity extends ListActivity {
 				});
 
 				Button button3 = (Button) findViewById(R.id.btnread3);
-				button3.setText("Ordina");
-				button3.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						ordinaDatabase();						
-					}
-				});
+				button3.setVisibility(View.INVISIBLE);
 
 
 
@@ -106,29 +123,32 @@ public class ReadTxtActivity extends ListActivity {
 			} else {
 
 				Button button1 = (Button) findViewById(R.id.btnread1);
-				button1.setVisibility(View.INVISIBLE);
-
-
-				Button button2 = (Button) findViewById(R.id.btnread2);
-				button2.setText("salta");
-				button2.setVisibility(View.VISIBLE);
-				button2.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						posScroll += myListActivity.getCount() / 5;
-						myListActivity.setSelection(posScroll);
-					}
-
-				});
-
-				Button button3 = (Button) findViewById(R.id.btnread3);
-				button3.setVisibility(View.INVISIBLE);
-				button3.setOnClickListener(new View.OnClickListener() {
+				button1.setVisibility(View.VISIBLE);
+				button1.setText("Ordina");
+				button1.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
 						ordinaDatabase();						
 					}
 				});
+
+
+				Button button2 = (Button) findViewById(R.id.btnread2);
+				button2.setVisibility(View.VISIBLE);
+				button2.setText("Salta");
+				button2.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						posScroll += myListActivity.getCount() / 5;
+						myListActivity.setSelection(posScroll);
+						
+					}
+
+				});
+
+				
+				Button button3 = (Button) findViewById(R.id.btnread3);
+				button3.setVisibility(View.INVISIBLE);
 
 
 				if (myGlobal.statoDBLocal == false) {
@@ -142,13 +162,13 @@ public class ReadTxtActivity extends ListActivity {
 			}
 
 
+			
+			initializeActivity();
+	        
 
-			querystr = "SELECT * FROM " + MyDatabase.DataINStable.TABELLA_INSDATA ;
-			if (readDBtype.equals("full")) {
-				querystr = querystr + " ORDER BY " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" DESC";
-			}
 
-			refreshAllDatabase(querystr);
+
+			refreshAllDatabase();
 			
 			
 			
@@ -294,7 +314,7 @@ public class ReadTxtActivity extends ListActivity {
 			return true;
 
 		case R.id.action_refresh:
-			refreshAllDatabase(querystr);
+			refreshAllDatabase();
 			return true;
 			
 		default:
@@ -312,8 +332,6 @@ public class ReadTxtActivity extends ListActivity {
 
 	public void SearchTextOnDB() {
 		AlertDialog.Builder alert = new AlertDialog.Builder(ReadTxtActivity.this);
-
-
 		alert.setMessage("Cerca Descrizione");
 
 		// Set an EditText view to get user input 
@@ -325,11 +343,13 @@ public class ReadTxtActivity extends ListActivity {
 				String value = input.getText().toString();
 
 				querystr = "SELECT * FROM " + MyDatabase.DataINStable.TABELLA_INSDATA + " WHERE "
-						+ MyDatabase.DataINStable.DESCRIZIONE_KEY + " LIKE '%" + value + "%'" + " OR "
-						+ MyDatabase.DataINStable.NOTE_KEY + " LIKE '%" + value + "%'" + " OR "
-						+ MyDatabase.DataINStable.CATEGORIA_KEY + " LIKE '%" + value + "%'" ;
-				if (readDBtype.equals("full")) {
-					querystr = querystr + " ORDER BY " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" DESC";
+						+ " (" + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + ">='" + editTextDateInizio.getText().toString() + "' AND " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + "<='"+ editTextDateFine.getText().toString() + "') " + " AND "
+						+ MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY + " LIKE '%" + value + "%'" + " COLLATE NOCASE OR "
+						+ MyDatabase.DataINStable.DESCRIZIONE_KEY + " LIKE '%" + value + "%'" + " COLLATE NOCASE OR "
+						+ MyDatabase.DataINStable.NOTE_KEY + " LIKE '%" + value + "%'" + " COLLATE NOCASE OR "
+						+ MyDatabase.DataINStable.CATEGORIA_KEY + " LIKE '%" + value + "%'" + " COLLATE NOCASE " ;
+				if (readDBtype.equals("full")) {					
+					querystr = querystr + sqlOrderTpye;
 				}
 
 				DBINStoread.open();
@@ -403,11 +423,18 @@ public class ReadTxtActivity extends ListActivity {
 	}
 
 	
-	public void refreshAllDatabase(String _query) {
+	public void refreshAllDatabase() {
+
+		querystr = "SELECT * FROM " + MyDatabase.DataINStable.TABELLA_INSDATA + " WHERE "
+				+ " (" + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + ">='" + editTextDateInizio.getText().toString() + "' AND " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + "<='"+ editTextDateFine.getText().toString() + "') "	;
+		if (readDBtype.equals("full")) {
+			querystr = querystr + sqlOrderTpye;
+		}
+		
 		DBINStoread.open();
 
 		//mycursor = DBINStoread.fetchDati();
-		mycursor = DBINStoread.rawQuery(_query,  null );
+		mycursor = DBINStoread.rawQuery(querystr,  null );
 
 		if (mycursor.getCount() == 0) {
 			assert true;	// nop
@@ -448,24 +475,107 @@ public class ReadTxtActivity extends ListActivity {
 	
 	private void ordinaDatabase(){
 		
-		if (querystr.contains(MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" DESC")) {
-			querystr = querystr.replace(MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" DESC", MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" ASC");
+		if (sqlOrderTpye.contains(MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" DESC")) {
+			sqlOrderTpye = sqlOrderTpye.replace(MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" DESC", MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" ASC");
 			showToast("Ordine :" + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" ASC");
-		} else if (querystr.contains(MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" ASC")) {
-			querystr = querystr.replace(MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" ASC", MyDatabase.DataINStable.ID +" DESC");
+		} else if (sqlOrderTpye.contains(MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" ASC")) {
+			sqlOrderTpye = sqlOrderTpye.replace(MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" ASC", MyDatabase.DataINStable.ID +" DESC");
 			showToast("Ordine :" + MyDatabase.DataINStable.ID +" DESC");
-		} else if (querystr.contains(MyDatabase.DataINStable.ID +" DESC")) {
-			querystr = querystr.replace(MyDatabase.DataINStable.ID +" DESC", MyDatabase.DataINStable.ID +" ASC");
+		} else if (sqlOrderTpye.contains(MyDatabase.DataINStable.ID +" DESC")) {
+			sqlOrderTpye = sqlOrderTpye.replace(MyDatabase.DataINStable.ID +" DESC", MyDatabase.DataINStable.ID +" ASC");
 			showToast("Ordine :" + MyDatabase.DataINStable.ID +" ASC");
-		} else if (querystr.contains(MyDatabase.DataINStable.ID +" ASC")) {
-			querystr = querystr.replace(MyDatabase.DataINStable.ID +" ASC", MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" DESC");
+		} else if (sqlOrderTpye.contains(MyDatabase.DataINStable.ID +" ASC")) {
+			sqlOrderTpye = sqlOrderTpye.replace(MyDatabase.DataINStable.ID +" ASC", MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" DESC");
 			showToast("Ordine :" + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" DESC");
 
 		}
-		refreshAllDatabase(querystr);
+		refreshAllDatabase();
 	}
 	
+
+
+	class ClickDataButtonInizio implements View.OnTouchListener {
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {    		
+			if (MotionEvent.ACTION_UP == event.getAction()) {
+				editTextClicked = editTextDateInizio;	// oggetto da impostare in callback
+				selezionaData();
+			}
+			return false;
+		}
+	};
+
+	class ClickDataButtonFine implements View.OnTouchListener {
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {    		
+			if (MotionEvent.ACTION_UP == event.getAction()) {
+				editTextClicked = editTextDateFine;	// oggetto da impostare in callback
+				selezionaData();
+			}
+			return false;
+		}
+	};
+
+	private void initializeActivity() {
+		Calendar c = Calendar.getInstance();
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALY);
+		String formattedDateOnly = df.format( c.getTime());
+				
+	    editTextDateInizio = (EditText) findViewById(R.id.DataInizio);
+	    editTextDateFine = (EditText) findViewById(R.id.DataFine);
+	    
+	    editTextDateFine.setText(formattedDateOnly);
+	    
+	    c.set(Calendar.DAY_OF_YEAR, 1);
+	    //c.set(c.get(Calendar.YEAR),1,1);
+	    formattedDateOnly = df.format( c.getTime());	    
+	    editTextDateInizio.setText(formattedDateOnly);
+	    
+	    editTextDateInizio.setOnTouchListener(new ClickDataButtonInizio());
+	    editTextDateFine.setOnTouchListener(new ClickDataButtonFine());
+	    
+	}
+
+
+	private void selezionaData(){
+        final Calendar c = Calendar.getInstance();
+        year = c.get(Calendar.YEAR);
+        month = c.get(Calendar.MONTH);
+        day = c.get(Calendar.DAY_OF_MONTH);
+
+        String[] datestr = editTextClicked.getText().toString().split("-");
+
+        year = Integer.valueOf(datestr[0]);
+        month = Integer.valueOf(datestr[1])-1;        // Calendar di Java ha il mese che parte da 0 e non da 1
+        day = Integer.valueOf(datestr[2]);
+
+
+		Dialog dd = new DatePickerDialog(mycontext, myDateSetListener, year, month, day);
+		dd.show();
+	}
 	
+	// questa è la Callback che indica che l'utente ha finito di scegliere la data
+	OnDateSetListener myDateSetListener = new OnDateSetListener() {
+
+	    @Override
+	    public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+
+	    	SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALY);	    	
+	    	String formattedDate = df.format(new Date(year-1900, month, day));
+	    	
+	        Calendar cal = Calendar.getInstance();
+	        cal.set(Calendar.YEAR, year);
+	        cal.set(Calendar.DAY_OF_MONTH, day);
+	        cal.set(Calendar.MONTH, month);
+	    	String format = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALY).format(cal.getTime());
+	    	
+	    	editTextClicked.setText(format);
+	    	refreshAllDatabase();
+	    }
+	};
+
+
+
 }
 
 

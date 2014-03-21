@@ -6,7 +6,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.fant.fanins"        
     android:versionCode="5"
-    android:versionName="1.6.0" >
+    android:versionName="1.6.2" >
 
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -84,7 +84,12 @@
             android:label="@string/title_activity_report"
             android:theme="@style/android:Theme.Holo">
         </activity>               
-        
+         <activity
+            android:name="com.fant.fanins.ReportGraphActivity"
+            android:label="@string/title_activity_report"
+            android:theme="@style/android:Theme.Holo">
+        </activity>               
+         
 </application>
 
 </manifest>
