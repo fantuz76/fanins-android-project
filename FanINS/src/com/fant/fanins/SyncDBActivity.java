@@ -5,10 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Locale;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -20,6 +17,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.Window;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dropbox.client2.DropboxAPI;
@@ -264,7 +262,7 @@ public class SyncDBActivity extends Activity {
 				if (true) {
 					// prima di fare upload tento di farne una copia di backup in remoto
 					try {
-						DropboxAPI.Entry newEntry = myGlobal.mApiDropbox.copy(path, path + ".bkup_" + myGlobal.formattedDate());
+						DropboxAPI.Entry newEntry = myGlobal.mApiDropbox.copy(path, path + "."  + myGlobal.formattedDate() + ".bkup");
 					} catch (DropboxUnlinkedException e) {
 						Log.e(myGlobal.TAG, "User has unlinked." + e.getMessage());
 					} catch (DropboxException e) {
@@ -297,9 +295,11 @@ public class SyncDBActivity extends Activity {
 			} catch (DropboxUnlinkedException e) {
 				// The AuthSession wasn't properly authenticated or user unlinked.
 				mErrorMsg = "Dropbox session not properly authenticated or user unlinked";
+				return (false);
 			} catch (DropboxPartialFileException e) {
 				// We canceled the operation
 				mErrorMsg = "Download canceled";
+				return (false);
 			} catch (DropboxServerException e) {
 				// Server-side exception.  These are examples of what could happen, 
 				// but we don't do anything special with them here.
@@ -329,12 +329,15 @@ public class SyncDBActivity extends Activity {
 			} catch (DropboxIOException e) {
 				// Happens all the time, probably want to retry automatically.
 				mErrorMsg = "Network error.  Try again.";
+				return (false);
 			} catch (DropboxParseException e) {
 				// Probably due to Dropbox server restarting, should retry
 				mErrorMsg = "Dropbox error.  Try again.";
+				return (false);
 			} catch (DropboxException e) {
 				// Unknown error
 				mErrorMsg = "Unknown error.  Try again.";
+				return (false);
 			} catch (FileNotFoundException e1) {
 				mErrorMsg = "File not found Exception. " + e1.getMessage();
 			} catch (IOException e) {            	
@@ -351,12 +354,31 @@ public class SyncDBActivity extends Activity {
 		@Override
 		protected void onPostExecute(Boolean result) {
 			mDialog.dismiss();
+			TextView tt = (TextView)findViewById(R.id.textView1);
 			if (result) {
 				// result OK
 				showToast("Sincronizzazione terminata correttamente");
+				tt.setText("CIAO "+ System.getProperty("line.separator") +
+						"" + System.getProperty("line.separator") +
+						"INSApp Sync terminata con esito:  OK" + System.getProperty("line.separator") +
+						"" + System.getProperty("line.separator") +
+						"" + System.getProperty("line.separator") +
+						"E' stato scaricato il database presente nel cloud ed è stato integrato con i valori inseriti nel file locale" + System.getProperty("line.separator") +
+						"Il file locale è stato quindi svuotato. Si è poi ricaricato nel cloud il database completo." + System.getProperty("line.separator") +
+						"E' stata anche sovrascritta la copia del database completo in locale. Attenzione che eventuali precedenti modifiche al database completo locale non committate sul cloud sono perse." + System.getProperty("line.separator") +
+						"" + System.getProperty("line.separator") +
+						"");
 			} else {
 				// Couldn't download it, so show an error
 				showToast(mErrorMsg);
+				tt.setText("CIAO "+ System.getProperty("line.separator") +
+						"Errore rilevato durante la sincronizzazione:" + System.getProperty("line.separator") +
+						mErrorMsg + System.getProperty("line.separator") +
+						"" + System.getProperty("line.separator") +
+						"" + System.getProperty("line.separator") +
+						"Conviene rieffettuare l'operazione. Nel caso peggiore cancellare i file locali o forzare un nuovo download" + System.getProperty("line.separator") +
+						"" + System.getProperty("line.separator") +
+						"");
 			}
 
 		}
@@ -399,87 +421,7 @@ public class SyncDBActivity extends Activity {
 		SyncAllDBData ss = new SyncAllDBData();
 		ss.execute();
 
-		/*
-		DownloadFromDropbox download1 = new DownloadFromDropbox(SyncDBActivity.this, myGlobal.mApiDropbox, myGlobal.DROPBOX_INS_DIR, myGlobal.REMOTE_DB_FILENAME,
-				myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator + myGlobal.LOCAL_DOWNLOADED_DB_FILE);
 
-
-
-
-
-		// prepara file
-		File filechk = new File(myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator + myGlobal.LOCAL_DOWNLOADED_DB_FILE);
-		if(!filechk.exists()) {
-			showToast("File scaricato non trovato: " + myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator + myGlobal.LOCAL_DOWNLOADED_DB_FILE);
-			finish();
-			return;
-		}
-
-		try {
-			DBINSlocal = new MyDatabase(
-					getApplicationContext(), 
-					myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_DB_FILENAME);
-
-			DBINSdownloaded = new MyDatabase(
-					getApplicationContext(), 
-					myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator + myGlobal.LOCAL_DOWNLOADED_DB_FILE);
-
-
-
-			DBINSlocal.open();
-			DBINSdownloaded.open();
-
-
-			// Attacco DB Locale al DB scaricato
-			DBINSdownloaded.execSQLsimple("attach database \"" + myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_DB_FILENAME + "\" as locdbatt");
-			// Faccio intersezione tra DB scaricato e DB locale su alcune Colonne
-			mycursor = DBINSdownloaded.rawQuery("SELECT DataOperazione,TipoOperazione,ChiFa,ADa,CPers,Valore,Categoria,Descrizione FROM  myINSData" 
-					+ " INTERSECT " +
-					"SELECT DataOperazione,TipoOperazione,ChiFa,ADa,CPers,Valore,Categoria,Descrizione  FROM  locdbatt.myINSData ", null);
-
-			// se getCount=0 vuol dire che non ci sono righe doppie
-			if (mycursor.getCount() != 0) {
-				// TODO Ci sono delle righe doppie 
-
-			}
-
-			// Aggiungo al DB scaricato i valori del DB locale che vengono cancellati man mano
-			Cursor cursorLocal = DBINSlocal.fetchDati();		
-			if (cursorLocal.getCount() != 0) {
-				while ( cursorLocal.moveToNext() ) {
-					DBINSdownloaded.insertRecordDataIns(
-							cursorLocal.getString( cursorLocal.getColumnIndex(MyDatabase.DataINStable.DATA_OPERAZIONE_KEY) ), 
-							cursorLocal.getString( cursorLocal.getColumnIndex(MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY) ), 
-							cursorLocal.getString( cursorLocal.getColumnIndex(MyDatabase.DataINStable.CHI_FA_KEY) ), 
-							cursorLocal.getString( cursorLocal.getColumnIndex(MyDatabase.DataINStable.A_DA_KEY) ), 
-							cursorLocal.getString( cursorLocal.getColumnIndex(MyDatabase.DataINStable.C_PERS_KEY) ), 
-							cursorLocal.getString( cursorLocal.getColumnIndex(MyDatabase.DataINStable.VALORE_KEY) ), 
-							cursorLocal.getString( cursorLocal.getColumnIndex(MyDatabase.DataINStable.CATEGORIA_KEY) ), 
-							cursorLocal.getString( cursorLocal.getColumnIndex(MyDatabase.DataINStable.DESCRIZIONE_KEY) ), 
-							cursorLocal.getString( cursorLocal.getColumnIndex(MyDatabase.DataINStable.NOTE_KEY) ), 
-							cursorLocal.getString( cursorLocal.getColumnIndex(MyDatabase.DataINStable.SPECIAL_NOTE_KEY) ));
-
-					// elimino dal database la riga corrispondente, guardando solo il codice ID univoco 
-					String actualID = cursorLocal.getString( cursorLocal.getColumnIndex(MyDatabase.DataINStable.ID) );
-					DBINSlocal.deleteDatabyID(actualID);
-
-				}
-			}
-
-			DBINSlocal.close();
-			DBINSdownloaded.close();
-
-			// Salvo il DB downloaded così aggiornato come DB full locale
-	    	java.io.File oldFile = new java.io.File(myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator + myGlobal.LOCAL_DOWNLOADED_DB_FILE);
-	    	//Now invoke the renameTo() method on the reference, oldFile in this case
-	    	oldFile.renameTo(new java.io.File( myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator + myGlobal.LOCAL_FULL_DB_FILE));		            	    	
-	    	showToast("aggiornato file DB full locale: " + myGlobal.LOCAL_FULL_DB_FILE);			
-
-		} catch (Exception e) {
-    		e.printStackTrace();
-    		showToast("Error Exception: " + e.getMessage());
-		}
-		 */
 	}
 
 	@Override

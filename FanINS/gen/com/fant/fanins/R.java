@@ -218,23 +218,26 @@ containing a value of this type.
         public static final int common_signin_btn_text_pressed_light=0x7f020017;
         public static final int ic_add=0x7f020018;
         public static final int ic_add_big=0x7f020019;
-        public static final int ic_calendar=0x7f02001a;
-        public static final int ic_calendar_big=0x7f02001b;
-        public static final int ic_cloud_sync=0x7f02001c;
-        public static final int ic_folder_bookmark=0x7f02001d;
-        public static final int ic_folder_library=0x7f02001e;
-        public static final int ic_folder_web_upload=0x7f02001f;
-        public static final int ic_launcher=0x7f020020;
-        public static final int ic_money=0x7f020021;
-        public static final int ic_money_big=0x7f020022;
-        public static final int ic_plusone_medium_off_client=0x7f020023;
-        public static final int ic_plusone_small_off_client=0x7f020024;
-        public static final int ic_plusone_standard_off_client=0x7f020025;
-        public static final int ic_plusone_tall_off_client=0x7f020026;
-        public static final int ic_refresh=0x7f020027;
-        public static final int ic_refresh_144=0x7f020028;
-        public static final int ic_refresh_256=0x7f020029;
-        public static final int ic_search_83=0x7f02002a;
+        public static final int ic_blue_download=0x7f02001a;
+        public static final int ic_calendar=0x7f02001b;
+        public static final int ic_calendar_big=0x7f02001c;
+        public static final int ic_cloud_sync=0x7f02001d;
+        public static final int ic_delete=0x7f02001e;
+        public static final int ic_delete_file=0x7f02001f;
+        public static final int ic_folder_bookmark=0x7f020020;
+        public static final int ic_folder_library=0x7f020021;
+        public static final int ic_folder_web_upload=0x7f020022;
+        public static final int ic_launcher=0x7f020023;
+        public static final int ic_money=0x7f020024;
+        public static final int ic_money_big=0x7f020025;
+        public static final int ic_plusone_medium_off_client=0x7f020026;
+        public static final int ic_plusone_small_off_client=0x7f020027;
+        public static final int ic_plusone_standard_off_client=0x7f020028;
+        public static final int ic_plusone_tall_off_client=0x7f020029;
+        public static final int ic_refresh=0x7f02002a;
+        public static final int ic_refresh_144=0x7f02002b;
+        public static final int ic_refresh_256=0x7f02002c;
+        public static final int ic_search_83=0x7f02002d;
     }
     public static final class id {
         public static final int AppVersion=0x7f060009;
@@ -310,8 +313,9 @@ containing a value of this type.
     public static final class menu {
         public static final int main=0x7f0c0000;
         public static final int read_data_actions=0x7f0c0001;
-        public static final int read_txt=0x7f0c0002;
-        public static final int report_actions=0x7f0c0003;
+        public static final int read_data_local_actions=0x7f0c0002;
+        public static final int read_txt=0x7f0c0003;
+        public static final int report_actions=0x7f0c0004;
     }
     public static final class string {
         public static final int action_authDropbox_login=0x7f070023;

@@ -7,8 +7,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.fant.fanins"
     android:configChanges="keyboardHidden|orientation|screenSize"
-    android:versionCode="6"
-    android:versionName="1.7.0" >
+    android:versionCode="8"
+    android:versionName="1.7.2" >
 
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.INTERNET" />

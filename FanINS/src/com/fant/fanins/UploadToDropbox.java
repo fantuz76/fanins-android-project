@@ -93,7 +93,7 @@ public class UploadToDropbox extends AsyncTask<Void, Long, Boolean> {
 
             	try {
             		@SuppressWarnings("unused")
-					DropboxAPI.Entry newEntry = mApi.copy(path, path + ".bkup_" + myGlobal.formattedDate());
+					DropboxAPI.Entry newEntry = mApi.copy(path, path + "."  + myGlobal.formattedDate() + ".bkup");
             	} catch (DropboxUnlinkedException e) {
             		Log.e(myGlobal.TAG, "User has unlinked." + e.getMessage());
             	} catch (DropboxException e) {

@@ -75,9 +75,9 @@
                 android:fadingEdge="vertical"
                 android:gravity="center"
                 android:inputType="date"
-                android:textStyle="bold" >
-
-                <requestFocus />
+                android:textStyle="bold"
+                android:focusable = "false" >
+                
             </EditText>
 
             <TextView

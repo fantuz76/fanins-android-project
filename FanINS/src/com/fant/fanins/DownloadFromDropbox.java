@@ -5,6 +5,7 @@ package com.fant.fanins;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import android.app.ProgressDialog;
@@ -51,11 +52,12 @@ public class DownloadFromDropbox extends AsyncTask<Void, Long, Boolean> {
 	// won't be able to use this code for two simultaneous downloads.
 	private static String local_file_name;
 	private static String dropbox_file_name;
+	private static boolean backupLocalFile;
 
 
 
 	public DownloadFromDropbox(Context context, DropboxAPI<?> api,
-			String dropboxPath, String dropboxFile, String localFile) {
+			String dropboxPath, String dropboxFile, String localFile, boolean createBackup) {
 		// We set the context this way so we don't accidentally leak activities
 		mContext = context.getApplicationContext();
 
@@ -63,7 +65,9 @@ public class DownloadFromDropbox extends AsyncTask<Void, Long, Boolean> {
 		mPath = dropboxPath;
 		local_file_name = localFile;
 		dropbox_file_name = dropboxFile;
-
+		backupLocalFile = createBackup;
+		
+		
 		mDialog = new ProgressDialog(context);
 		mDialog.setMax(100);
 		mDialog.setMessage("Downloading " + local_file_name);
@@ -119,6 +123,26 @@ public class DownloadFromDropbox extends AsyncTask<Void, Long, Boolean> {
 				return false;
 			}
 
+			// Eseguo backup locale se richiesto
+			if (backupLocalFile) {
+				if (!(new File(local_file_name).exists())) {
+					showToast("File " + local_file_name + " non esiste, non si può fare backup ");
+				} else {
+					try {
+
+						// backup file													
+						java.io.File oldFile = new java.io.File(local_file_name);
+						java.io.File newFile = new java.io.File(local_file_name + "."  + myGlobal.formattedDate() + ".bkup" );
+						myGlobal.copyFiles(oldFile, newFile);
+					} catch (IOException e) {				
+						e.printStackTrace();
+						showToast("Error IOException: " + e.getMessage());
+					}	
+				}
+			}
+
+
+			
 			// Now pick the first one
 			Entry ent = thumbs.get(0);
 			String path = ent.path;

@@ -220,7 +220,7 @@ public class ReadTxtActivity extends ListActivity {
 							switch (which) {
 							case 0:
 								mycursor.moveToPosition(posizioneDaEditare);
-								Intent intent = new Intent(ReadTxtActivity.this, ModifyDataActivity.class);
+								Intent intent = new Intent(mycontext, ModifyDataActivity.class);
 
 
 								// Passo parametri a nuova activity, con lo stesso nome della colonna DataBase
@@ -247,17 +247,30 @@ public class ReadTxtActivity extends ListActivity {
 								break;
 
 							case 1:
-								mycursor.moveToPosition(posizioneDaEditare);
-								_dbID = mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.ID));
-								DBINStoread.open();
-								DBINStoread.deleteDatabyID(_dbID);
-								mycursor = DBINStoread.rawQuery(querystr,  null );
-								dataAdapter.changeCursor(mycursor);
-								dataAdapter.notifyDataSetChanged();		                    
 
-								DBINStoread.close();
+								AlertDialog.Builder builder = new AlertDialog.Builder(mycontext);
+								builder    	    	
+								.setTitle("Cancella elemento")
+								.setMessage("Are you sure?")
+								.setIcon(android.R.drawable.ic_dialog_alert)
+								.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog, int which) {    	    	    	    	    	    	
+										mycursor.moveToPosition(posizioneDaEditare);
+										String _dbID = mycursor.getString( mycursor.getColumnIndex(MyDatabase.DataINStable.ID));
+										DBINStoread.open();
+										DBINStoread.deleteDatabyID(_dbID);
+										mycursor = DBINStoread.rawQuery(querystr,  null );
+										dataAdapter.changeCursor(mycursor);
+										dataAdapter.notifyDataSetChanged();		                    
 
-								showToast("Cancellato elemento _id=" + _dbID);			    	    		
+										DBINStoread.close();
+
+										showToast("Cancellato elemento _id=" + _dbID);		    	    	
+									}
+								})
+								.setNegativeButton("No", null)						//Do nothing on no
+								.show();
+							    	    		
 								break;
 
 							case 2:
@@ -295,7 +308,10 @@ public class ReadTxtActivity extends ListActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.read_data_actions, menu);
+		if (readDBtype.equals("full")) 
+			inflater.inflate(R.menu.read_data_actions, menu);
+		else
+			inflater.inflate(R.menu.read_data_local_actions, menu);
 		return super.onCreateOptionsMenu(menu);		
 
 	}
@@ -311,20 +327,32 @@ public class ReadTxtActivity extends ListActivity {
 			return true;
 
 		case R.id.action_read_data_upload:
-			// 
-			// Preparo l'upload creando in locale una copia del file LOCAL_FULL_DB_FILE con nome REMOTE_DB_FILENAME
-			java.io.File oldFileDB = new java.io.File(myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_FULL_DB_FILE);        		
-			java.io.File newFileDB2 = new java.io.File(myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.REMOTE_DB_FILENAME);
-			try {
-				myGlobal.copyFiles(oldFileDB, newFileDB2);
-			} catch (IOException e) {
-				e.printStackTrace();
-				showToast("Errore " + e.getMessage());
-			}
+			AlertDialog.Builder buildersync = new AlertDialog.Builder(this);
+			buildersync    	    	
+			.setTitle("Caricamento (commit) del DB completo locale sul cloud")
+			.setMessage("Sicuro di caricare? " + System.getProperty("line.separator") +
+					"(il database remoto sul cloud verrà rinominato e rimpiazzato dal database completo locale)")
+					.setIcon(android.R.drawable.ic_dialog_alert)
+					.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {    	    	    	    	    	    	
+							// Preparo l'upload creando in locale una copia del file LOCAL_FULL_DB_FILE con nome REMOTE_DB_FILENAME
+							java.io.File oldFileDB = new java.io.File(myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_FULL_DB_FILE);        		
+							java.io.File newFileDB2 = new java.io.File(myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.REMOTE_DB_FILENAME);
+							try {
+								myGlobal.copyFiles(oldFileDB, newFileDB2);
+							} catch (IOException e) {
+								e.printStackTrace();
+								showToast("Errore " + e.getMessage());
+							}
 
-			// Effettuo UPLOAD tentando il backup remoto e cancellando il file in locale alla fine
-	  		UploadToDropbox uploadDB = new UploadToDropbox(this, myGlobal.mApiDropbox, myGlobal.DROPBOX_INS_DIR, newFileDB2, true, true);
-    		uploadDB.execute();
+							// Effettuo UPLOAD tentando il backup remoto e cancellando il file in locale alla fine
+							UploadToDropbox uploadDB = new UploadToDropbox(mycontext, myGlobal.mApiDropbox, myGlobal.DROPBOX_INS_DIR, newFileDB2, true, true);
+							uploadDB.execute();
+
+						}
+					})
+					.setNegativeButton("No", null)						//Do nothing on no
+					.show();
 			return true;
 			
 			
@@ -351,11 +379,11 @@ public class ReadTxtActivity extends ListActivity {
 	}
 
 	public void SearchTextOnDB() {
-		AlertDialog.Builder alert = new AlertDialog.Builder(ReadTxtActivity.this);
+		AlertDialog.Builder alert = new AlertDialog.Builder(mycontext);
 		alert.setMessage("Cerca Descrizione");
 
 		// Set an EditText view to get user input 
-		final EditText input = new EditText(ReadTxtActivity.this);
+		final EditText input = new EditText(mycontext);
 		alert.setView(input);
 
 		alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
@@ -534,7 +562,12 @@ public class ReadTxtActivity extends ListActivity {
 		//mycursor = DBINStoread.fetchDati();
 		mycursor = DBINStoread.rawQuery(querystr,  null );
 
-		if (mycursor.getCount() == 0) {
+		if (mycursor.getCount() == 0)
+			showToast("Attenzione nessun dato valido, controllare l'intervallo di date");
+		
+		if (false)
+		{
+			
 			assert true;	// nop
 		} else {
 			super.onCreate(mySavedInstance);
@@ -627,10 +660,14 @@ public class ReadTxtActivity extends ListActivity {
 	    
 	    editTextDateFine.setText(formattedDateOnly);
 	    
-	    c.set(Calendar.DAY_OF_YEAR, 1);
-	    //c.set(c.get(Calendar.YEAR),1,1);
-	    formattedDateOnly = df.format( c.getTime());	    
-	    editTextDateInizio.setText(formattedDateOnly);
+	    if (readDBtype.equals("full")) {
+	    	c.set(Calendar.DAY_OF_YEAR, 1);
+	    } else {
+	    	c.set(Calendar.DAY_OF_YEAR, 1);
+	    	c.set(Calendar.YEAR, 2000);
+	    }
+    	formattedDateOnly = df.format( c.getTime());	    
+    	editTextDateInizio.setText(formattedDateOnly);
 	    
 	    editTextDateInizio.setOnTouchListener(new ClickDataButtonInizio());
 	    editTextDateFine.setOnTouchListener(new ClickDataButtonFine());
