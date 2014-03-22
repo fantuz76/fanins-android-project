@@ -359,6 +359,11 @@ public class ReadTxtActivity extends ListActivity {
 		case R.id.action_sort_column:
 			SortOnColumnDB();
 			return true;
+			
+		case R.id.action_doubles:
+			doublesQuery();
+			refreshAllDatabase();
+			return true;
 
 		case R.id.action_refresh:
 			refreshQuery();
@@ -546,6 +551,32 @@ public class ReadTxtActivity extends ListActivity {
 		}
 	}
 
+	
+	public void doublesQuery() {
+/*
+SELECT myINSData.*,RigheDoppie.Occ FROM myINSData,
+(SELECT DataOperazione, Valore, COUNT(*) AS Occ FROM myINSData GROUP BY DataOperazione,Valore HAVING COUNT(*) > 1  ORDER BY DataOperazione) as RigheDoppie
+WHERE 
+myINSData.DataOperazione=RigheDoppie.DataOperazione AND
+myINSData.Valore=RigheDoppie.Valore
+ORDER BY RigheDoppie.Occ, myINSData.DataOperazione
+*/
+		// Definisco degli alias per rendere più leggibile
+		String tab = MyDatabase.DataINStable.TABELLA_INSDATA;
+		String val = MyDatabase.DataINStable.VALORE_KEY;
+		String data = MyDatabase.DataINStable.DATA_OPERAZIONE_KEY;
+		
+		querystr = "SELECT " + tab + ".*, RigheDoppie.Occ FROM " + tab + 
+		", (SELECT " + data + ", " + val + ", COUNT(*) AS Occ FROM " + tab + " GROUP BY " + data +", " + val + " HAVING COUNT(*) > 1  ORDER BY " + data + ") as RigheDoppie" +  
+				 " WHERE (" +tab+"."+data + ">='" + editTextDateInizio.getText().toString() + "' AND " +tab+"."+data + "<='"+ editTextDateFine.getText().toString() + "') " +
+				 " AND " +tab+"."+data + "=RigheDoppie." + data +
+				 " AND " +tab+"."+val + "=RigheDoppie." + val + 
+				 " ORDER BY RigheDoppie.Occ, " +tab+"."+data
+				 ;
+		
+		showToast("Selezione di righe doppie" + System.getProperty("line.separator") + "(stesso valore e stessa data)" + System.getProperty("line.separator") + " tra le date " + editTextDateInizio.getText().toString() + " - " + editTextDateFine.getText().toString());
+	}
+	
 	public void refreshQuery() {
 		querystr = "SELECT * FROM " + MyDatabase.DataINStable.TABELLA_INSDATA + " WHERE "
 				+ " (" + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + ">='" + editTextDateInizio.getText().toString() + "' AND " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + "<='"+ editTextDateFine.getText().toString() + "') "	;
