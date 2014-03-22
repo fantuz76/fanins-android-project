@@ -28,18 +28,21 @@
                 android:text="@string/titoloDataIntervallo"
                 android:textColor="@color/LightGreen" />
 
+
+
             <EditText
                 android:id="@+id/DataInizio"
                 style="android:editTextStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:width="110dp"
                 android:background="@color/LightGray2"
                 android:ems="3"
                 android:fadingEdge="vertical"
                 android:gravity="center"
                 android:inputType="date"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:width="110dp" 
+                android:focusable = "false"/>
 
             <TextView
                 android:id="@+id/DataFineLabel"
@@ -55,21 +58,21 @@
                 style="android:editTextStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:width="110dp"
                 android:background="@color/LightGray2"
                 android:ems="3"
                 android:fadingEdge="vertical"
                 android:gravity="center"
                 android:inputType="date"
-                android:textStyle="bold" >
+                android:textStyle="bold"
+                android:width="110dp"
+                android:focusable = "false" >
             </EditText>
-            
+
             <Button
                 android:id="@+id/btnread3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="btn3" />
-            
         </LinearLayout>
 
         <LinearLayout
@@ -87,8 +90,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="btn2" />
-
-
         </LinearLayout>
 
         <ListView

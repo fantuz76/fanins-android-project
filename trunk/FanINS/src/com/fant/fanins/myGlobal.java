@@ -39,10 +39,7 @@ public class myGlobal extends Application
 	public static boolean statoDBLocalFull;
 	public static DropboxAPI<AndroidAuthSession> mApiDropbox;
 
-	public static boolean MainActivityLoaded;
 	public static boolean ReadTxtActivityLoaded;
-
-
 
 	public static String[] arrTipoOperazione;
 	public static String[] arrChiFa;
@@ -207,8 +204,9 @@ public class myGlobal extends Application
 	// *************************************************************************
 	// Preparo file database, se non ci sono li crea 
 	// *************************************************************************    
-	public static  boolean prepDBfilesisOK(final Context ctx, boolean _forceDownladlocalEmpty, boolean _forceDownladlocalFull ){
+	public static  boolean prepDBfilesisOK(final Context ctx, boolean _forceDownladlocalEmpty, boolean _forceDownladlocalFull, final boolean backupIfPossible){
 		MyDatabase DBINStmp;
+		String tmpmsg;
 
 
 		final File _local = new File(myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_DB_FILENAME);
@@ -217,16 +215,20 @@ public class myGlobal extends Application
 		try  {
 			// controllo presenza dei file Database locali
 			if(!_local.exists() || _forceDownladlocalEmpty) {
+				if(!_local.exists())
+					tmpmsg = "File non trovato: " + myGlobal.LOCAL_DB_FILENAME;
+				else 
+					tmpmsg = "Scaricamento " + myGlobal.LOCAL_DB_FILENAME;
 				// file non esiste devo scaricarlo?
 				AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
 				builder
-				.setTitle("File non trovato: " + myGlobal.LOCAL_DB_FILENAME)
+				.setTitle(tmpmsg)
 				.setMessage("Scaricarlo da DropBox?")
 				.setIcon(android.R.drawable.ic_dialog_alert)
 				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {			      	
 						DownloadFromDropbox download2 = new DownloadFromDropbox(ctx, myGlobal.mApiDropbox, myGlobal.DROPBOX_INS_DIR, myGlobal.REMOTE_DB_FILENAME_EMPTY,
-								myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator + myGlobal.LOCAL_DB_FILENAME);
+								myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator + myGlobal.LOCAL_DB_FILENAME, backupIfPossible);
 						download2.execute();
 					}
 				})
@@ -253,16 +255,20 @@ public class myGlobal extends Application
 
 
 			if(!_full.exists() || _forceDownladlocalFull) {
+				if(!_local.exists())
+					tmpmsg = "File non trovato: " + myGlobal.LOCAL_FULL_DB_FILE;
+				else 
+					tmpmsg = "Scaricamento " + myGlobal.LOCAL_FULL_DB_FILE;				
 				// file non esiste devo scaricarlo?
 				AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
 				builder
-				.setTitle("File non trovato: " + myGlobal.LOCAL_FULL_DB_FILE)
+				.setTitle(tmpmsg)
 				.setMessage("Scaricarlo da DropBox?")
 				.setIcon(android.R.drawable.ic_dialog_alert)
 				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {			      	
 						DownloadFromDropbox download2 = new DownloadFromDropbox(ctx, myGlobal.mApiDropbox, myGlobal.DROPBOX_INS_DIR, myGlobal.REMOTE_DB_FILENAME,
-								myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator + myGlobal.LOCAL_FULL_DB_FILE);
+								myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator + myGlobal.LOCAL_FULL_DB_FILE, backupIfPossible);
 						download2.execute();
 					}
 				})

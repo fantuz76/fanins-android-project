@@ -20,7 +20,7 @@ import android.widget.Toast;
 
 public class MySettings extends PreferenceActivity {
 
-	static Context myContext;
+	static Context mycontext;
 public static String versionName = "";
 
     @Override
@@ -28,7 +28,7 @@ public static String versionName = "";
         super.onCreate(savedInstanceState);
 
         
-        myContext = this;
+        mycontext = this;
 
   		try {
 			versionName = this.getPackageManager()
@@ -65,10 +65,12 @@ public static String versionName = "";
     public static void CancellaDatabase() {
 
 		//Put up the Yes/No message box
-		AlertDialog.Builder buildererase = new AlertDialog.Builder(myContext);
-		buildererase    	    	
-		.setTitle(R.string.action_sync)
-		.setMessage("Sicuro di cancellare i file Database?")
+		AlertDialog.Builder buildererase = new AlertDialog.Builder(mycontext);
+		buildererase
+		.setTitle("Cancellazione dei file database locali")
+		.setMessage("Sicuro di cancellare i file Database?" + System.getProperty("line.separator") +
+				"Verranno persi tutti dati inseriti e non sincronizzati (database locale) "+ System.getProperty("line.separator") +
+				"e eventuali modifiche non committate del database completo (database completo locale)")
 		.setIcon(android.R.drawable.ic_dialog_alert)
 		.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {    	    	    	    	    	    	
@@ -121,10 +123,30 @@ public static String versionName = "";
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
 
-            if (!myGlobal.prepDBfilesisOK(myContext,true,true))
-            	showToast("Errore nel download database");
+			// Prima di sincronizzare chiedo se voglio fare la copia in locale
+            // l'info viene poi passata tramite booleano fino alla procedura di download da dropbox
 
-            
+			AlertDialog.Builder buildersync = new AlertDialog.Builder(mycontext);
+			buildersync    	    	
+			.setTitle("Backup file")
+			.setMessage("Creare una copia nel telefono dei file prima di scaricare?" + System.getProperty("line.separator") +
+					"(consigliato anche se occupa memoria)")
+					.setIcon(android.R.drawable.ic_dialog_alert)
+					.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+				            if (!myGlobal.prepDBfilesisOK(mycontext,true,true,true))
+				            	showToast("Errore nel download database");
+						}    				    	
+					})
+					.setNegativeButton("No",  new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							// Solo addesso faccio iniziare il download
+				            if (!myGlobal.prepDBfilesisOK(mycontext,true,true,false))
+				            	showToast("Errore nel download database");
+						}
+					})						
+					.show();
+
              	         
         }
     }    
@@ -207,7 +229,7 @@ public static String versionName = "";
     	MySettings.runOnUI(new Runnable() {
           @Override
           public void run() {
-            Toast.makeText(myContext , toast, Toast.LENGTH_LONG).show();
+            Toast.makeText(mycontext , toast, Toast.LENGTH_LONG).show();
           }
         });
       }

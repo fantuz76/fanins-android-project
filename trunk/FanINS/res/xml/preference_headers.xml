@@ -2,12 +2,12 @@
 
     <header
         android:fragment="com.fant.fanins.MySettings$DeleteAllDatabase"
-        android:icon="@drawable/ic_money"
+        android:icon="@drawable/ic_delete_file"
         android:summary="Cancella i file del database locale"
         android:title="Cancella File Database" />
     <header
         android:fragment="com.fant.fanins.MySettings$DownloadAllDatabase"
-        android:icon="@drawable/ic_money"
+        android:icon="@drawable/ic_blue_download"
         android:summary="Download i file del database da Dropbox e sovrascrive quelli in locale"
         android:title="Download File Database" />
     <header
@@ -27,11 +27,11 @@
     </header>
     <header
         android:icon="@drawable/ic_money"
-        android:summary="Launches an Intent."
-        android:title="Intent" >
+        android:summary="Start intent sito web google"
+        android:title="Sito Web" >
         <intent
             android:action="android.intent.action.VIEW"
-            android:data="http://www.android.com" />
+            android:data="http://www.google.com" />
     </header>
     <header
         android:fragment="com.fant.fanins.MySettings$Prefs2Fragment"
