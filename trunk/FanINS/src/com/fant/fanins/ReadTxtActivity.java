@@ -54,9 +54,6 @@ public class ReadTxtActivity extends ListActivity {
 	Context mycontext;
 	Bundle mySavedInstance;
 	
-	private int year;
-	private int month;
-	private int day;
 	EditText editTextDateInizio, editTextDateFine, editTextClicked;
 
 	static final String ORDER_DEFAULT =" ORDER BY " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY +" DESC "; 
@@ -595,42 +592,36 @@ ORDER BY RigheDoppie.Occ, myINSData.DataOperazione
 
 		if (mycursor.getCount() == 0)
 			showToast("Attenzione nessun dato valido, controllare l'intervallo di date");
-		
-		if (false)
-		{
-			
-			assert true;	// nop
-		} else {
-			super.onCreate(mySavedInstance);
 
-			dataAdapter = new SimpleCursorAdapter(
-					this, R.layout.list_item, 
-					mycursor, 
-					new String[] 
-							{ MyDatabase.DataINStable.DATA_OPERAZIONE_KEY, 
-							MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY, 
-							MyDatabase.DataINStable.CHI_FA_KEY, 
-							MyDatabase.DataINStable.A_DA_KEY, 
-							MyDatabase.DataINStable.C_PERS_KEY, 
-							MyDatabase.DataINStable.VALORE_KEY, 
-							MyDatabase.DataINStable.CATEGORIA_KEY,  
-							MyDatabase.DataINStable.DESCRIZIONE_KEY, 
-							MyDatabase.DataINStable.NOTE_KEY}, 
-							new int[]
-									{ R.id.dataText, 
-							R.id.tipooperazioneText, 
-							R.id.chifaText, 
-							R.id.adaText, 
-							R.id.cpersText, 
-							R.id.valoreText, 
-							R.id.categoriaText, 
-							R.id.descrizioneText, 
-							R.id.noteText},
-							0);
+		super.onCreate(mySavedInstance);
 
-			setListAdapter(dataAdapter);
+		dataAdapter = new SimpleCursorAdapter(
+				this, R.layout.list_item, 
+				mycursor, 
+				new String[] 
+						{ MyDatabase.DataINStable.DATA_OPERAZIONE_KEY, 
+						MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY, 
+						MyDatabase.DataINStable.CHI_FA_KEY, 
+						MyDatabase.DataINStable.A_DA_KEY, 
+						MyDatabase.DataINStable.C_PERS_KEY, 
+						MyDatabase.DataINStable.VALORE_KEY, 
+						MyDatabase.DataINStable.CATEGORIA_KEY,  
+						MyDatabase.DataINStable.DESCRIZIONE_KEY, 
+						MyDatabase.DataINStable.NOTE_KEY}, 
+						new int[]
+								{ R.id.dataText, 
+						R.id.tipooperazioneText, 
+						R.id.chifaText, 
+						R.id.adaText, 
+						R.id.cpersText, 
+						R.id.valoreText, 
+						R.id.categoriaText, 
+						R.id.descrizioneText, 
+						R.id.noteText},
+						0);
 
-		}
+		setListAdapter(dataAdapter);
+
 		DBINStoread.close();
 	}
 	
@@ -707,6 +698,8 @@ ORDER BY RigheDoppie.Occ, myINSData.DataOperazione
 
 
 	private void selezionaData(){
+		int year, month, day;
+		
         final Calendar c = Calendar.getInstance();
         year = c.get(Calendar.YEAR);
         month = c.get(Calendar.MONTH);

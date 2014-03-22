@@ -1,9 +1,16 @@
 package com.fant.fanins;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 import org.achartengine.model.CategorySeries;
 
+import android.app.DatePickerDialog;
+import android.app.DatePickerDialog.OnDateSetListener;
+import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
@@ -13,7 +20,11 @@ import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -22,7 +33,7 @@ public class ReportActivity extends ListActivity {
 
 	static final int MY_REQUEST_MODIFY_DATA = 1;
 
-	private String readDBtype;
+	
 	private MyDatabase DBINStoread;
 
 	public static String versionName = "";
@@ -34,11 +45,11 @@ public class ReportActivity extends ListActivity {
 	private String querystr = "";
 
 	private ListAdapter myadapter;
+	
+	EditText editTextDateInizio, editTextDateFine, editTextClicked;
 
 	Context mycontext;
-	Bundle mySavedInstance;
-
-	
+	Bundle mySavedInstance;	
 	CategorySeries seriePie;
 	
 	@Override
@@ -59,6 +70,7 @@ public class ReportActivity extends ListActivity {
 		mySavedInstance = savedInstanceState;
 
 
+		initializeActivity();
 
 		if (myGlobal.statoDBLocalFull == false) {
 			showToast("Errore di presenza file DB: " + myGlobal.LOCAL_FULL_DB_FILE);
@@ -68,7 +80,7 @@ public class ReportActivity extends ListActivity {
 
 		calcoloTotale();
 
-		DBINStoread.close();
+		
 
 
 
@@ -133,16 +145,21 @@ public class ReportActivity extends ListActivity {
 				myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator + myGlobal.LOCAL_FULL_DB_FILE);
 
 
-		ArrayList<String> columnArray1 = new ArrayList<String>();		
+		ArrayList<String> columnArray1 = new ArrayList<String>();
+		ArrayList<String> columnArray2 = new ArrayList<String>();
 		String DataInizio = "2007-01-11";
 		String DataFine = "2015-02-01";
 		String queryTipoOperazione = "Spesa";
 		String queryCPers = "C";
 		String queryChiFa = "IWBank";
 
+		DataInizio = editTextDateInizio.getText().toString();
+		DataFine = editTextDateFine.getText().toString();
+		
+		
 		DBINStoread.open();
-
-		// ------ Spese comuni
+/*
+		// ***-- Spese comuni
 		queryTipoOperazione = "Spesa";
 		queryCPers = "C";		
 
@@ -263,7 +280,7 @@ public class ReportActivity extends ListActivity {
 
 
 
-		// ------ Spese JB
+		// ***-- Spese JB
 		queryTipoOperazione = "Spesa";
 		queryCPers = "JB";		
 
@@ -383,7 +400,7 @@ public class ReportActivity extends ListActivity {
 
 
 
-		// ------ Spese SF
+		// ***-- Spese SF
 		queryTipoOperazione = "Spesa";
 		queryCPers = "SF";		
 
@@ -492,11 +509,6 @@ public class ReportActivity extends ListActivity {
 			columnArray1.add(DataInizio + " <-> " + DataFine + " # " + queryTipoOperazione + " " + queryChiFa + " " + queryCPers + "   ==>" +
 					mycursor.getString(mycursor.getColumnIndex("Total")));
 		}
-
-
-
-
-
 
 
 
@@ -635,6 +647,7 @@ public class ReportActivity extends ListActivity {
 				);
 		setListAdapter(myadapter);		
 
+		*/
 		String tmpchifa;
 
 		float ComuniIW = getResultSpesa(DataInizio, DataFine, "C", "IWBank");
@@ -725,52 +738,73 @@ public class ReportActivity extends ListActivity {
 		showToast("SF deve versare su IW:" + SFversaIW);
 
 
-		columnArray1.clear();
-		columnArray1.add("---- SF DEVE= " + String.valueOf(SFdeve));
-		columnArray1.add("---- SF DEVE versare= " + String.valueOf(SFversaIW));
-		columnArray1.add("---- SF dovrebbe a JB1= " + String.valueOf(SFdovrebbeJB1));
-		columnArray1.add("---- SF dovrebbe a JB2= " + String.valueOf(SFdovrebbeJB2));
+		columnArray1.clear();		
 		columnArray1.add("");
-		columnArray1.add("---- Tot messi da JB= " + String.valueOf((ComuniJB + SpostdaJulieAIW - SpostdaIWaJB)));
-		columnArray1.add("---- Tot messi da SF= " + String.valueOf((ComuniSF + SpostdaSimoneAIW - SpostdaIWaSF)));
+		columnArray1.add("Il calcolo del dovuto");
+		columnArray1.add("SF DEVE= 						" + myGlobal.FloatToStr(SFdeve));
+		columnArray1.add("SF DEVE versare su IW= 		" + myGlobal.FloatToStr(SFversaIW));
+		columnArray1.add("(valore *2)");
 		columnArray1.add("");
-		columnArray1.add("---- Tot da SF a JB= " + String.valueOf((SpostdaSimoneAJulie + PersJBSF)));
-		columnArray1.add("---- Tot da JB a SF= " + String.valueOf((SpostdaJulieASimone + PersSFJB)));
+		columnArray1.add("SF deve a JB per spese comuni o IW=	" + myGlobal.FloatToStr(SFdovrebbeJB1));
+		columnArray1.add("calcolati facendo [Tot messi da JB]-[Tot messi da SF] e poi diviso 2 (tutte spese comuni):");  //((ComuniJB + SpostdaJulieAIW - SpostdaIWaJB) - (ComuniSF + SpostdaSimoneAIW - SpostdaIWaSF)) / 2;
+		columnArray1.add("+" + myGlobal.FloatToStr(ComuniJB)+ "\t\tJB sp comuni");
+		columnArray1.add("+" + myGlobal.FloatToStr(SpostdaJulieAIW)+ "\t\tJB dato a IW");
+		columnArray1.add("-" + myGlobal.FloatToStr(SpostdaIWaJB) +"\t\tJB preso da IW");
+		columnArray1.add("[Tot messi da JB]= 			" + myGlobal.FloatToStr((ComuniJB + SpostdaJulieAIW - SpostdaIWaJB)));
+		columnArray1.add("");
+		columnArray1.add("+" + myGlobal.FloatToStr(ComuniSF) + "\t\tSF sp comuni");
+		columnArray1.add("+" + myGlobal.FloatToStr(SpostdaSimoneAIW) + "\t\tSF dato a IW");		
+		columnArray1.add("-" + myGlobal.FloatToStr(SpostdaIWaSF) + "\t\tSF preso da IW");
+		columnArray1.add("[Tot messi da SF]= 			" + myGlobal.FloatToStr((ComuniSF + SpostdaSimoneAIW - SpostdaIWaSF)));		
+		columnArray1.add("");
+		columnArray1.add("SF dovrebbe a JB per scambi diretti o personali=	" + myGlobal.FloatToStr(SFdovrebbeJB2));
+		columnArray1.add("calcolati facendo [Spost JB->SF] - [Spost SF->JB] :");  //(SpostdaJulieASimone + PersSFJB) - (SpostdaSimoneAJulie + PersJBSF);
+		columnArray1.add("+" + myGlobal.FloatToStr(SpostdaJulieASimone) + "\t\tJB ha dato a SF");
+		columnArray1.add("+" + myGlobal.FloatToStr(PersSFJB) + "\t\tJB ha pagato pers SF");
+		columnArray1.add("[Spost SF->JB]= 			" + myGlobal.FloatToStr((SpostdaSimoneAJulie + PersJBSF)));
+		columnArray1.add("");
+		columnArray1.add("+" + myGlobal.FloatToStr(SpostdaSimoneAJulie) + "\t\tSF ha dato a JB");
+		columnArray1.add("+" + myGlobal.FloatToStr(PersJBSF) + "\t\tSF ha pagato pers JB ");
+		columnArray1.add("[Spost JB->SF]= 			" + myGlobal.FloatToStr((SpostdaJulieASimone + PersSFJB)));
 		columnArray1.add("");
 		columnArray1.add("");
-		columnArray1.add("---- Comuni");
-		columnArray1.add(String.valueOf(ComuniIW));
-		columnArray1.add(String.valueOf(ComuniJB));
-		columnArray1.add(String.valueOf(ComuniSF));
-
-		columnArray1.add("---- Pers JB");
-		columnArray1.add(String.valueOf(PersJBIW));
-		columnArray1.add(String.valueOf(PersJBJB));
-		columnArray1.add(String.valueOf(PersJBSF));		
-
-		columnArray1.add("---- Pers SF");
-		columnArray1.add(String.valueOf(PersSFIW));
-		columnArray1.add(String.valueOf(PersSFJB));
-		columnArray1.add(String.valueOf(PersSFSF));			
-
-		columnArray1.add("---- Spost da IW");
-		columnArray1.add(String.valueOf(SpostdaIWaIW));
-		columnArray1.add(String.valueOf(SpostdaIWaJB));
-		columnArray1.add(String.valueOf(SpostdaIWaSF));		
-
-		columnArray1.add("---- Spost da JB");
-		columnArray1.add(String.valueOf(SpostdaJulieAIW));
-		columnArray1.add(String.valueOf(SpostdaJulieAJulie));
-		columnArray1.add(String.valueOf(SpostdaJulieASimone));		
-
-		columnArray1.add("---- Spost da SF");
-		columnArray1.add(String.valueOf(SpostdaSimoneAIW));
-		columnArray1.add(String.valueOf(SpostdaSimoneAJulie));
-		columnArray1.add(String.valueOf(SpostdaSimoneASimone));		
+		columnArray1.add("");	
+		columnArray1.add("PARZIALI");
+		columnArray1.add("");
+		columnArray1.add("Sp Comuni fatte da IW/JB/SF");
+		columnArray1.add(myGlobal.FloatToStr(ComuniIW));
+		columnArray1.add(myGlobal.FloatToStr(ComuniJB));
+		columnArray1.add(myGlobal.FloatToStr(ComuniSF));
+		columnArray1.add("");
+		columnArray1.add("Pers JB    fatte da IW/JB/SF");
+		columnArray1.add(myGlobal.FloatToStr(PersJBIW));
+		columnArray1.add(myGlobal.FloatToStr(PersJBJB));
+		columnArray1.add(myGlobal.FloatToStr(PersJBSF));
+		columnArray1.add("");
+		columnArray1.add("Pers SF    fatte da IW/JB/SF");
+		columnArray1.add(myGlobal.FloatToStr(PersSFIW));
+		columnArray1.add(myGlobal.FloatToStr(PersSFJB));
+		columnArray1.add(myGlobal.FloatToStr(PersSFSF));			
+		columnArray1.add("");
+		columnArray1.add("Spost da IW   verso IW/JB/SF");
+		columnArray1.add(myGlobal.FloatToStr(SpostdaIWaIW));
+		columnArray1.add(myGlobal.FloatToStr(SpostdaIWaJB));
+		columnArray1.add(myGlobal.FloatToStr(SpostdaIWaSF));		
+		columnArray1.add("");
+		columnArray1.add("Spost da JB  verso IW/JB/SF");
+		columnArray1.add(myGlobal.FloatToStr(SpostdaJulieAIW));
+		columnArray1.add(myGlobal.FloatToStr(SpostdaJulieAJulie));
+		columnArray1.add(myGlobal.FloatToStr(SpostdaJulieASimone));		
+		columnArray1.add("");
+		columnArray1.add("Spost da SF  verso IW/JB/SF");
+		columnArray1.add(myGlobal.FloatToStr(SpostdaSimoneAIW));
+		columnArray1.add(myGlobal.FloatToStr(SpostdaSimoneAJulie));
+		columnArray1.add(myGlobal.FloatToStr(SpostdaSimoneASimone));		
 
 		myadapter = new ArrayAdapter<String>(
 				this,
-				android.R.layout.simple_list_item_1,
+				R.layout.list_report,
+				R.id.descrizioneReport,
 				columnArray1
 				);
 		setListAdapter(myadapter);
@@ -784,6 +818,9 @@ public class ReportActivity extends ListActivity {
 		seriePie.add("Spese JB", ComuniJB);
 		seriePie.add("Spese SF", ComuniSF);
 		
+		
+		
+		DBINStoread.close();
 
 	}
 
@@ -834,6 +871,97 @@ public class ReportActivity extends ListActivity {
 			return retval;			
 		}
 	}
+	
+	
+
+
+
+	class ClickDataButtonInizio implements View.OnTouchListener {
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {    		
+			if (MotionEvent.ACTION_UP == event.getAction()) {
+				editTextClicked = editTextDateInizio;	// oggetto da impostare in callback
+				selezionaData();
+			}
+			return false;
+		}
+	};
+
+	class ClickDataButtonFine implements View.OnTouchListener {
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {    		
+			if (MotionEvent.ACTION_UP == event.getAction()) {
+				editTextClicked = editTextDateFine;	// oggetto da impostare in callback
+				selezionaData();
+			}
+			return false;
+		}
+	};
+
+	private void initializeActivity() {
+		Calendar c = Calendar.getInstance();
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALY);
+		String formattedDateOnly = df.format( c.getTime());
+				
+	    editTextDateInizio = (EditText) findViewById(R.id.DataInizioReport);
+	    editTextDateFine = (EditText) findViewById(R.id.DataFineReport);
+	    
+	    editTextDateFine.setText(formattedDateOnly);
+	    
+	    
+    	c.set(Calendar.DAY_OF_YEAR, 1);
+    	c.set(Calendar.YEAR, 2007);
+    
+    	formattedDateOnly = df.format( c.getTime());	    
+    	editTextDateInizio.setText(formattedDateOnly);
+	    
+	    editTextDateInizio.setOnTouchListener(new ClickDataButtonInizio());
+	    editTextDateFine.setOnTouchListener(new ClickDataButtonFine());
+	    
+	}
+
+
+	private void selezionaData(){
+		int year, month, day;
+		
+        final Calendar c = Calendar.getInstance();
+        year = c.get(Calendar.YEAR);
+        month = c.get(Calendar.MONTH);
+        day = c.get(Calendar.DAY_OF_MONTH);
+
+        String[] datestr = editTextClicked.getText().toString().split("-");
+
+        year = Integer.valueOf(datestr[0]);
+        month = Integer.valueOf(datestr[1])-1;        // Calendar di Java ha il mese che parte da 0 e non da 1
+        day = Integer.valueOf(datestr[2]);
+
+
+		Dialog dd = new DatePickerDialog(mycontext, myDateSetListener, year, month, day);
+		dd.show();
+	}
+	
+	
+	// questa è la Callback che indica che l'utente ha finito di scegliere la data
+	OnDateSetListener myDateSetListener = new OnDateSetListener() {
+
+	    @Override
+	    public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+
+	    	SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALY);	    	
+	    	String formattedDate = df.format(new Date(year-1900, month, day));
+	    	
+	        Calendar cal = Calendar.getInstance();
+	        cal.set(Calendar.YEAR, year);
+	        cal.set(Calendar.DAY_OF_MONTH, day);
+	        cal.set(Calendar.MONTH, month);
+	    	String format = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALY).format(cal.getTime());
+	    	
+	    	editTextClicked.setText(format);
+	    	
+	    	calcoloTotale();
+	    }
+	};
+
 }
 
 
