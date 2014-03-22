@@ -6,6 +6,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -299,5 +302,18 @@ public class myGlobal extends Application
 			return false;
 		}
 
+	}
+	
+	public static String FloatToStr(float _num){
+		String _tmp;
+		
+		DecimalFormat formatter;// = (DecimalFormat) NumberFormat.getInstance(Locale.ITALY);
+		formatter = new DecimalFormat("###,###.##€");
+		DecimalFormatSymbols symbols = formatter.getDecimalFormatSymbols();
+
+		symbols.setGroupingSeparator(' ');
+		_tmp = formatter.format(_num);
+				
+		return _tmp;
 	}
 }
