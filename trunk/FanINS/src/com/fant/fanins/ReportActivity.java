@@ -761,11 +761,11 @@ public class ReportActivity extends ListActivity {
 		columnArray1.add("calcolati facendo [Spost JB->SF] - [Spost SF->JB] :");  //(SpostdaJulieASimone + PersSFJB) - (SpostdaSimoneAJulie + PersJBSF);
 		columnArray1.add("+" + myGlobal.FloatToStr(SpostdaJulieASimone) + "\t\tJB ha dato a SF");
 		columnArray1.add("+" + myGlobal.FloatToStr(PersSFJB) + "\t\tJB ha pagato pers SF");
-		columnArray1.add("[Spost SF->JB]= 			" + myGlobal.FloatToStr((SpostdaSimoneAJulie + PersJBSF)));
+		columnArray1.add("[Spost SF->JB]= 			" + myGlobal.FloatToStr((SpostdaJulieASimone + PersSFJB)));
 		columnArray1.add("");
 		columnArray1.add("+" + myGlobal.FloatToStr(SpostdaSimoneAJulie) + "\t\tSF ha dato a JB");
 		columnArray1.add("+" + myGlobal.FloatToStr(PersJBSF) + "\t\tSF ha pagato pers JB ");
-		columnArray1.add("[Spost JB->SF]= 			" + myGlobal.FloatToStr((SpostdaJulieASimone + PersSFJB)));
+		columnArray1.add("[Spost JB->SF]= 			" + myGlobal.FloatToStr((SpostdaSimoneAJulie + PersJBSF)));
 		columnArray1.add("");
 		columnArray1.add("");
 		columnArray1.add("");	

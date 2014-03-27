@@ -316,6 +316,8 @@ public class ReadTxtActivity extends ListActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
+		Intent intent;
+		
 		switch(item.getItemId())
 		{
 
@@ -352,7 +354,12 @@ public class ReadTxtActivity extends ListActivity {
 					.show();
 			return true;
 			
-			
+
+		case R.id.action_report:
+			intent = new Intent(this, ReportActivity.class);    		
+			startActivity(intent);    		
+			return true;
+
 		case R.id.action_sort_column:
 			SortOnColumnDB();
 			return true;

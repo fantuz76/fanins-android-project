@@ -5,9 +5,6 @@ package com.fant.fanins;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Locale;
 
 import android.app.ProgressDialog;
 import android.content.Context;

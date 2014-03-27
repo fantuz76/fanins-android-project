@@ -31,7 +31,7 @@ public class PieGraph {
 
 	public Intent getIntent(Context context) {
 
-		int[] colors = new int[] { Color.rgb(40, 122, 169), Color.GREEN, Color.MAGENTA, Color.YELLOW, Color.CYAN, Color.GRAY };
+		int[] colors = new int[] { Color.rgb(40, 122, 169), Color.rgb(169, 122, 35), Color.rgb(200, 234, 229), Color.YELLOW, Color.CYAN, Color.GRAY };
 
 		DefaultRenderer renderer = new DefaultRenderer();
 		for (int i=0; i<series.getItemCount();i++) {

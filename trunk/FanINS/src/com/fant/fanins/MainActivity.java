@@ -9,7 +9,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -769,10 +768,6 @@ public class MainActivity extends FragmentActivity {
 			return true;
 
 
-		case R.id.action_reportlaunch:
-			intent = new Intent(this, ReportActivity.class);    		
-			startActivity(intent);    		
-			return true;
 
 		case R.id.action_settings:
 			//Intent intentSettings = new Intent(this, SettingsActivity.class);                
