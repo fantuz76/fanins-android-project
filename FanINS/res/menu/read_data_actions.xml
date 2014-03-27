@@ -20,6 +20,12 @@
         android:showAsAction="never"
         android:title="Refresh dati"/>
 
+    <!-- Report -->
+    <item
+        android:id="@+id/action_report"
+        android:showAsAction="never"
+        android:title="Reportistica"/>    
+    
     <!-- Doppie -->
     <item
         android:id="@+id/action_doubles"
