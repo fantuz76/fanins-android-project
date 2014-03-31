@@ -8,9 +8,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -316,4 +316,17 @@ public class myGlobal extends Application
 				
 		return _tmp;
 	}
+	
+	 public static String intToString(int num, int digits) {
+		    assert digits > 0 : "Invalid number of digits";
+
+		    // create variable length array of zeros
+		    char[] zeros = new char[digits];
+		    Arrays.fill(zeros, '0');
+		    // format number as String
+		    DecimalFormat df = new DecimalFormat(String.valueOf(zeros));
+
+		    return df.format(num);
+		}
+	
 }

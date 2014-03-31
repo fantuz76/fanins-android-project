@@ -159,9 +159,12 @@ containing a value of this type.
     public static final class color {
         public static final int DarkGray=0x7f05000f;
         public static final int LightBlue=0x7f050012;
+        public static final int LightCyan=0x7f050015;
         public static final int LightGray=0x7f05000c;
         public static final int LightGray2=0x7f05000d;
         public static final int LightGreen=0x7f05000e;
+        public static final int LightOrange=0x7f050014;
+        public static final int LightPink=0x7f050013;
         public static final int LightRed=0x7f050010;
         public static final int LightYellow=0x7f050011;
         public static final int TitleGreen=0x7f05000a;
@@ -178,8 +181,8 @@ containing a value of this type.
         public static final int common_signin_btn_light_text_disabled=0x7f050006;
         public static final int common_signin_btn_light_text_focused=0x7f050007;
         public static final int common_signin_btn_light_text_pressed=0x7f050005;
-        public static final int common_signin_btn_text_dark=0x7f050013;
-        public static final int common_signin_btn_text_light=0x7f050014;
+        public static final int common_signin_btn_text_dark=0x7f050016;
+        public static final int common_signin_btn_text_light=0x7f050017;
     }
     public static final class dimen {
         /**  Default screen margins, per the Android Design guidelines. 
@@ -264,6 +267,7 @@ containing a value of this type.
         public static final int action_authDropbox=0x7f060039;
         public static final int action_doubles=0x7f06003f;
         public static final int action_graph=0x7f060041;
+        public static final int action_graph_pie=0x7f060042;
         public static final int action_read_data_upload=0x7f06003c;
         public static final int action_readfileDBfull=0x7f060035;
         public static final int action_readfileDBlocal=0x7f060034;

@@ -4,9 +4,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Locale;
 
 import org.achartengine.model.CategorySeries;
+import org.achartengine.model.TimeSeries;
 
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
@@ -51,6 +53,7 @@ public class ReportActivity extends ListActivity {
 	Context mycontext;
 	Bundle mySavedInstance;	
 	CategorySeries seriePie;
+	TimeSeries serieLine;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -102,19 +105,19 @@ public class ReportActivity extends ListActivity {
 		switch(item.getItemId())
 		{
 		case R.id.action_graph:
+			LineGraph line = new LineGraph(this, "",serieLine);
+			Intent lineIntent = line.getIntent(this);
+			startActivity(lineIntent);			
+			return true;
 			
-			//LineGraph line = new LineGraph();
-			//Intent lineIntent = line.getIntent(this);
-			//startActivity(lineIntent);
-			
-			
-			
-			PieGraph pie = new PieGraph("Distribuzione Spese", seriePie);
+		case R.id.action_graph_pie:			
+			PieGraph pie = new PieGraph(this, "Distribuzione Spese", seriePie);
 			Intent pieIntent = pie.getIntent(this);
 			startActivity(pieIntent);
 			return true;
 
-
+			
+			
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -148,506 +151,15 @@ public class ReportActivity extends ListActivity {
 		ArrayList<String> columnArray1 = new ArrayList<String>();
 		ArrayList<String> columnArray2 = new ArrayList<String>();
 		String DataInizio = "2007-01-11";
-		String DataFine = "2015-02-01";
-		String queryTipoOperazione = "Spesa";
-		String queryCPers = "C";
-		String queryChiFa = "IWBank";
+		String DataFine = "2050-12-31";
 
 		DataInizio = editTextDateInizio.getText().toString();
 		DataFine = editTextDateFine.getText().toString();
 		
 		
 		DBINStoread.open();
-/*
-		// ***-- Spese comuni
-		queryTipoOperazione = "Spesa";
-		queryCPers = "C";		
 
-
-		queryChiFa = "IWBank";
-
-		querystr = "SELECT SUM(Valore) AS Total FROM " + MyDatabase.DataINStable.TABELLA_INSDATA + " WHERE " + 
-				" (" + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + ">='" + DataInizio + "' AND " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + "<='"+ DataFine + "') AND " +
-				" " + MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY + "='" + queryTipoOperazione+"' COLLATE NOCASE AND " + 
-				MyDatabase.DataINStable.C_PERS_KEY + "='" + queryCPers + "' COLLATE NOCASE AND "+
-				MyDatabase.DataINStable.CHI_FA_KEY + "='" + queryChiFa + "' COLLATE NOCASE " ; 
-		mycursor = DBINStoread.rawQuery(querystr,  null );
-		if (mycursor.getCount() == 0) {
-			assert true;	// nop
-		} else {
-			mycursor.moveToFirst();
-			columnArray1.add(DataInizio + " <-> " + DataFine + " # " + queryTipoOperazione + " " + queryChiFa + " " + queryCPers + "   ==>" +
-					mycursor.getString(mycursor.getColumnIndex("Total")));
-		}
-
-
-
-		queryChiFa = "JB";
-
-		querystr = "SELECT SUM(Valore) AS Total FROM " + MyDatabase.DataINStable.TABELLA_INSDATA + " WHERE " + 
-				" (" + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + ">='" + DataInizio + "' AND " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + "<='"+ DataFine + "') AND " +
-				" " + MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY + "='" + queryTipoOperazione+"' COLLATE NOCASE AND " + 
-				MyDatabase.DataINStable.C_PERS_KEY + "='" + queryCPers + "' COLLATE NOCASE AND "+
-				MyDatabase.DataINStable.CHI_FA_KEY + "='" + queryChiFa + "' COLLATE NOCASE " ; 
-		mycursor = DBINStoread.rawQuery(querystr,  null );
-		if (mycursor.getCount() == 0) {
-			assert true;	// nop
-		} else {
-			mycursor.moveToFirst();
-			columnArray1.add(DataInizio + " <-> " + DataFine + " # " + queryTipoOperazione + " " + queryChiFa + " " + queryCPers + "   ==>" +
-					mycursor.getString(mycursor.getColumnIndex("Total")));
-		}
-
-
-
-		queryChiFa = "Fineco";
-
-		querystr = "SELECT SUM(Valore) AS Total FROM " + MyDatabase.DataINStable.TABELLA_INSDATA + " WHERE " + 
-				" (" + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + ">='" + DataInizio + "' AND " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + "<='"+ DataFine + "') AND " +
-				" " + MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY + "='" + queryTipoOperazione+"' COLLATE NOCASE AND " + 
-				MyDatabase.DataINStable.C_PERS_KEY + "='" + queryCPers + "' COLLATE NOCASE AND "+
-				MyDatabase.DataINStable.CHI_FA_KEY + "='" + queryChiFa + "' COLLATE NOCASE " ; 
-		mycursor = DBINStoread.rawQuery(querystr,  null );
-		if (mycursor.getCount() == 0) {
-			assert true;	// nop
-		} else {
-			mycursor.moveToFirst();
-			columnArray1.add(DataInizio + " <-> " + DataFine + " # " + queryTipoOperazione + " " + queryChiFa + " " + queryCPers + "   ==>" +
-					mycursor.getString(mycursor.getColumnIndex("Total")));
-		}
-
-
-
-		queryChiFa = "LaBanque";
-
-		querystr = "SELECT SUM(Valore) AS Total FROM " + MyDatabase.DataINStable.TABELLA_INSDATA + " WHERE " + 
-				" (" + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + ">='" + DataInizio + "' AND " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + "<='"+ DataFine + "') AND " +
-				" " + MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY + "='" + queryTipoOperazione+"' COLLATE NOCASE AND " + 
-				MyDatabase.DataINStable.C_PERS_KEY + "='" + queryCPers + "' COLLATE NOCASE AND "+
-				MyDatabase.DataINStable.CHI_FA_KEY + "='" + queryChiFa + "' COLLATE NOCASE " ; 
-		mycursor = DBINStoread.rawQuery(querystr,  null );
-		if (mycursor.getCount() == 0) {
-			assert true;	// nop
-		} else {
-			mycursor.moveToFirst();
-			columnArray1.add(DataInizio + " <-> " + DataFine + " # " + queryTipoOperazione + " " + queryChiFa + " " + queryCPers + "   ==>" +
-					mycursor.getString(mycursor.getColumnIndex("Total")));
-		}
-
-
-		queryChiFa = "SF";
-
-		querystr = "SELECT SUM(Valore) AS Total FROM " + MyDatabase.DataINStable.TABELLA_INSDATA + " WHERE " + 
-				" (" + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + ">='" + DataInizio + "' AND " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + "<='"+ DataFine + "') AND " +
-				" " + MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY + "='" + queryTipoOperazione+"' COLLATE NOCASE AND " + 
-				MyDatabase.DataINStable.C_PERS_KEY + "='" + queryCPers + "' COLLATE NOCASE AND "+
-				MyDatabase.DataINStable.CHI_FA_KEY + "='" + queryChiFa + "' COLLATE NOCASE " ; 
-		mycursor = DBINStoread.rawQuery(querystr,  null );
-		if (mycursor.getCount() == 0) {
-			assert true;	// nop
-		} else {
-			mycursor.moveToFirst();
-			columnArray1.add(DataInizio + " <-> " + DataFine + " # " + queryTipoOperazione + " " + queryChiFa + " " + queryCPers + "   ==>" +
-					mycursor.getString(mycursor.getColumnIndex("Total")));
-		}
-
-
-
-		queryChiFa = "MPS";
-
-		querystr = "SELECT SUM(Valore) AS Total FROM " + MyDatabase.DataINStable.TABELLA_INSDATA + " WHERE " + 
-				" (" + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + ">='" + DataInizio + "' AND " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + "<='"+ DataFine + "') AND " +
-				" " + MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY + "='" + queryTipoOperazione+"' COLLATE NOCASE AND " + 
-				MyDatabase.DataINStable.C_PERS_KEY + "='" + queryCPers + "' COLLATE NOCASE AND "+
-				MyDatabase.DataINStable.CHI_FA_KEY + "='" + queryChiFa + "' COLLATE NOCASE " ; 
-		mycursor = DBINStoread.rawQuery(querystr,  null );
-		if (mycursor.getCount() == 0) {
-			assert true;	// nop
-		} else {
-			mycursor.moveToFirst();
-			columnArray1.add(DataInizio + " <-> " + DataFine + " # " + queryTipoOperazione + " " + queryChiFa + " " + queryCPers + "   ==>" +
-					mycursor.getString(mycursor.getColumnIndex("Total")));
-		}
-
-
-
-
-
-
-
-
-
-
-
-
-		// ***-- Spese JB
-		queryTipoOperazione = "Spesa";
-		queryCPers = "JB";		
-
-
-		queryChiFa = "IWBank";
-
-		querystr = "SELECT SUM(Valore) AS Total FROM " + MyDatabase.DataINStable.TABELLA_INSDATA + " WHERE " + 
-				" (" + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + ">='" + DataInizio + "' AND " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + "<='"+ DataFine + "') AND " +
-				" " + MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY + "='" + queryTipoOperazione+"' COLLATE NOCASE AND " + 
-				MyDatabase.DataINStable.C_PERS_KEY + "='" + queryCPers + "' COLLATE NOCASE AND "+
-				MyDatabase.DataINStable.CHI_FA_KEY + "='" + queryChiFa + "' COLLATE NOCASE " ; 
-		mycursor = DBINStoread.rawQuery(querystr,  null );
-		if (mycursor.getCount() == 0) {
-			assert true;	// nop
-		} else {
-			mycursor.moveToFirst();
-			columnArray1.add(DataInizio + " <-> " + DataFine + " # " + queryTipoOperazione + " " + queryChiFa + " " + queryCPers + "   ==>" +
-					mycursor.getString(mycursor.getColumnIndex("Total")));
-		}
-
-
-
-		queryChiFa = "JB";
-
-		querystr = "SELECT SUM(Valore) AS Total FROM " + MyDatabase.DataINStable.TABELLA_INSDATA + " WHERE " + 
-				" (" + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + ">='" + DataInizio + "' AND " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + "<='"+ DataFine + "') AND " +
-				" " + MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY + "='" + queryTipoOperazione+"' COLLATE NOCASE AND " + 
-				MyDatabase.DataINStable.C_PERS_KEY + "='" + queryCPers + "' COLLATE NOCASE AND "+
-				MyDatabase.DataINStable.CHI_FA_KEY + "='" + queryChiFa + "' COLLATE NOCASE " ; 
-		mycursor = DBINStoread.rawQuery(querystr,  null );
-		if (mycursor.getCount() == 0) {
-			assert true;	// nop
-		} else {
-			mycursor.moveToFirst();
-			columnArray1.add(DataInizio + " <-> " + DataFine + " # " + queryTipoOperazione + " " + queryChiFa + " " + queryCPers + "   ==>" +
-					mycursor.getString(mycursor.getColumnIndex("Total")));
-		}
-
-
-
-		queryChiFa = "Fineco";
-
-		querystr = "SELECT SUM(Valore) AS Total FROM " + MyDatabase.DataINStable.TABELLA_INSDATA + " WHERE " + 
-				" (" + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + ">='" + DataInizio + "' AND " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + "<='"+ DataFine + "') AND " +
-				" " + MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY + "='" + queryTipoOperazione+"' COLLATE NOCASE AND " + 
-				MyDatabase.DataINStable.C_PERS_KEY + "='" + queryCPers + "' COLLATE NOCASE AND "+
-				MyDatabase.DataINStable.CHI_FA_KEY + "='" + queryChiFa + "' COLLATE NOCASE " ; 
-		mycursor = DBINStoread.rawQuery(querystr,  null );
-		if (mycursor.getCount() == 0) {
-			assert true;	// nop
-		} else {
-			mycursor.moveToFirst();
-			columnArray1.add(DataInizio + " <-> " + DataFine + " # " + queryTipoOperazione + " " + queryChiFa + " " + queryCPers + "   ==>" +
-					mycursor.getString(mycursor.getColumnIndex("Total")));
-		}
-
-
-
-		queryChiFa = "LaBanque";
-
-		querystr = "SELECT SUM(Valore) AS Total FROM " + MyDatabase.DataINStable.TABELLA_INSDATA + " WHERE " + 
-				" (" + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + ">='" + DataInizio + "' AND " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + "<='"+ DataFine + "') AND " +
-				" " + MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY + "='" + queryTipoOperazione+"' COLLATE NOCASE AND " + 
-				MyDatabase.DataINStable.C_PERS_KEY + "='" + queryCPers + "' COLLATE NOCASE AND "+
-				MyDatabase.DataINStable.CHI_FA_KEY + "='" + queryChiFa + "' COLLATE NOCASE " ; 
-		mycursor = DBINStoread.rawQuery(querystr,  null );
-		if (mycursor.getCount() == 0) {
-			assert true;	// nop
-		} else {
-			mycursor.moveToFirst();
-			columnArray1.add(DataInizio + " <-> " + DataFine + " # " + queryTipoOperazione + " " + queryChiFa + " " + queryCPers + "   ==>" +
-					mycursor.getString(mycursor.getColumnIndex("Total")));
-		}
-
-
-		queryChiFa = "SF";
-
-		querystr = "SELECT SUM(Valore) AS Total FROM " + MyDatabase.DataINStable.TABELLA_INSDATA + " WHERE " + 
-				" (" + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + ">='" + DataInizio + "' AND " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + "<='"+ DataFine + "') AND " +
-				" " + MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY + "='" + queryTipoOperazione+"' COLLATE NOCASE AND " + 
-				MyDatabase.DataINStable.C_PERS_KEY + "='" + queryCPers + "' COLLATE NOCASE AND "+
-				MyDatabase.DataINStable.CHI_FA_KEY + "='" + queryChiFa + "' COLLATE NOCASE " ; 
-		mycursor = DBINStoread.rawQuery(querystr,  null );
-		if (mycursor.getCount() == 0) {
-			assert true;	// nop
-		} else {
-			mycursor.moveToFirst();
-			columnArray1.add(DataInizio + " <-> " + DataFine + " # " + queryTipoOperazione + " " + queryChiFa + " " + queryCPers + "   ==>" +
-					mycursor.getString(mycursor.getColumnIndex("Total")));
-		}
-
-
-
-		queryChiFa = "MPS";
-
-		querystr = "SELECT SUM(Valore) AS Total FROM " + MyDatabase.DataINStable.TABELLA_INSDATA + " WHERE " + 
-				" (" + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + ">='" + DataInizio + "' AND " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + "<='"+ DataFine + "') AND " +
-				" " + MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY + "='" + queryTipoOperazione+"' COLLATE NOCASE AND " + 
-				MyDatabase.DataINStable.C_PERS_KEY + "='" + queryCPers + "' COLLATE NOCASE AND "+
-				MyDatabase.DataINStable.CHI_FA_KEY + "='" + queryChiFa + "' COLLATE NOCASE " ; 
-		mycursor = DBINStoread.rawQuery(querystr,  null );
-		if (mycursor.getCount() == 0) {
-			assert true;	// nop
-		} else {
-			mycursor.moveToFirst();
-			columnArray1.add(DataInizio + " <-> " + DataFine + " # " + queryTipoOperazione + " " + queryChiFa + " " + queryCPers + "   ==>" +
-					mycursor.getString(mycursor.getColumnIndex("Total")));
-		}
-
-
-
-
-
-
-
-
-
-
-
-		// ***-- Spese SF
-		queryTipoOperazione = "Spesa";
-		queryCPers = "SF";		
-
-
-		queryChiFa = "IWBank";
-
-		querystr = "SELECT SUM(Valore) AS Total FROM " + MyDatabase.DataINStable.TABELLA_INSDATA + " WHERE " + 
-				" (" + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + ">='" + DataInizio + "' AND " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + "<='"+ DataFine + "') AND " +
-				" " + MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY + "='" + queryTipoOperazione+"' COLLATE NOCASE AND " + 
-				MyDatabase.DataINStable.C_PERS_KEY + "='" + queryCPers + "' COLLATE NOCASE AND "+
-				MyDatabase.DataINStable.CHI_FA_KEY + "='" + queryChiFa + "' COLLATE NOCASE " ; 
-		mycursor = DBINStoread.rawQuery(querystr,  null );
-		if (mycursor.getCount() == 0) {
-			assert true;	// nop
-		} else {
-			mycursor.moveToFirst();
-			columnArray1.add(DataInizio + " <-> " + DataFine + " # " + queryTipoOperazione + " " + queryChiFa + " " + queryCPers + "   ==>" +
-					mycursor.getString(mycursor.getColumnIndex("Total")));
-		}
-
-
-
-		queryChiFa = "JB";
-
-		querystr = "SELECT SUM(Valore) AS Total FROM " + MyDatabase.DataINStable.TABELLA_INSDATA + " WHERE " + 
-				" (" + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + ">='" + DataInizio + "' AND " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + "<='"+ DataFine + "') AND " +
-				" " + MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY + "='" + queryTipoOperazione+"' COLLATE NOCASE AND " + 
-				MyDatabase.DataINStable.C_PERS_KEY + "='" + queryCPers + "' COLLATE NOCASE AND "+
-				MyDatabase.DataINStable.CHI_FA_KEY + "='" + queryChiFa + "' COLLATE NOCASE " ; 
-		mycursor = DBINStoread.rawQuery(querystr,  null );
-		if (mycursor.getCount() == 0) {
-			assert true;	// nop
-		} else {
-			mycursor.moveToFirst();
-			columnArray1.add(DataInizio + " <-> " + DataFine + " # " + queryTipoOperazione + " " + queryChiFa + " " + queryCPers + "   ==>" +
-					mycursor.getString(mycursor.getColumnIndex("Total")));
-		}
-
-
-
-		queryChiFa = "Fineco";
-
-		querystr = "SELECT SUM(Valore) AS Total FROM " + MyDatabase.DataINStable.TABELLA_INSDATA + " WHERE " + 
-				" (" + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + ">='" + DataInizio + "' AND " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + "<='"+ DataFine + "') AND " +
-				" " + MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY + "='" + queryTipoOperazione+"' COLLATE NOCASE AND " + 
-				MyDatabase.DataINStable.C_PERS_KEY + "='" + queryCPers + "' COLLATE NOCASE AND "+
-				MyDatabase.DataINStable.CHI_FA_KEY + "='" + queryChiFa + "' COLLATE NOCASE " ; 
-		mycursor = DBINStoread.rawQuery(querystr,  null );
-		if (mycursor.getCount() == 0) {
-			assert true;	// nop
-		} else {
-			mycursor.moveToFirst();
-			columnArray1.add(DataInizio + " <-> " + DataFine + " # " + queryTipoOperazione + " " + queryChiFa + " " + queryCPers + "   ==>" +
-					mycursor.getString(mycursor.getColumnIndex("Total")));
-		}
-
-
-
-		queryChiFa = "LaBanque";
-
-		querystr = "SELECT SUM(Valore) AS Total FROM " + MyDatabase.DataINStable.TABELLA_INSDATA + " WHERE " + 
-				" (" + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + ">='" + DataInizio + "' AND " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + "<='"+ DataFine + "') AND " +
-				" " + MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY + "='" + queryTipoOperazione+"' COLLATE NOCASE AND " + 
-				MyDatabase.DataINStable.C_PERS_KEY + "='" + queryCPers + "' COLLATE NOCASE AND "+
-				MyDatabase.DataINStable.CHI_FA_KEY + "='" + queryChiFa + "' COLLATE NOCASE " ; 
-		mycursor = DBINStoread.rawQuery(querystr,  null );
-		if (mycursor.getCount() == 0) {
-			assert true;	// nop
-		} else {
-			mycursor.moveToFirst();
-			columnArray1.add(DataInizio + " <-> " + DataFine + " # " + queryTipoOperazione + " " + queryChiFa + " " + queryCPers + "   ==>" +
-					mycursor.getString(mycursor.getColumnIndex("Total")));
-		}
-
-
-		queryChiFa = "SF";
-
-		querystr = "SELECT SUM(Valore) AS Total FROM " + MyDatabase.DataINStable.TABELLA_INSDATA + " WHERE " + 
-				" (" + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + ">='" + DataInizio + "' AND " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + "<='"+ DataFine + "') AND " +
-				" " + MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY + "='" + queryTipoOperazione+"' COLLATE NOCASE AND " + 
-				MyDatabase.DataINStable.C_PERS_KEY + "='" + queryCPers + "' COLLATE NOCASE AND "+
-				MyDatabase.DataINStable.CHI_FA_KEY + "='" + queryChiFa + "' COLLATE NOCASE " ; 
-		mycursor = DBINStoread.rawQuery(querystr,  null );
-		if (mycursor.getCount() == 0) {
-			assert true;	// nop
-		} else {
-			mycursor.moveToFirst();
-			columnArray1.add(DataInizio + " <-> " + DataFine + " # " + queryTipoOperazione + " " + queryChiFa + " " + queryCPers + "   ==>" +
-					mycursor.getString(mycursor.getColumnIndex("Total")));
-		}
-
-
-
-		queryChiFa = "MPS";
-
-		querystr = "SELECT SUM(Valore) AS Total FROM " + MyDatabase.DataINStable.TABELLA_INSDATA + " WHERE " + 
-				" (" + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + ">='" + DataInizio + "' AND " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + "<='"+ DataFine + "') AND " +
-				" " + MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY + "='" + queryTipoOperazione+"' COLLATE NOCASE AND " + 
-				MyDatabase.DataINStable.C_PERS_KEY + "='" + queryCPers + "' COLLATE NOCASE AND "+
-				MyDatabase.DataINStable.CHI_FA_KEY + "='" + queryChiFa + "' COLLATE NOCASE " ; 
-		mycursor = DBINStoread.rawQuery(querystr,  null );
-		if (mycursor.getCount() == 0) {
-			assert true;	// nop
-		} else {
-			mycursor.moveToFirst();
-			columnArray1.add(DataInizio + " <-> " + DataFine + " # " + queryTipoOperazione + " " + queryChiFa + " " + queryCPers + "   ==>" +
-					mycursor.getString(mycursor.getColumnIndex("Total")));
-		}
-
-
-
-
-
-
-
-		String queryAda = "";
-
-
-		// Spostamenti
-		queryTipoOperazione = "Spostamento";
-		queryCPers = "C";		
-
-		queryChiFa = "IWBank";
-
-		queryAda = "IWBank";
-
-		querystr = "SELECT SUM(Valore) AS Total FROM " + MyDatabase.DataINStable.TABELLA_INSDATA + " WHERE " + 
-				" (" + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + ">='" + DataInizio + "' AND " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + "<='"+ DataFine + "') AND " +
-				" " + MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY + "='" + queryTipoOperazione+"' COLLATE NOCASE AND " + 
-				MyDatabase.DataINStable.C_PERS_KEY + "='" + queryCPers + "' COLLATE NOCASE AND "+
-				MyDatabase.DataINStable.CHI_FA_KEY + "='" + queryChiFa + "' COLLATE NOCASE AND "+ 
-				MyDatabase.DataINStable.A_DA_KEY + "='" + queryAda + "' COLLATE NOCASE ";
-		mycursor = DBINStoread.rawQuery(querystr,  null );
-		if (mycursor.getCount() == 0) {
-			assert true;	// nop
-		} else {
-			mycursor.moveToFirst();
-			columnArray1.add(DataInizio + " <-> " + DataFine + " # " + queryTipoOperazione + " " + queryChiFa + " aDa " + queryAda + " " + queryCPers + "   ==>" +
-					mycursor.getString(mycursor.getColumnIndex("Total")));
-		}
-
-
-
-		queryAda = "JB";
-
-		querystr = "SELECT SUM(Valore) AS Total FROM " + MyDatabase.DataINStable.TABELLA_INSDATA + " WHERE " + 
-				" (" + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + ">='" + DataInizio + "' AND " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + "<='"+ DataFine + "') AND " +
-				" " + MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY + "='" + queryTipoOperazione+"' COLLATE NOCASE AND " + 
-				MyDatabase.DataINStable.C_PERS_KEY + "='" + queryCPers + "' COLLATE NOCASE AND "+
-				MyDatabase.DataINStable.CHI_FA_KEY + "='" + queryChiFa + "' COLLATE NOCASE AND "+ 
-				MyDatabase.DataINStable.A_DA_KEY + "='" + queryAda + "' COLLATE NOCASE ";
-		mycursor = DBINStoread.rawQuery(querystr,  null );
-		if (mycursor.getCount() == 0) {
-			assert true;	// nop
-		} else {
-			mycursor.moveToFirst();
-			columnArray1.add(DataInizio + " <-> " + DataFine + " # " + queryTipoOperazione + " " + queryChiFa + " aDa " + queryAda + " " + queryCPers + "   ==>" +
-					mycursor.getString(mycursor.getColumnIndex("Total")));
-		}
-
-
-
-		queryAda = "Fineco";
-
-		querystr = "SELECT SUM(Valore) AS Total FROM " + MyDatabase.DataINStable.TABELLA_INSDATA + " WHERE " + 
-				" (" + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + ">='" + DataInizio + "' AND " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + "<='"+ DataFine + "') AND " +
-				" " + MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY + "='" + queryTipoOperazione+"' COLLATE NOCASE AND " + 
-				MyDatabase.DataINStable.C_PERS_KEY + "='" + queryCPers + "' COLLATE NOCASE AND "+
-				MyDatabase.DataINStable.CHI_FA_KEY + "='" + queryChiFa + "' COLLATE NOCASE AND "+ 
-				MyDatabase.DataINStable.A_DA_KEY + "='" + queryAda + "' COLLATE NOCASE ";
-		mycursor = DBINStoread.rawQuery(querystr,  null );
-		if (mycursor.getCount() == 0) {
-			assert true;	// nop
-		} else {
-			mycursor.moveToFirst();
-			columnArray1.add(DataInizio + " <-> " + DataFine + " # " + queryTipoOperazione + " " + queryChiFa + " aDa " + queryAda + " " + queryCPers + "   ==>" +
-					mycursor.getString(mycursor.getColumnIndex("Total")));
-		}
-
-
-
-		queryAda = "LaBanque";
-
-		querystr = "SELECT SUM(Valore) AS Total FROM " + MyDatabase.DataINStable.TABELLA_INSDATA + " WHERE " + 
-				" (" + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + ">='" + DataInizio + "' AND " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + "<='"+ DataFine + "') AND " +
-				" " + MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY + "='" + queryTipoOperazione+"' COLLATE NOCASE AND " + 
-				MyDatabase.DataINStable.C_PERS_KEY + "='" + queryCPers + "' COLLATE NOCASE AND "+
-				MyDatabase.DataINStable.CHI_FA_KEY + "='" + queryChiFa + "' COLLATE NOCASE AND "+ 
-				MyDatabase.DataINStable.A_DA_KEY + "='" + queryAda + "' COLLATE NOCASE ";
-		mycursor = DBINStoread.rawQuery(querystr,  null );
-		if (mycursor.getCount() == 0) {
-			assert true;	// nop
-		} else {
-			mycursor.moveToFirst();
-			columnArray1.add(DataInizio + " <-> " + DataFine + " # " + queryTipoOperazione + " " + queryChiFa + " aDa " + queryAda + " " + queryCPers + "   ==>" +
-					mycursor.getString(mycursor.getColumnIndex("Total")));
-		}
-
-
-		queryAda = "sf";
-
-		querystr = "SELECT SUM(Valore) AS Total FROM " + MyDatabase.DataINStable.TABELLA_INSDATA + " WHERE " + 
-				" (" + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + ">='" + DataInizio + "' AND " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + "<='"+ DataFine + "') AND " +
-				" " + MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY + "='" + queryTipoOperazione+"' COLLATE NOCASE AND " + 
-				MyDatabase.DataINStable.C_PERS_KEY + "='" + queryCPers + "' COLLATE NOCASE AND "+
-				MyDatabase.DataINStable.CHI_FA_KEY + "='" + queryChiFa + "' COLLATE NOCASE AND "+ 
-				MyDatabase.DataINStable.A_DA_KEY + "='" + queryAda + "' COLLATE NOCASE ";
-		mycursor = DBINStoread.rawQuery(querystr,  null );
-		if (mycursor.getCount() == 0) {
-			assert true;	// nop
-		} else {
-			mycursor.moveToFirst();
-			columnArray1.add(DataInizio + " <-> " + DataFine + " # " + queryTipoOperazione + " " + queryChiFa + " aDa " + queryAda + " " + queryCPers + "   ==>" +
-					mycursor.getString(mycursor.getColumnIndex("Total")));
-		}
-
-
-
-
-		queryAda = "mps";
-
-		querystr = "SELECT SUM(Valore) AS Total FROM " + MyDatabase.DataINStable.TABELLA_INSDATA + " WHERE " + 
-				" (" + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + ">='" + DataInizio + "' AND " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + "<='"+ DataFine + "') AND " +
-				" " + MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY + "='" + queryTipoOperazione+"' COLLATE NOCASE AND " + 
-				MyDatabase.DataINStable.C_PERS_KEY + "='" + queryCPers + "' COLLATE NOCASE AND "+
-				MyDatabase.DataINStable.CHI_FA_KEY + "='" + queryChiFa + "' COLLATE NOCASE AND "+ 
-				MyDatabase.DataINStable.A_DA_KEY + "='" + queryAda + "' COLLATE NOCASE ";
-		mycursor = DBINStoread.rawQuery(querystr,  null );
-		if (mycursor.getCount() == 0) {
-			assert true;	// nop
-		} else {
-			mycursor.moveToFirst();
-			columnArray1.add(DataInizio + " <-> " + DataFine + " # " + queryTipoOperazione + " " + queryChiFa + " aDa " + queryAda + " " + queryCPers + "   ==>" +
-					mycursor.getString(mycursor.getColumnIndex("Total")));
-		}
-
-
-
-
-		myadapter = new ArrayAdapter<String>(
-				this,
-				android.R.layout.simple_list_item_1,
-				columnArray1
-				);
-		setListAdapter(myadapter);		
-
-		*/
+		
 		String tmpchifa;
 
 		float ComuniIW = getResultSpesa(DataInizio, DataFine, "C", "IWBank");
@@ -737,77 +249,88 @@ public class ReportActivity extends ListActivity {
 
 		showToast("SF deve versare su IW:" + SFversaIW);
 
+		ArrayList<ReportObject> myReportList = new ArrayList<ReportObject>();
+		
+		myReportList.add(new ReportObject("Casa" , "0"));
+		myReportList.add(new ReportObject("Peso" , "1"));
+		
+		myReportList.clear();
+		
+		
+		myReportList.add(new ReportObject("",""));
+		myReportList.add(new ReportObject("Il calcolo del dovuto",""));
+		myReportList.add(new ReportObject("SF DEVE= " , myGlobal.FloatToStr(SFdeve)));
+		myReportList.add(new ReportObject("SF DEVE versare su IW=" , myGlobal.FloatToStr(SFversaIW)));
+		myReportList.add(new ReportObject("(valore *2)",""));
+		myReportList.add(new ReportObject("",""));
+		myReportList.add(new ReportObject("SF deve a JB per spese comuni o IW=	" , myGlobal.FloatToStr(SFdovrebbeJB1)));
+		myReportList.add(new ReportObject("calcolati facendo [Tot messi da JB]-[Tot messi da SF] e poi diviso 2 (tutte spese comuni):",""));  //((ComuniJB + SpostdaJulieAIW - SpostdaIWaJB) - (ComuniSF + SpostdaSimoneAIW - SpostdaIWaSF)) / 2;
+		myReportList.add(new ReportObject("+" + "\t\tJB sp comuni",myGlobal.FloatToStr(ComuniJB)));
+		myReportList.add(new ReportObject("+" + "\t\tJB dato a IW",myGlobal.FloatToStr(SpostdaJulieAIW)));
+		myReportList.add(new ReportObject("-" + "\t\tJB preso da IW",myGlobal.FloatToStr(SpostdaIWaJB)));
+		myReportList.add(new ReportObject("[Tot messi da JB]= " , myGlobal.FloatToStr((ComuniJB + SpostdaJulieAIW - SpostdaIWaJB))));
+		myReportList.add(new ReportObject("",""));
+		myReportList.add(new ReportObject("+" + "\t\tSF sp comuni",myGlobal.FloatToStr(ComuniSF)));
+		myReportList.add(new ReportObject("+" +  "\t\tSF dato a IW",myGlobal.FloatToStr(SpostdaSimoneAIW)));		
+		myReportList.add(new ReportObject("-"  + "\t\tSF preso da IW",myGlobal.FloatToStr(SpostdaIWaSF)));
+		myReportList.add(new ReportObject("[Tot messi da SF]= 	" , myGlobal.FloatToStr((ComuniSF + SpostdaSimoneAIW - SpostdaIWaSF))));		
+		myReportList.add(new ReportObject("",""));
+		myReportList.add(new ReportObject("SF dovrebbe a JB per scambi diretti o personali=	" , myGlobal.FloatToStr(SFdovrebbeJB2)));
+		myReportList.add(new ReportObject("calcolati facendo [Spost JB->SF] - [Spost SF->JB] :",""));  //(SpostdaJulieASimone + PersSFJB) - (SpostdaSimoneAJulie + PersJBSF);
+		myReportList.add(new ReportObject("+" +  "\t\tJB ha dato a SF",myGlobal.FloatToStr(SpostdaJulieASimone)));
+		myReportList.add(new ReportObject("+"  + "\t\tJB ha pagato pers SF",myGlobal.FloatToStr(PersSFJB)));
+		myReportList.add(new ReportObject("[Spost SF->JB]= 			" , myGlobal.FloatToStr((SpostdaJulieASimone + PersSFJB))));
+		myReportList.add(new ReportObject("",""));
+		myReportList.add(new ReportObject("+"  + "\t\tSF ha dato a JB",myGlobal.FloatToStr(SpostdaSimoneAJulie)));
+		myReportList.add(new ReportObject("+" + "\t\tSF ha pagato pers JB ",myGlobal.FloatToStr(PersJBSF) ));
+		myReportList.add(new ReportObject("[Spost JB->SF]= 			" , myGlobal.FloatToStr((SpostdaSimoneAJulie + PersJBSF))));
+		myReportList.add(new ReportObject("",""));
+		myReportList.add(new ReportObject("",""));
+		myReportList.add(new ReportObject("PARZIALI",""));
+		myReportList.add(new ReportObject("",""));
+		myReportList.add(new ReportObject("Sp Comuni fatte da:",""));
+		myReportList.add(new ReportObject("IW",myGlobal.FloatToStr(ComuniIW)));
+		myReportList.add(new ReportObject("JB",myGlobal.FloatToStr(ComuniJB)));
+		myReportList.add(new ReportObject("SF",myGlobal.FloatToStr(ComuniSF)));
+		myReportList.add(new ReportObject("",""));
+		myReportList.add(new ReportObject("Pers JB    fatte da:",""));
+		myReportList.add(new ReportObject("IW",myGlobal.FloatToStr(PersJBIW)));
+		myReportList.add(new ReportObject("JB",myGlobal.FloatToStr(PersJBJB)));
+		myReportList.add(new ReportObject("SF",myGlobal.FloatToStr(PersJBSF)));
+		myReportList.add(new ReportObject("",""));
+		myReportList.add(new ReportObject("Pers SF    fatte da:",""));
+		myReportList.add(new ReportObject("IW",myGlobal.FloatToStr(PersSFIW)));
+		myReportList.add(new ReportObject("JB",myGlobal.FloatToStr(PersSFJB)));
+		myReportList.add(new ReportObject("SF",myGlobal.FloatToStr(PersSFSF)));			
+		myReportList.add(new ReportObject("",""));
+		myReportList.add(new ReportObject("Spost da IW   verso:",""));
+		myReportList.add(new ReportObject("IW",myGlobal.FloatToStr(SpostdaIWaIW)));
+		myReportList.add(new ReportObject("JB",myGlobal.FloatToStr(SpostdaIWaJB)));
+		myReportList.add(new ReportObject("SF",myGlobal.FloatToStr(SpostdaIWaSF)));		
+		myReportList.add(new ReportObject("",""));
+		myReportList.add(new ReportObject("Spost da JB  verso:",""));
+		myReportList.add(new ReportObject("IW",myGlobal.FloatToStr(SpostdaJulieAIW)));
+		myReportList.add(new ReportObject("JB",myGlobal.FloatToStr(SpostdaJulieAJulie)));
+		myReportList.add(new ReportObject("SF",myGlobal.FloatToStr(SpostdaJulieASimone)));		
+		myReportList.add(new ReportObject("",""));
+		myReportList.add(new ReportObject("Spost da SF  verso:",""));
+		myReportList.add(new ReportObject("IW",myGlobal.FloatToStr(SpostdaSimoneAIW)));
+		myReportList.add(new ReportObject("JB",myGlobal.FloatToStr(SpostdaSimoneAJulie)));
+		myReportList.add(new ReportObject("SF",myGlobal.FloatToStr(SpostdaSimoneASimone)));		
 
-		columnArray1.clear();		
-		columnArray1.add("");
-		columnArray1.add("Il calcolo del dovuto");
-		columnArray1.add("SF DEVE= 						" + myGlobal.FloatToStr(SFdeve));
-		columnArray1.add("SF DEVE versare su IW= 		" + myGlobal.FloatToStr(SFversaIW));
-		columnArray1.add("(valore *2)");
-		columnArray1.add("");
-		columnArray1.add("SF deve a JB per spese comuni o IW=	" + myGlobal.FloatToStr(SFdovrebbeJB1));
-		columnArray1.add("calcolati facendo [Tot messi da JB]-[Tot messi da SF] e poi diviso 2 (tutte spese comuni):");  //((ComuniJB + SpostdaJulieAIW - SpostdaIWaJB) - (ComuniSF + SpostdaSimoneAIW - SpostdaIWaSF)) / 2;
-		columnArray1.add("+" + myGlobal.FloatToStr(ComuniJB)+ "\t\tJB sp comuni");
-		columnArray1.add("+" + myGlobal.FloatToStr(SpostdaJulieAIW)+ "\t\tJB dato a IW");
-		columnArray1.add("-" + myGlobal.FloatToStr(SpostdaIWaJB) +"\t\tJB preso da IW");
-		columnArray1.add("[Tot messi da JB]= 			" + myGlobal.FloatToStr((ComuniJB + SpostdaJulieAIW - SpostdaIWaJB)));
-		columnArray1.add("");
-		columnArray1.add("+" + myGlobal.FloatToStr(ComuniSF) + "\t\tSF sp comuni");
-		columnArray1.add("+" + myGlobal.FloatToStr(SpostdaSimoneAIW) + "\t\tSF dato a IW");		
-		columnArray1.add("-" + myGlobal.FloatToStr(SpostdaIWaSF) + "\t\tSF preso da IW");
-		columnArray1.add("[Tot messi da SF]= 			" + myGlobal.FloatToStr((ComuniSF + SpostdaSimoneAIW - SpostdaIWaSF)));		
-		columnArray1.add("");
-		columnArray1.add("SF dovrebbe a JB per scambi diretti o personali=	" + myGlobal.FloatToStr(SFdovrebbeJB2));
-		columnArray1.add("calcolati facendo [Spost JB->SF] - [Spost SF->JB] :");  //(SpostdaJulieASimone + PersSFJB) - (SpostdaSimoneAJulie + PersJBSF);
-		columnArray1.add("+" + myGlobal.FloatToStr(SpostdaJulieASimone) + "\t\tJB ha dato a SF");
-		columnArray1.add("+" + myGlobal.FloatToStr(PersSFJB) + "\t\tJB ha pagato pers SF");
-		columnArray1.add("[Spost SF->JB]= 			" + myGlobal.FloatToStr((SpostdaJulieASimone + PersSFJB)));
-		columnArray1.add("");
-		columnArray1.add("+" + myGlobal.FloatToStr(SpostdaSimoneAJulie) + "\t\tSF ha dato a JB");
-		columnArray1.add("+" + myGlobal.FloatToStr(PersJBSF) + "\t\tSF ha pagato pers JB ");
-		columnArray1.add("[Spost JB->SF]= 			" + myGlobal.FloatToStr((SpostdaSimoneAJulie + PersJBSF)));
-		columnArray1.add("");
-		columnArray1.add("");
-		columnArray1.add("");	
-		columnArray1.add("PARZIALI");
-		columnArray1.add("");
-		columnArray1.add("Sp Comuni fatte da IW/JB/SF");
-		columnArray1.add(myGlobal.FloatToStr(ComuniIW));
-		columnArray1.add(myGlobal.FloatToStr(ComuniJB));
-		columnArray1.add(myGlobal.FloatToStr(ComuniSF));
-		columnArray1.add("");
-		columnArray1.add("Pers JB    fatte da IW/JB/SF");
-		columnArray1.add(myGlobal.FloatToStr(PersJBIW));
-		columnArray1.add(myGlobal.FloatToStr(PersJBJB));
-		columnArray1.add(myGlobal.FloatToStr(PersJBSF));
-		columnArray1.add("");
-		columnArray1.add("Pers SF    fatte da IW/JB/SF");
-		columnArray1.add(myGlobal.FloatToStr(PersSFIW));
-		columnArray1.add(myGlobal.FloatToStr(PersSFJB));
-		columnArray1.add(myGlobal.FloatToStr(PersSFSF));			
-		columnArray1.add("");
-		columnArray1.add("Spost da IW   verso IW/JB/SF");
-		columnArray1.add(myGlobal.FloatToStr(SpostdaIWaIW));
-		columnArray1.add(myGlobal.FloatToStr(SpostdaIWaJB));
-		columnArray1.add(myGlobal.FloatToStr(SpostdaIWaSF));		
-		columnArray1.add("");
-		columnArray1.add("Spost da JB  verso IW/JB/SF");
-		columnArray1.add(myGlobal.FloatToStr(SpostdaJulieAIW));
-		columnArray1.add(myGlobal.FloatToStr(SpostdaJulieAJulie));
-		columnArray1.add(myGlobal.FloatToStr(SpostdaJulieASimone));		
-		columnArray1.add("");
-		columnArray1.add("Spost da SF  verso IW/JB/SF");
-		columnArray1.add(myGlobal.FloatToStr(SpostdaSimoneAIW));
-		columnArray1.add(myGlobal.FloatToStr(SpostdaSimoneAJulie));
-		columnArray1.add(myGlobal.FloatToStr(SpostdaSimoneASimone));		
-
-		myadapter = new ArrayAdapter<String>(
+/*		myadapter = new ArrayAdapter<String>(
 				this,
 				R.layout.list_report,
 				R.id.descrizioneReport,
 				columnArray1
 				);
-		setListAdapter(myadapter);
+		setListAdapter(myadapter);*/
+		
+
+		
+		ReportAdapter myReportAdapter = new ReportAdapter(this, myReportList);
+		setListAdapter(myReportAdapter);
+		
 		
 
 		
@@ -818,7 +341,39 @@ public class ReportActivity extends ListActivity {
 		seriePie.add("Spese JB", ComuniJB);
 		seriePie.add("Spese SF", ComuniSF);
 		
+		//getResultSpesa(DataInizio, DataFine, "C", "IWBank");
 		
+        String[] datestr = DataInizio.toString().split("-");
+        int yearInizio = Integer.valueOf(datestr[0]);
+        int monthInizio = Integer.valueOf(datestr[1]);
+
+        datestr = DataFine.toString().split("-");
+        int yearFine = Integer.valueOf(datestr[0]);
+        int monthFine = Integer.valueOf(datestr[1]);
+        
+        serieLine = new TimeSeries("Andamento spese comuni");
+        
+        int cntColonna = 1;                
+        for (int cntanno = yearInizio; cntanno <= yearFine; cntanno++)
+        {            
+            double _totAnno = 0;
+            for (int i = 1; i <= 12; i++)
+            {
+            	Calendar cal = new GregorianCalendar(cntanno, i, 1);
+            	Date datepoint = cal.getTime();
+                double _totmese = 0;                        
+                _totmese += getTotMeseCatGenerica(cntanno, i, "C", "");
+                _totAnno += _totmese;
+                
+                serieLine.add(cntColonna,(double)_totmese);
+                serieLine.addAnnotation(String.valueOf(cntanno) + "/" + String.valueOf(i) + System.getProperty("line.separator")+ myGlobal.FloatToStr((float)_totmese) ,cntColonna,(double)_totmese);
+                                
+                cntColonna++;
+            }
+                                            
+            
+        }
+        
 		
 		DBINStoread.close();
 
@@ -828,6 +383,13 @@ public class ReportActivity extends ListActivity {
 
 	private float getResultSpesa(String _DataInizio, String _DataFine, String _queryCPers, String _queryChiFa){
 		String _queryTipoOperazione = "Spesa";
+		/*
+		if (_queryChiFa.equals("")){
+			querystr = "SELECT SUM(Valore) AS Total FROM " + MyDatabase.DataINStable.TABELLA_INSDATA + " WHERE " + 
+					" (" + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + ">='" + _DataInizio + "' AND " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + "<='"+ _DataFine + "') AND " +
+					" " + MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY + "='" + _queryTipoOperazione+"' COLLATE NOCASE AND " + 
+					MyDatabase.DataINStable.C_PERS_KEY + "='" + _queryCPers + "' COLLATE NOCASE" ; 			
+		}*/
 		querystr = "SELECT SUM(Valore) AS Total FROM " + MyDatabase.DataINStable.TABELLA_INSDATA + " WHERE " + 
 				" (" + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + ">='" + _DataInizio + "' AND " + MyDatabase.DataINStable.DATA_OPERAZIONE_KEY + "<='"+ _DataFine + "') AND " +
 				" " + MyDatabase.DataINStable.TIPO_OPERAZIONE_KEY + "='" + _queryTipoOperazione+"' COLLATE NOCASE AND " + 
@@ -874,8 +436,62 @@ public class ReportActivity extends ListActivity {
 	
 	
 
+    double getTotMeseCatGenerica(int _anno, int _mese, String _CPers, String _CatGenerica)
+    {
+        double _res = 0;
+        int _annoend = _anno, _meseend = _mese;
+        
+
+        if (_mese == 12) {
+            _annoend = _anno + 1;
+            _meseend = 1;
+        } else {
+            _annoend = _anno;
+            _meseend = _mese + 1;
+        }
 
 
+        String querystr = "SELECT SUM(CAST(Valore AS REAL)) AS Total FROM myINSData WHERE " +
+        		" (DataOperazione>='" + myGlobal.intToString(_anno,4) + "-" + myGlobal.intToString(_mese,2) + "-01' AND DataOperazione<'" + myGlobal.intToString(_annoend,2) + "-" + myGlobal.intToString(_meseend,2) + "-01') AND " +
+        		"TipoOperazione='Spesa' " ;
+        if (_CPers != "")
+        {
+        	querystr += " AND CPers='" + _CPers + "'";
+        }
+        if (_CatGenerica != "")
+        {
+        	querystr += " AND Generica='" + _CatGenerica + "'";
+        }
+
+        mycursor = DBINStoread.rawQuery(querystr,  null );
+        if (mycursor.getCount() == 0) {
+        	return 0;
+        } else {
+        	mycursor.moveToFirst();
+        	if (mycursor.getString(mycursor.getColumnIndex("Total")) == null) 
+        		return 0;			
+        	String str = mycursor.getString(mycursor.getColumnIndex("Total"));
+        	float retval;
+
+        	retval = Float.valueOf(str);
+        	return retval;			
+        }
+
+    }
+
+
+    double getTotAnnoCatGenerica(int _anno, String _CatGenerica)
+    {
+        double _res = 0;
+
+        for (int i = 1; i <= 12; i++)
+        {
+            _res += getTotMeseCatGenerica(_anno, i, "C", _CatGenerica);
+        }
+        return _res;
+    }
+
+    
 	class ClickDataButtonInizio implements View.OnTouchListener {
 		@Override
 		public boolean onTouch(View v, MotionEvent event) {    		

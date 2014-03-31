@@ -12,6 +12,7 @@ import android.graphics.Color;
 public class PieGraph {
 	CategorySeries series;
 	String Titolo;
+	Context mycontext;
 	
 	public PieGraph(){
 		int[] values = { 1, 2, 3, 4, 5 };
@@ -24,14 +25,15 @@ public class PieGraph {
 
 	}
 
-	public PieGraph(String _title, CategorySeries _cat){
+	public PieGraph(Context _context, String _title, CategorySeries _cat){
 		Titolo = _title;
 		series = _cat;
+		mycontext = _context;
 	}
 
 	public Intent getIntent(Context context) {
 
-		int[] colors = new int[] { Color.rgb(40, 122, 169), Color.rgb(169, 122, 35), Color.rgb(200, 234, 229), Color.YELLOW, Color.CYAN, Color.GRAY };
+		int[] colors = new int[] { mycontext.getResources().getColor(R.color.LightBlue), mycontext.getResources().getColor(R.color.LightGray), mycontext.getResources().getColor(R.color.LightGreen), Color.YELLOW, Color.CYAN, Color.GRAY };
 
 		DefaultRenderer renderer = new DefaultRenderer();
 		for (int i=0; i<series.getItemCount();i++) {
