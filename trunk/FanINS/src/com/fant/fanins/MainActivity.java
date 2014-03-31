@@ -81,7 +81,7 @@ public class MainActivity extends FragmentActivity {
 	// ship code which contains your key & secret in such an obvious way.
 	// Obfuscation is good.
 	final static private String APP_KEY = "7dlkc5hdc0cvk82";
-	final static private String APP_SECRET = "4m8c8auq5eheo3q_SECRET";
+	final static private String APP_SECRET = "4m8c8auq5eheo3q";
 	///////////////////////////////////////////////////////////////////////////
 	//                      End app-specific settings.                       //
 	///////////////////////////////////////////////////////////////////////////
@@ -681,15 +681,20 @@ public class MainActivity extends FragmentActivity {
 												}
 
 												// Solo addesso faccio iniziare la sincronizzazione
-												Intent intent = new Intent(MainActivity.this, SyncDBActivity.class);
-												startActivity(intent);												
+												//Intent intent = new Intent(MainActivity.this, SyncDBActivity.class);
+												//startActivity(intent);	
+												SyncAllDBData sync = new SyncAllDBData(MainActivity.this);
+												sync.execute();
 											}    				    	
 										})
 										.setNegativeButton("No",  new DialogInterface.OnClickListener() {
 											public void onClick(DialogInterface dialog, int which) {
 												// Solo addesso faccio iniziare la sincronizzazione
-												Intent intent = new Intent(MainActivity.this, SyncDBActivity.class);
-												startActivity(intent);												
+												//Intent intent = new Intent(MainActivity.this, SyncDBActivity.class);
+												//startActivity(intent);
+												SyncAllDBData sync = new SyncAllDBData(MainActivity.this);
+												sync.execute();												
+												
 											}
 										})	
 										.show();

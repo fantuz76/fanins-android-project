@@ -1,5 +1,6 @@
 package com.fant.fanins;
 
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -7,7 +8,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -15,11 +15,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.database.Cursor;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.Window;
-import android.widget.Toast;
 
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.DropboxAPI.DropboxFileInfo;
@@ -32,14 +28,10 @@ import com.dropbox.client2.exception.DropboxPartialFileException;
 import com.dropbox.client2.exception.DropboxServerException;
 import com.dropbox.client2.exception.DropboxUnlinkedException;
 
-public class SyncDBActivity extends Activity {
+public class SyncAllDBData extends AsyncTask<Void, Long, Boolean> {
 
-// *************************************************************************
-// Classe che esegue in background sincronizzazione Database
-// *************************************************************************
-public class SyncAllDBData  extends AsyncTask<Void, Long, Boolean> {
-	private DropboxAPI<?> mApi;
-	
+	//private DropboxAPI<?> mApi;
+
 	private UploadRequest mRequest;
 	private boolean mCanceled;
 	private String mPath;
@@ -51,12 +43,15 @@ public class SyncAllDBData  extends AsyncTask<Void, Long, Boolean> {
 	private int faseTask;
 	private MyDatabase DBINSlocal, DBINSdownloaded;
 	private Context mycontext;
+	
+	private int datiInseriti;
 
 	// *******************************
 	// Costruttore, prepara tuttoe mostra dialog
 	// *******************************        
 	public SyncAllDBData(Context _context) {
 
+		datiInseriti = 0;
 		mycontext = _context;
 		// riferimento totale progress
 		totProgressLen = Long.valueOf(500);
@@ -133,7 +128,7 @@ public class SyncAllDBData  extends AsyncTask<Void, Long, Boolean> {
 			path = ent.path;
 			mFileLen = ent.bytes;
 
-			publishProgress((totProgressLen/10));
+			publishProgress((totProgressLen/20));
 			faseTask++;
 
 			try {
@@ -150,7 +145,7 @@ public class SyncAllDBData  extends AsyncTask<Void, Long, Boolean> {
 
 					@Override
 					public void onProgress(long bytes, long total) {    	                	
-						publishProgress((totProgressLen/10) + (bytes/mFileLen * (totProgressLen/2)));
+						publishProgress((totProgressLen/20) + ((bytes * (totProgressLen/2))/mFileLen));
 					}
 				});
 				Log.i(myGlobal.TAG, "The file's rev is: " + info.getMetadata().rev);
@@ -176,11 +171,11 @@ public class SyncAllDBData  extends AsyncTask<Void, Long, Boolean> {
 			// *******************************
 			// *-*-*-* Apertura Database locale e remoto scaricato
 			DBINSlocal = new MyDatabase(
-					getApplicationContext(), 
+					mycontext, 
 					myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator +  myGlobal.LOCAL_DB_FILENAME);
 
 			DBINSdownloaded = new MyDatabase(
-					getApplicationContext(), 
+					mycontext, 
 					myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator + myGlobal.LOCAL_DOWNLOADED_DB_FILE);
 
 
@@ -205,7 +200,8 @@ public class SyncAllDBData  extends AsyncTask<Void, Long, Boolean> {
 			// *******************************
 			// *-*-*-* Aggiungo al DB scaricato i valori del DB locale che vengono cancellati man mano
 			Cursor cursorLocal = DBINSlocal.fetchDati();		
-			showToast("Inserimento di " + cursorLocal.getCount() + " dati!");
+			//showToast("Inserimento di " + cursorLocal.getCount() + " dati!");
+			datiInseriti = cursorLocal.getCount();
 			if (cursorLocal.getCount() != 0) {
 				while ( cursorLocal.moveToNext() ) {
 					DBINSdownloaded.insertRecordDataIns(
@@ -230,7 +226,7 @@ public class SyncAllDBData  extends AsyncTask<Void, Long, Boolean> {
 
 
 
-			publishProgress((totProgressLen*2/3));
+			publishProgress((totProgressLen*3/5));
 			faseTask++;
 
 			// *******************************
@@ -245,7 +241,7 @@ public class SyncAllDBData  extends AsyncTask<Void, Long, Boolean> {
 			// *-*-*-* Salvo il DB downloaded aggiornato rinominandolo come LOCAL_FULL_DB_FILE
 			java.io.File oldFile = new java.io.File(myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator + myGlobal.LOCAL_DOWNLOADED_DB_FILE);				
 			oldFile.renameTo(new java.io.File( myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator + myGlobal.LOCAL_FULL_DB_FILE));		            	    	
-			showToast("aggiornato file DB full locale: " + myGlobal.LOCAL_FULL_DB_FILE);			
+			//showToast("aggiornato file DB full locale: " + myGlobal.LOCAL_FULL_DB_FILE);
 
 
 			// *******************************
@@ -285,7 +281,7 @@ public class SyncAllDBData  extends AsyncTask<Void, Long, Boolean> {
 
 				@Override
 				public void onProgress(long bytes, long total) {
-					publishProgress(((totProgressLen * 2/3)) + (bytes/mFileLen * (totProgressLen * 1/3)) );
+					publishProgress(((totProgressLen * 3/5)) + ((bytes * ((totProgressLen * 2) / 5))/mFileLen) );
 				}
 			});
 
@@ -360,38 +356,39 @@ public class SyncAllDBData  extends AsyncTask<Void, Long, Boolean> {
 	protected void onPostExecute(Boolean result) {
 		AlertDialog.Builder builder;
 
+		//showToast("aggiornato file DB full locale: " + myGlobal.LOCAL_FULL_DB_FILE);			datiInseriti
+		
 		mDialog.dismiss();
 		String textToShow;			
 		if (result) {
 			// result OK
-			showToast("Sincronizzazione terminata correttamente");
-			textToShow = ("CIAO "+ System.getProperty("line.separator") +
+			//showToast("Sincronizzazione terminata correttamente");
+			textToShow = ("Sincronizzazione terminata correttamente "+ System.getProperty("line.separator") +
+					"Aggiunti " + String.valueOf(datiInseriti) + " dati! " + System.getProperty("line.separator") +
 					"" + System.getProperty("line.separator") +
-					"INSApp Sync terminata con esito:  OK" + System.getProperty("line.separator") +
-					"" + System.getProperty("line.separator") +
-					"" + System.getProperty("line.separator") +
-					"E' stato scaricato il database presente nel cloud ed è stato integrato con i valori inseriti nel file locale" + System.getProperty("line.separator") +
-					"Il file locale è stato quindi svuotato. Si è poi ricaricato nel cloud il database completo." + System.getProperty("line.separator") +
-					"E' stata anche sovrascritta la copia del database completo in locale. Attenzione che eventuali precedenti modifiche al database completo locale non committate sul cloud sono perse." + System.getProperty("line.separator") +
+					"Scaricato il database dal cloud e integrato con i dati inseriti nel file locale" + System.getProperty("line.separator") +
+					"Il file locale è stato svuotato. Ricaricato nel cloud il database completo: " + myGlobal.REMOTE_DB_FILENAME + System.getProperty("line.separator") +
+					System.getProperty("line.separator") +					
+					"Aggiornate la copia del database completo in locale: "+ myGlobal.LOCAL_FULL_DB_FILE + System.getProperty("line.separator") +
+					"Attenzione che eventuali precedenti modifiche al database completo locale non committate sul cloud sono perse." + System.getProperty("line.separator") +
 					"" + System.getProperty("line.separator") +
 					"");
 
 			builder=new AlertDialog.Builder(mycontext);
-			builder.setTitle("Avviso");
+			builder.setTitle("Sincronizzazione DB");
 			builder.setMessage(textToShow);
 			builder.setCancelable(false);
 			builder.setPositiveButton("Chiudi",new DialogInterface.OnClickListener(){
 				public void onClick(DialogInterface dialog, int id){
 					dialog.dismiss();
-					finish();
+					//finish();
 				}
 			});
 			builder.show();
 		} else {
 			// Couldn't download it, so show an error
-			showToast(mErrorMsg);
-			textToShow = ("CIAO "+ System.getProperty("line.separator") +
-					"Errore rilevato durante la sincronizzazione:" + System.getProperty("line.separator") +
+			//showToast(mErrorMsg);
+			textToShow = ("Errore rilevato durante la sincronizzazione:" + System.getProperty("line.separator") +
 					mErrorMsg + System.getProperty("line.separator") +
 					"" + System.getProperty("line.separator") +
 					"" + System.getProperty("line.separator") +
@@ -400,13 +397,13 @@ public class SyncAllDBData  extends AsyncTask<Void, Long, Boolean> {
 					"");
 
 			builder=new AlertDialog.Builder(mycontext);
-			builder.setTitle("Avviso");
+			builder.setTitle("Sincronizzazione DB");
 			builder.setMessage(textToShow);
 			builder.setCancelable(false);
 			builder.setPositiveButton("Chiudi",new DialogInterface.OnClickListener(){
 				public void onClick(DialogInterface dialog, int id){
 					dialog.dismiss();
-					finish();
+					//finish();
 				}
 			});	
 			builder.show();
@@ -431,47 +428,6 @@ public class SyncAllDBData  extends AsyncTask<Void, Long, Boolean> {
 		}
 
 	}        
-
-}
-
-
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-
-
-		super.onCreate(savedInstanceState);
-		//Remove title bar
-		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-		//Remove notification bar
-		//this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-		setContentView(R.layout.activity_syncdb);
-
-
-		SyncAllDBData ss = new SyncAllDBData(SyncDBActivity.this);
-		ss.execute();
-
-
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.read_txt, menu);
-		return true;
-	}
-// *************************************************************************
-// Mostra messaggio toast 
-// *************************************************************************
-public void showToast(final String toast) {
-	runOnUiThread(new Runnable() {
-		@Override
-		public void run() {
-			Toast.makeText(getApplicationContext(), toast, Toast.LENGTH_LONG).show();
-		}
-	});
-}
 
 
 
