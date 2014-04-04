@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 
 import android.app.AlertDialog;
@@ -729,8 +728,8 @@ ORDER BY RigheDoppie.Occ, myINSData.DataOperazione
 	    @Override
 	    public void onDateSet(DatePicker datePicker, int year, int month, int day) {
 
-	    	SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALY);	    	
-	    	String formattedDate = df.format(new Date(year-1900, month, day));
+	    	//SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALY);	    	
+	    	//String formattedDate = df.format(new Date(year-1900, month, day));
 	    	
 	        Calendar cal = Calendar.getInstance();
 	        cal.set(Calendar.YEAR, year);
