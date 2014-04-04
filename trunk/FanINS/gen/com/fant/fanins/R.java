@@ -265,6 +265,8 @@ containing a value of this type.
         public static final int TextNote=0x7f06001c;
         public static final int TextValore=0x7f060015;
         public static final int action_authDropbox=0x7f060039;
+        public static final int action_cat_gen=0x7f060043;
+        public static final int action_conti=0x7f060044;
         public static final int action_doubles=0x7f06003f;
         public static final int action_graph=0x7f060041;
         public static final int action_graph_pie=0x7f060042;

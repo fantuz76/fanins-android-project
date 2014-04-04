@@ -5,10 +5,13 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Locale;
 
 import org.achartengine.model.CategorySeries;
 import org.achartengine.model.TimeSeries;
+
+import com.fant.fanins.MyDatabase.DataINStable;
 
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
@@ -24,7 +27,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListAdapter;
@@ -35,7 +37,7 @@ public class ReportActivity extends ListActivity {
 
 	static final int MY_REQUEST_MODIFY_DATA = 1;
 
-	
+
 	private MyDatabase DBINStoread;
 
 	public static String versionName = "";
@@ -47,14 +49,14 @@ public class ReportActivity extends ListActivity {
 	private String querystr = "";
 
 	private ListAdapter myadapter;
-	
+
 	EditText editTextDateInizio, editTextDateFine, editTextClicked;
 
 	Context mycontext;
 	Bundle mySavedInstance;	
 	CategorySeries seriePie;
 	TimeSeries serieLine;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -83,7 +85,7 @@ public class ReportActivity extends ListActivity {
 
 		calcoloTotale();
 
-		
+
 
 
 
@@ -109,15 +111,20 @@ public class ReportActivity extends ListActivity {
 			Intent lineIntent = line.getIntent(this);
 			startActivity(lineIntent);			
 			return true;
-			
+
 		case R.id.action_graph_pie:			
 			PieGraph pie = new PieGraph(this, "Distribuzione Spese", seriePie);
 			Intent pieIntent = pie.getIntent(this);
 			startActivity(pieIntent);
 			return true;
-
 			
+		case R.id.action_cat_gen:	
+			calcoloTotaleCategorie();
+			return true;
 			
+		case R.id.action_conti:	
+			calcoloTotale();
+			return true;	
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -155,11 +162,11 @@ public class ReportActivity extends ListActivity {
 
 		DataInizio = editTextDateInizio.getText().toString();
 		DataFine = editTextDateFine.getText().toString();
-		
-		
+
+
 		DBINStoread.open();
 
-		
+
 		String tmpchifa;
 
 		float ComuniIW = getResultSpesa(DataInizio, DataFine, "C", "IWBank");
@@ -250,13 +257,13 @@ public class ReportActivity extends ListActivity {
 		showToast("SF deve versare su IW:" + SFversaIW);
 
 		ArrayList<ReportObject> myReportList = new ArrayList<ReportObject>();
-		
+
 		myReportList.add(new ReportObject("Casa" , "0"));
 		myReportList.add(new ReportObject("Peso" , "1"));
-		
+
 		myReportList.clear();
-		
-		
+
+
 		myReportList.add(new ReportObject("",""));
 		myReportList.add(new ReportObject("Il calcolo del dovuto",""));
 		myReportList.add(new ReportObject("SF DEVE= " , myGlobal.FloatToStr(SFdeve)));
@@ -318,67 +325,140 @@ public class ReportActivity extends ListActivity {
 		myReportList.add(new ReportObject("JB",myGlobal.FloatToStr(SpostdaSimoneAJulie)));
 		myReportList.add(new ReportObject("SF",myGlobal.FloatToStr(SpostdaSimoneASimone)));		
 
-/*		myadapter = new ArrayAdapter<String>(
+		/*		myadapter = new ArrayAdapter<String>(
 				this,
 				R.layout.list_report,
 				R.id.descrizioneReport,
 				columnArray1
 				);
 		setListAdapter(myadapter);*/
-		
 
-		
+
+
 		ReportAdapter myReportAdapter = new ReportAdapter(this, myReportList);
 		setListAdapter(myReportAdapter);
-		
-		
 
-		
-		
+
+
+
+
 		/// Impostazione delle serie per i grafici
 		seriePie = new CategorySeries("Spese Comuni fatte dai soggetti");
 		seriePie.add("Spese IW", ComuniIW);
 		seriePie.add("Spese JB", ComuniJB);
 		seriePie.add("Spese SF", ComuniSF);
-		
-		//getResultSpesa(DataInizio, DataFine, "C", "IWBank");
-		
-        String[] datestr = DataInizio.toString().split("-");
-        int yearInizio = Integer.valueOf(datestr[0]);
-        int monthInizio = Integer.valueOf(datestr[1]);
 
-        datestr = DataFine.toString().split("-");
-        int yearFine = Integer.valueOf(datestr[0]);
-        int monthFine = Integer.valueOf(datestr[1]);
-        
-        serieLine = new TimeSeries("Andamento spese comuni");
-        
-        int cntColonna = 1;                
-        for (int cntanno = yearInizio; cntanno <= yearFine; cntanno++)
-        {            
-            double _totAnno = 0;
-            for (int i = 1; i <= 12; i++)
-            {
-            	Calendar cal = new GregorianCalendar(cntanno, i, 1);
-            	Date datepoint = cal.getTime();
-                double _totmese = 0;                        
-                _totmese += getTotMeseCatGenerica(cntanno, i, "C", "");
-                _totAnno += _totmese;
-                
-                serieLine.add(cntColonna,(double)_totmese);
-                serieLine.addAnnotation(String.valueOf(cntanno) + "/" + String.valueOf(i) + System.getProperty("line.separator")+ myGlobal.FloatToStr((float)_totmese) ,cntColonna,(double)_totmese);
-                                
-                cntColonna++;
-            }
-                                            
-            
-        }
-        
-		
+		//getResultSpesa(DataInizio, DataFine, "C", "IWBank");
+
+		String[] datestr = DataInizio.toString().split("-");
+		int yearInizio = Integer.valueOf(datestr[0]);
+		int monthInizio = Integer.valueOf(datestr[1]);
+
+		datestr = DataFine.toString().split("-");
+		int yearFine = Integer.valueOf(datestr[0]);
+		int monthFine = Integer.valueOf(datestr[1]);
+
+		serieLine = new TimeSeries("Andamento spese comuni");
+
+		int cntColonna = 1;                
+		for (int cntanno = yearInizio; cntanno <= yearFine; cntanno++)
+		{            
+			double _totAnno = 0;
+			for (int i = 1; i <= 12; i++)
+			{
+				Calendar cal = new GregorianCalendar(cntanno, i, 1);
+				Date datepoint = cal.getTime();
+				double _totmese = 0;                        
+				_totmese += getTotMeseCatGenerica(cntanno, i, "C", "");
+				_totAnno += _totmese;
+
+				serieLine.add(cntColonna,(double)_totmese);
+				serieLine.addAnnotation(String.valueOf(cntanno) + "/" + String.valueOf(i) + System.getProperty("line.separator")+ myGlobal.FloatToStr((float)_totmese) ,cntColonna,(double)_totmese);
+
+				cntColonna++;
+			}
+
+
+		}
+
+
 		DBINStoread.close();
 
 	}
 
+
+	private void calcoloTotaleCategorie () {
+
+		DBINStoread = new MyDatabase(
+				getApplicationContext(), 
+				myGlobal.getStorageDatabaseFantDir().getPath() + java.io.File.separator + myGlobal.LOCAL_FULL_DB_FILE);
+
+
+		String DataInizio = "2007-01-11";
+		String DataFine = "2050-12-31";
+
+		DataInizio = editTextDateInizio.getText().toString();
+		DataFine = editTextDateFine.getText().toString();
+
+
+		DBINStoread.open();
+
+
+		String tmpchifa;
+
+
+
+
+
+
+		ArrayList<ReportObject> myReportList = new ArrayList<ReportObject>();
+
+
+
+		myReportList.clear();
+		myReportList.add(new ReportObject("",""));
+
+
+		String[] datestr = DataInizio.toString().split("-");
+		int yearInizio = Integer.valueOf(datestr[0]);
+		int monthInizio = Integer.valueOf(datestr[1]);
+
+		datestr = DataFine.toString().split("-");
+		int yearFine = Integer.valueOf(datestr[0]);
+		int monthFine = Integer.valueOf(datestr[1]);
+
+		int cntColonna = 1;            
+		//List<String> mylistr; 
+		//mylistr = myGlobal.DBINSlocal.fetchValori(MyDatabase.DataINStable.TABELLA_CATEGORIE);
+		Cursor c;
+		c = DBINStoread.mDb.query(DataINStable.TABELLA_CATEGORIE, null,null,null,null,null,null);
+		
+			
+
+		for (int i = 0; i < c.getCount(); i++)			
+		{
+			double _totAnno = 0;
+			for (int cntanno = yearInizio; cntanno <= yearFine; cntanno++) {
+				_totAnno += getTotAnnoCategoria(cntanno, c.getString( c.getColumnIndex("Valori")));
+
+				myReportList.add(new ReportObject(String.valueOf(cntanno) + " " + c.getString( c.getColumnIndex("Valori")), String.valueOf(_totAnno)));
+				cntColonna++;
+			}
+			c.moveToNext();
+		}
+
+		myReportList.add(new ReportObject("",""));
+
+
+		ReportAdapter myReportAdapter = new ReportAdapter(this, myReportList);
+		setListAdapter(myReportAdapter);
+
+
+
+
+		DBINStoread.close();
+
+	}	
 
 
 	private float getResultSpesa(String _DataInizio, String _DataFine, String _queryCPers, String _queryChiFa){
@@ -433,65 +513,126 @@ public class ReportActivity extends ListActivity {
 			return retval;			
 		}
 	}
+
+
+	
+	
+	
+	
+	
+
+	double getTotAnnoCategoria(int _anno, String _CatGenerica)
+	{
+		double _res = 0;
+
+		for (int i = 1; i <= 12; i++)
+		{
+			_res += getTotMeseCatGenerica(_anno, i, "C", _CatGenerica);
+		}
+		return _res;
+	}
+
+
+	double getTotMeseCategoria(int _anno, int _mese, String _CPers, String _Categoria)
+	{        
+		int _annoend = _anno, _meseend = _mese;
+
+
+		if (_mese == 12) {
+			_annoend = _anno + 1;
+			_meseend = 1;
+		} else {
+			_annoend = _anno;
+			_meseend = _mese + 1;
+		}
+
+
+		String querystr = "SELECT SUM(CAST(Valore AS REAL)) AS Total FROM myINSData WHERE " +
+				" (DataOperazione>='" + myGlobal.intToString(_anno,4) + "-" + myGlobal.intToString(_mese,2) + "-01' AND DataOperazione<'" + myGlobal.intToString(_annoend,2) + "-" + myGlobal.intToString(_meseend,2) + "-01') AND " +
+				"TipoOperazione='Spesa' " ;
+		if (_CPers != "")
+		{
+			querystr += " AND CPers='" + _CPers + "'";
+		}
+		if (_Categoria != "")
+		{
+			querystr += " AND Categoria='" + _Categoria + "'";
+		}
+
+		mycursor = DBINStoread.rawQuery(querystr,  null );
+		if (mycursor.getCount() == 0) {
+			return 0;
+		} else {
+			mycursor.moveToFirst();
+			if (mycursor.getString(mycursor.getColumnIndex("Total")) == null) 
+				return 0;			
+			String str = mycursor.getString(mycursor.getColumnIndex("Total"));
+			double retval;
+
+			retval = Float.valueOf(str);
+			return retval;			
+		}
+
+	}
 	
 	
 
-    double getTotMeseCatGenerica(int _anno, int _mese, String _CPers, String _CatGenerica)
-    {
-        double _res = 0;
-        int _annoend = _anno, _meseend = _mese;
-        
+	double getTotAnnoCatGenerica(int _anno, String _CatGenerica)
+	{
+		double _res = 0;
 
-        if (_mese == 12) {
-            _annoend = _anno + 1;
-            _meseend = 1;
-        } else {
-            _annoend = _anno;
-            _meseend = _mese + 1;
-        }
+		for (int i = 1; i <= 12; i++)
+		{
+			_res += getTotMeseCatGenerica(_anno, i, "C", _CatGenerica);
+		}
+		return _res;
+	}
 
 
-        String querystr = "SELECT SUM(CAST(Valore AS REAL)) AS Total FROM myINSData WHERE " +
-        		" (DataOperazione>='" + myGlobal.intToString(_anno,4) + "-" + myGlobal.intToString(_mese,2) + "-01' AND DataOperazione<'" + myGlobal.intToString(_annoend,2) + "-" + myGlobal.intToString(_meseend,2) + "-01') AND " +
-        		"TipoOperazione='Spesa' " ;
-        if (_CPers != "")
-        {
-        	querystr += " AND CPers='" + _CPers + "'";
-        }
-        if (_CatGenerica != "")
-        {
-        	querystr += " AND Generica='" + _CatGenerica + "'";
-        }
-
-        mycursor = DBINStoread.rawQuery(querystr,  null );
-        if (mycursor.getCount() == 0) {
-        	return 0;
-        } else {
-        	mycursor.moveToFirst();
-        	if (mycursor.getString(mycursor.getColumnIndex("Total")) == null) 
-        		return 0;			
-        	String str = mycursor.getString(mycursor.getColumnIndex("Total"));
-        	float retval;
-
-        	retval = Float.valueOf(str);
-        	return retval;			
-        }
-
-    }
+	double getTotMeseCatGenerica(int _anno, int _mese, String _CPers, String _CatGenerica)
+	{        
+		int _annoend = _anno, _meseend = _mese;
 
 
-    double getTotAnnoCatGenerica(int _anno, String _CatGenerica)
-    {
-        double _res = 0;
+		if (_mese == 12) {
+			_annoend = _anno + 1;
+			_meseend = 1;
+		} else {
+			_annoend = _anno;
+			_meseend = _mese + 1;
+		}
 
-        for (int i = 1; i <= 12; i++)
-        {
-            _res += getTotMeseCatGenerica(_anno, i, "C", _CatGenerica);
-        }
-        return _res;
-    }
 
-    
+		String querystr = "SELECT SUM(CAST(Valore AS REAL)) AS Total FROM myINSData WHERE " +
+				" (DataOperazione>='" + myGlobal.intToString(_anno,4) + "-" + myGlobal.intToString(_mese,2) + "-01' AND DataOperazione<'" + myGlobal.intToString(_annoend,2) + "-" + myGlobal.intToString(_meseend,2) + "-01') AND " +
+				"TipoOperazione='Spesa' " ;
+		if (_CPers != "")
+		{
+			querystr += " AND CPers='" + _CPers + "'";
+		}
+		if (_CatGenerica != "")
+		{
+			querystr += " AND Generica='" + _CatGenerica + "'";
+		}
+
+		mycursor = DBINStoread.rawQuery(querystr,  null );
+		if (mycursor.getCount() == 0) {
+			return 0;
+		} else {
+			mycursor.moveToFirst();
+			if (mycursor.getString(mycursor.getColumnIndex("Total")) == null) 
+				return 0;			
+			String str = mycursor.getString(mycursor.getColumnIndex("Total"));
+			double retval;
+
+			retval = Float.valueOf(str);
+			return retval;			
+		}
+
+	}
+
+
+
 	class ClickDataButtonInizio implements View.OnTouchListener {
 		@Override
 		public boolean onTouch(View v, MotionEvent event) {    		
@@ -518,64 +659,64 @@ public class ReportActivity extends ListActivity {
 		Calendar c = Calendar.getInstance();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALY);
 		String formattedDateOnly = df.format( c.getTime());
-				
-	    editTextDateInizio = (EditText) findViewById(R.id.DataInizioReport);
-	    editTextDateFine = (EditText) findViewById(R.id.DataFineReport);
-	    
-	    editTextDateFine.setText(formattedDateOnly);
-	    
-	    
-    	c.set(Calendar.DAY_OF_YEAR, 1);
-    	c.set(Calendar.YEAR, 2007);
-    
-    	formattedDateOnly = df.format( c.getTime());	    
-    	editTextDateInizio.setText(formattedDateOnly);
-	    
-	    editTextDateInizio.setOnTouchListener(new ClickDataButtonInizio());
-	    editTextDateFine.setOnTouchListener(new ClickDataButtonFine());
-	    
+
+		editTextDateInizio = (EditText) findViewById(R.id.DataInizioReport);
+		editTextDateFine = (EditText) findViewById(R.id.DataFineReport);
+
+		editTextDateFine.setText(formattedDateOnly);
+
+
+		c.set(Calendar.DAY_OF_YEAR, 1);
+		c.set(Calendar.YEAR, 2007);
+
+		formattedDateOnly = df.format( c.getTime());	    
+		editTextDateInizio.setText(formattedDateOnly);
+
+		editTextDateInizio.setOnTouchListener(new ClickDataButtonInizio());
+		editTextDateFine.setOnTouchListener(new ClickDataButtonFine());
+
 	}
 
 
 	private void selezionaData(){
 		int year, month, day;
-		
-        final Calendar c = Calendar.getInstance();
-        year = c.get(Calendar.YEAR);
-        month = c.get(Calendar.MONTH);
-        day = c.get(Calendar.DAY_OF_MONTH);
 
-        String[] datestr = editTextClicked.getText().toString().split("-");
+		final Calendar c = Calendar.getInstance();
+		year = c.get(Calendar.YEAR);
+		month = c.get(Calendar.MONTH);
+		day = c.get(Calendar.DAY_OF_MONTH);
 
-        year = Integer.valueOf(datestr[0]);
-        month = Integer.valueOf(datestr[1])-1;        // Calendar di Java ha il mese che parte da 0 e non da 1
-        day = Integer.valueOf(datestr[2]);
+		String[] datestr = editTextClicked.getText().toString().split("-");
+
+		year = Integer.valueOf(datestr[0]);
+		month = Integer.valueOf(datestr[1])-1;        // Calendar di Java ha il mese che parte da 0 e non da 1
+		day = Integer.valueOf(datestr[2]);
 
 
 		Dialog dd = new DatePickerDialog(mycontext, myDateSetListener, year, month, day);
 		dd.show();
 	}
-	
-	
+
+
 	// questa è la Callback che indica che l'utente ha finito di scegliere la data
 	OnDateSetListener myDateSetListener = new OnDateSetListener() {
 
-	    @Override
-	    public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+		@Override
+		public void onDateSet(DatePicker datePicker, int year, int month, int day) {
 
-	    	SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALY);	    	
-	    	String formattedDate = df.format(new Date(year-1900, month, day));
-	    	
-	        Calendar cal = Calendar.getInstance();
-	        cal.set(Calendar.YEAR, year);
-	        cal.set(Calendar.DAY_OF_MONTH, day);
-	        cal.set(Calendar.MONTH, month);
-	    	String format = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALY).format(cal.getTime());
-	    	
-	    	editTextClicked.setText(format);
-	    	
-	    	calcoloTotale();
-	    }
+			//SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALY);	    	
+			//String formattedDate = df.format(new Date(year-1900, month, day));
+
+			Calendar cal = Calendar.getInstance();
+			cal.set(Calendar.YEAR, year);
+			cal.set(Calendar.DAY_OF_MONTH, day);
+			cal.set(Calendar.MONTH, month);
+			String format = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALY).format(cal.getTime());
+
+			editTextClicked.setText(format);
+
+			calcoloTotale();
+		}
 	};
 
 }
