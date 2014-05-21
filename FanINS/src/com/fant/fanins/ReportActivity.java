@@ -11,8 +11,6 @@ import java.util.Locale;
 import org.achartengine.model.CategorySeries;
 import org.achartengine.model.TimeSeries;
 
-import com.fant.fanins.MyDatabase.DataINStable;
-
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.app.Dialog;
@@ -32,6 +30,8 @@ import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.fant.fanins.MyDatabase.DataINStable;
 
 public class ReportActivity extends ListActivity {
 
@@ -117,9 +117,12 @@ public class ReportActivity extends ListActivity {
 			Intent pieIntent = pie.getIntent(this);
 			startActivity(pieIntent);
 			return true;
+		
+		case R.id.action_cat_simple:		
+			calcoloTotaleCategorie();
+			return true;
 			
 		case R.id.action_cat_gen:	
-			calcoloTotaleCategorie();
 			return true;
 			
 		case R.id.action_conti:	
@@ -404,13 +407,6 @@ public class ReportActivity extends ListActivity {
 		DBINStoread.open();
 
 
-		String tmpchifa;
-
-
-
-
-
-
 		ArrayList<ReportObject> myReportList = new ArrayList<ReportObject>();
 
 
@@ -427,34 +423,16 @@ public class ReportActivity extends ListActivity {
 		int yearFine = Integer.valueOf(datestr[0]);
 		int monthFine = Integer.valueOf(datestr[1]);
 
-		int cntColonna = 1;            
-		//List<String> mylistr; 
-		//mylistr = myGlobal.DBINSlocal.fetchValori(MyDatabase.DataINStable.TABELLA_CATEGORIE);
-		Cursor c;
-		c = DBINStoread.mDb.query(DataINStable.TABELLA_CATEGORIE, null,null,null,null,null,null);
-		
-			
-
-		for (int i = 0; i < c.getCount(); i++)			
+		for (int i = 0; i < myGlobal.arrCategoria.length; i++)			
 		{
-			double _totAnno = 0;
-			for (int cntanno = yearInizio; cntanno <= yearFine; cntanno++) {
-				_totAnno += getTotAnnoCategoria(cntanno, c.getString( c.getColumnIndex("Valori")));
-
-				myReportList.add(new ReportObject(String.valueOf(cntanno) + " " + c.getString( c.getColumnIndex("Valori")), String.valueOf(_totAnno)));
-				cntColonna++;
-			}
-			c.moveToNext();
+			double _totAnno = getTotPeriodoCategoria(yearInizio, 1, yearFine, 12, "C", myGlobal.arrCategoria[i]);
+			myReportList.add(new ReportObject(String.valueOf(yearInizio) + "-" + String.valueOf(yearFine) + " " + myGlobal.arrCategoria[i], myGlobal.FloatToStr((float)_totAnno)));
 		}
 
 		myReportList.add(new ReportObject("",""));
 
-
 		ReportAdapter myReportAdapter = new ReportAdapter(this, myReportList);
 		setListAdapter(myReportAdapter);
-
-
-
 
 		DBINStoread.close();
 
@@ -577,6 +555,43 @@ public class ReportActivity extends ListActivity {
 	
 	
 
+	double getTotPeriodoCategoria(int _annoStart, int _meseStart, int _annoStop, int _meseStop, String _CPers, String _Categoria)
+	{        
+		int _annoend = _annoStop, _meseend = _meseStop;
+
+
+		if (_meseend == 12) {
+			_annoend = _annoend + 1;
+			_meseend = 1;
+		} 
+		String querystr = "SELECT SUM(CAST(Valore AS REAL)) AS Total FROM myINSData WHERE " +
+				" (DataOperazione>='" + myGlobal.intToString(_annoStart,4) + "-" + myGlobal.intToString(_meseStart,2) + "-01' AND DataOperazione<'" + myGlobal.intToString(_annoend,2) + "-" + myGlobal.intToString(_meseend,2) + "-01') AND " +
+				"TipoOperazione='Spesa' " ;
+		if (_CPers != "")
+		{
+			querystr += " AND CPers='" + _CPers + "'";
+		}
+		if (_Categoria != "")
+		{
+			querystr += " AND Categoria='" + _Categoria + "'";
+		}
+
+		mycursor = DBINStoread.rawQuery(querystr,  null );
+		if (mycursor.getCount() == 0) {
+			return 0;
+		} else {
+			mycursor.moveToFirst();
+			if (mycursor.getString(mycursor.getColumnIndex("Total")) == null) 
+				return 0;			
+			String str = mycursor.getString(mycursor.getColumnIndex("Total"));
+			double retval;
+
+			retval = Float.valueOf(str);
+			return retval;			
+		}
+
+	}
+	
 	double getTotAnnoCatGenerica(int _anno, String _CatGenerica)
 	{
 		double _res = 0;
