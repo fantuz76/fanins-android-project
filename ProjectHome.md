@@ -1,0 +1,1 @@
+Project for Android mobile to enter INS data for family money
